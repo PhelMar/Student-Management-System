@@ -43,7 +43,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/students/drop/{id}', [StudentController::class, 'droppedStudent'])->name('admin.students.drop');
     Route::get('/students/graduate/{id}', [StudentController::class, 'graduatedStudent'])->name('admin.students.graduated');
     Route::delete('/students/delete/{id}', [StudentController::class, 'delete'])->name('admin.students.delete');
-    Route::get('/get-students/{school_year_id}', [StudentController::class, 'getStudents']);
+    //Route::get('/get-students/{school_year_id}', [StudentController::class, 'getStudents']);
 
     Route::get('/violations/create', [ViolationController::class, 'create'])->name('admin.violations.create');
     Route::post('/violations/store', [ViolationController::class, 'store'])->name('admin.violations.store');
@@ -130,4 +130,8 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::post('/violation_type/store', [ViolationsController::class, 'store'])->name('admin.violation_type.store');
     Route::put('/violation_type/update/{id}', [ViolationsController::class, 'update'])->name('admin.violation_type.update');
     Route::delete('/violation_type/delete/{id}', [ViolationsController::class, 'delete'])->name('admin.violation_type.delete');
+
+    Route::get('/export-pdf-Ips', [StudentController::class, 'exportIpsPdf'])->name('admin.export.IpsPdf');
+    Route::get('/export-pdf-Pwd', [StudentController::class, 'exportPwdPdf'])->name('admin.export.Pwdpdf');
+    Route::get('/export-pdf-Soloparent', [StudentController::class, 'exportSoloparentPdf'])->name('admin.export.soloparentpdf');
 });

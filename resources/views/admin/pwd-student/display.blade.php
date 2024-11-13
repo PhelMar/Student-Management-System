@@ -22,6 +22,7 @@
     </div>
     <div class="col-sm-auto">
         <button id="printButton" class="btn btn-primary">Print</button>
+        <button id="pdfDownload" class="btn btn-success">PDF</button>
     </div>
 </div>
 
@@ -76,6 +77,17 @@
         </table>
     </div>
 </div>
-<script src="{{asset('admin/js/pwdFunction.js')}}" ></script>
+<script src="{{asset('admin/js/pwdFunction.js')}}"></script>
+
+<script>
+    document.getElementById('pdfDownload').addEventListener('click', function() {
+        var schoolYearId = document.getElementById('school_year_id').value;
+        if (schoolYearId) {
+            window.location.href = "{{ route('admin.export.Pwdpdf') }}?school_year_id=" + schoolYearId;
+        } else {
+            alert("Please select a school year.");
+        }
+    });
+</script>
 
 @endsection

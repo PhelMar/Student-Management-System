@@ -6,11 +6,6 @@
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item active">IP's Students List</li>
 </ol>
-@if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
-@endif
 <div class="row justify-content-end align-items-center mb-3">
     <div class="col-sm-4">
         <select name="school_year_id" id="school_year_id" class="form-control">
@@ -22,6 +17,7 @@
     </div>
     <div class="col-sm-auto">
         <button id="printButton" class="btn btn-primary">Print</button>
+        <button id="pdfDownload" class="btn btn-success">PDF</button>
     </div>
 </div>
 
@@ -76,6 +72,16 @@
         </table>
     </div>
 </div>
-<script src="{{asset('admin/js/ipsFunction.js')}}" ></script>
+<script src="{{asset('admin/js/ipsFunction.js')}}"></script>
+<script>
+    document.getElementById('pdfDownload').addEventListener('click', function() {
+        var schoolYearId = document.getElementById('school_year_id').value;
+        if (schoolYearId) {
+            window.location.href = "{{ route('admin.export.IpsPdf') }}?school_year_id=" + schoolYearId;
+        } else {
+            alert("Please select a school year.");
+        }
+    });
+</script>
 
 @endsection

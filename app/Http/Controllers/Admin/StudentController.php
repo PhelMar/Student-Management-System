@@ -15,6 +15,7 @@ use App\Models\Semester;
 use App\Models\Stay;
 use App\Models\Student;
 use App\Models\Year;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -467,16 +468,26 @@ class StudentController extends Controller
         return view('admin.solo-parent-student.display', compact('soloparentData', 'school_years'));
     }
 
-    public function getStudents($school_year_id)
-    {
-        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $school_year_id)
-            ->where('status', 'active')
-            ->where('ips', 'Yes')
-            ->get();
+    // public function getIpsStudents($school_year_id)
+    // {
+    //     $ipsData = Student::with('course', 'year', 'semester', 'school_year')
+    //         ->where('school_year_id', $school_year_id)
+    //         ->where('status', 'active')
+    //         ->where('ips', 'Yes')
+    //         ->get();
 
-        return response()->json($ipsData);
-    }
+    //     return response()->json($ipsData);
+    // }
+    // public function getPwdStudents($school_year_id)
+    // {
+    //     $pwdData = Student::with('course', 'year', 'semester', 'school_year')
+    //         ->where('school_year_id', $school_year_id)
+    //         ->where('status', 'active')
+    //         ->where('pwd', 'Yes')
+    //         ->get();
+
+    //     return response()->json($pwdData);
+    // }
     public function delete($id)
     {
         $students = Student::find($id);
@@ -493,31 +504,68 @@ class StudentController extends Controller
         $below10k = Student::whereHas('income', function ($query) {
             $query->where('income_base', 'Below ₱10,000');
         })->with(['course', 'year', 'school_year'])
-        ->where('status', 'active')
-        ->orderBy('last_name','asc')
-        ->get();
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
 
         $tenkToTwentyk = Student::whereHas('income', function ($query) {
             $query->where('income_base', '₱10,000-₱20,000');
         })->with(['course', 'year', 'school_year'])
-        ->where('status', 'active')
-        ->orderBy('last_name','asc')
-        ->get();
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
 
         $twentykToThirtyk = Student::whereHas('income', function ($query) {
             $query->where('income_base', '₱20,000-₱30,000');
         })->with(['course', 'year', 'school_year'])
-        ->where('status', 'active')
-        ->orderBy('last_name','asc')
-        ->get();
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
 
         $above30k = Student::whereHas('income', function ($query) {
             $query->where('income_base', 'Above ₱30,000');
         })->with(['course', 'year', 'school_year'])
-        ->where('status', 'active')
-        ->orderBy('last_name','asc')
-        ->get();
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
 
         return view('admin.income-base-report.firstDisplay', compact('below10k', 'tenkToTwentyk', 'twentykToThirtyk', 'above30k'));
+    }
+
+    public function exportIpsPdf(Request $request)
+    {
+        // Fetch IPs data for the selected school year
+        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('ips', 'Yes')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.ips_pdf', compact('ipsData'));
+
+        return $pdf->download('ips_students.pdf');
+    }
+
+    public function exportPwdPdf(Request $request)
+    {
+        $pwdData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('pwd', 'Yes')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.pwd_pdf', compact('pwdData'));
+
+        return $pdf->download('pwd_students.pdf');
+    }
+
+    public function exportSoloparentPdf(Request $request)
+    {
+        $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('solo_parent', 'Yes')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', compact('soloparentData'));
+
+        return $pdf->download('soloparent_students.pdf');
     }
 }
