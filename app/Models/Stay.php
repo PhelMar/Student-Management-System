@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stay extends Model
 {
+
+    protected $fillable = [
+        'stay_name'
+    ];
     public function students(){
         return $this->hasMany(Student::class);
     }

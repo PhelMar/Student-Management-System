@@ -56,7 +56,7 @@
                         <label for="gender_id" class="form-label" style="font-weight: bold;">Gender</label>
                         <select class="form-control @error('gender_id') is-invalid @enderror"
                             name="gender_id" value="{{ old('gender_id') }}">
-                            <option value="" disabled selected>Select Gender</option>
+                            <option value="" disabled selected></option>
                             @foreach ($genders as $gender)
                             <option value="{{$gender->id}}" {{ (old('gender_id') == $gender->id) ? 'selected' : ''}}>
                                 {{$gender->gender_name}}
@@ -126,7 +126,7 @@
                         <label for="dialect_id" class="form-label" style="font-weight: bold;">Languages/Dialects Spoken at Home</label>
                         <select class="form-control @error('dialect_id') is-invalid @enderror"
                             name="dialect_id" value="{{ old('dialect_id') }}">
-                            <option value="" disabled selected>Select Dialect</option>
+                            <option value="" disabled selected></option>
                             @foreach ($dialects as $dialect)
                             <option value="{{$dialect->id}}" {{old('dialect_id') == $dialect->id ? 'selected' : ''}}>
                                 {{$dialect->dialect_name}}
@@ -138,7 +138,7 @@
                         <label for="pwd" class="form-label" style="font-weight: bold;">Are you PWD?</label>
                         <select class="form-control @error('pwd') is-invalid @enderror" id="pwd" name="pwd"
                             onchange="toggleRemarks('pwd_remarks', this.value)">
-                            <option value="" disabled selected>Select</option>
+                            <option value="" disabled selected></option>
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
                         </select>
@@ -153,7 +153,7 @@
                         <label for="solo_parent" class="form-label" style="font-weight: bold;">Are you a Solo Parent?</label>
                         <select class="form-control @error('solo_parent') is-invalid @enderror"
                             id="solo_parent" name="solo_parent">
-                            <option value="" disabled selected>Select</option>
+                            <option value="" disabled selected></option>
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
                         </select>
@@ -164,7 +164,7 @@
                         <label for="student_religion_id" class="form-label" style="font-weight: bold;">Religion</label>
                         <select class="form-control @error('student_religion_id') is-invalid @enderror"
                             name="student_religion_id" value="{{ old('student_religion_id') }}">
-                            <option value="" disabled selected>Select Religion</option>
+                            <option value="" disabled selected></option>
                             @foreach ($religions as $religion)
                             <option value="{{$religion->id}}"
                                 {{old('student_religion_id') == $religion->id ? 'selected' : '' }}>
@@ -177,7 +177,7 @@
                         <label for="ips" class="form-label" style="font-weight: bold;">Are you IPs?</label>
                         <select class="form-control @error('ips') is-invalid @enderror" id="ips" name="ips"
                             onchange="toggleRemarks('ips_remarks', this.value)">
-                            <option value="" disabled selected>Select</option>
+                            <option value="" disabled selected></option>
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
                         </select>
@@ -192,7 +192,7 @@
                         <label for="stay_id" class="form-label" style="font-weight: bold;">Who are you staying?</label>
                         <select class="form-control @error('stay_id') is-invalid @enderror"
                             name="stay_id" value="{{ old('stay_id') }}">
-                            <option value="" disabled selected>Please Select</option>
+                            <option value="" disabled selected></option>
                             @foreach ($stays as $stay)
                             <option value="{{$stay->id}}">{{$stay->stay_name}}</option>
                             @endforeach
@@ -217,7 +217,7 @@
                         <label for="school_year_id" class="form-label" style="font-weight: bold;">School Year</label>
                         <select class="form-control @error('school_year_id') is-invalid @enderror"
                             name="school_year_id" value="{{ old('school_year_id') }}">
-                            <option value="" disabled selected>Select School Year</option>
+                            <option value="" disabled selected></option>
                             @foreach ($school_years as $school_year)
                             <option value="{{$school_year->id}}">{{$school_year->school_year_name}}</option>
                             @endforeach
@@ -229,7 +229,7 @@
                         <label for="semester_id" class="form-label" style="font-weight: bold;">Semester</label>
                         <select class="form-control @error('semester_id') is-invalid @enderror"
                             name="semester_id" value="{{ old('semester_id') }}">
-                            <option value="" disabled selected>Select Semester</option>
+                            <option value="" disabled selected></option>
                             @foreach ($semesters as $semester)
                             <option value="{{$semester->id}}">{{$semester->semester_name}}</option>
                             @endforeach
@@ -242,7 +242,7 @@
                         <label for="course_id" class="form-label" style="font-weight: bold;">Course</label>
                         <select class="form-control @error('course_id') is-invalid @enderror"
                             name="course_id" value="{{ old('course_id') }}">
-                            <option value="" disabled selected>Select Course</option>
+                            <option value="" disabled selected></option>
                             @foreach ($courses as $course)
                             <option value="{{$course->id}}">{{$course->course_name}}</option>
                             @endforeach
@@ -254,7 +254,7 @@
                         <label for="year_id" class="form-label" style="font-weight: bold;">Year Level</label>
                         <select class="form-control @error('year_id') is-invalid @enderror"
                             name="year_id" value="{{ old('year_id') }}">
-                            <option value="" disabled selected>Select Year</option>
+                            <option value="" disabled selected></option>
                             @foreach ($years as $year)
                             <option value="{{$year->id}}">{{$year->year_name}}</option>
                             @endforeach
@@ -299,7 +299,7 @@
                         <label for="fathers_religion_id" class="form-label" style="font-weight: bold;">Religion</label>
                         <select class="form-control @error('fathers_religion_id') is-invalid @enderror"
                             name="fathers_religion_id" value="{{ old('fathers_religion_id') }}">
-                            <option value="" disabled selected>Choose Religion</option>
+                            <option value="" disabled selected></option>
                             @foreach ($religions as $religion)
                             <option value="{{$religion->id}}">{{$religion->religion_name}}</option>
                             @endforeach
@@ -312,7 +312,7 @@
                         <label for="fathers_highest_education_id" class="form-label" style="font-weight: bold;">Highest Education Attainment</label>
                         <select class="form-control @error('fathers_highest_education_id') is-invalid @enderror"
                             name="fathers_highest_education_id" value="{{ old('fathers_highest_education_id') }}">
-                            <option value="" disabled selected>Choose Highest Education Attainment</option>
+                            <option value="" disabled selected></option>
                             @foreach ($highest_educations as $highest_education)
                             <option value="{{$highest_education->id}}">{{$highest_education->highest_education_level}}</option>
                             @endforeach
@@ -323,7 +323,7 @@
                     <div class="mb-4">
                         <label for="fathers_occupation" class="form-label" style="font-weight: bold;">Occupation</label>
                         <input type="text" class="form-control @error('fathers_occupation') is-invalid @enderror"
-                            placeholder="Farmer" name="fathers_occupation" value="{{ old('fathers_occupation') }}">
+                            name="fathers_occupation" value="{{ old('fathers_occupation') }}">
                     </div>
                 </div>
                 <div class="col-xl-4 col-md-4">
@@ -346,7 +346,7 @@
                     <div class="mb-4">
                         <label for="mothers_address" class="form-label" style="font-weight: bold;">Address</label>
                         <textarea type="text" class="form-control @error('mothers_address') is-invalid @enderror"
-                            placeholder="Poblacion, Compostela" name="mothers_address" value="{{ old('mothers_address') }}" rows="2"></textarea>
+                            name="mothers_address" value="{{ old('mothers_address') }}" rows="2"></textarea>
                     </div>
                     <div class="mb-4">
                         <label for="mothers_contact_no" class="form-label" style="font-weight: bold;">Contact No.</label>
@@ -370,7 +370,7 @@
                         <label for="mothers_religion_id" class="form-label" style="font-weight: bold;">Religion</label>
                         <select class="form-control @error('mothers_religion_id') is-invalid @enderror"
                             name="mothers_religion_id" value="{{ old('mothers_religion_id') }}">
-                            <option value="" disabled selected>Choose Religion</option>
+                            <option value="" disabled selected></option>
                             @foreach ($religions as $religion)
                             <option value="{{$religion->id}}">{{$religion->religion_name}}</option>
                             @endforeach
@@ -383,7 +383,7 @@
                         <label for="mothers_highest_education_id" class="form-label" style="font-weight: bold;">Highest Education Attainment</label>
                         <select class="form-control @error('mothers_highest_education_id') is-invalid @enderror"
                             name="mothers_highest_education_id" value="{{ old('mothers_highest_education_id') }}">
-                            <option value="" disabled selected>Choose Highest Education Attainment</option>
+                            <option value="" disabled selected></option>
                             @foreach ($highest_educations as $highest_education)
                             <option value="{{$highest_education->id}}">{{$highest_education->highest_education_level}}</option>
                             @endforeach
@@ -411,7 +411,7 @@
                         <label for="income_id" class="form-label" style="font-weight: bold;">Monthly Family Income (Combined)</label>
                         <select class="form-control @error('income_id') is-invalid @enderror"
                             name="income_id" value="{{ old('income_id') }}">
-                            <option value="" disabled selected>Choose Income Base</option>
+                            <option value="" disabled selected></option>
                             @foreach ($incomes as $income)
                             <option value="{{$income->id}}">{{$income->income_base}}</option>
                             @endforeach
@@ -423,7 +423,7 @@
                         <label for="parents_status_id" class="form-label" style="font-weight: bold;">Parents Status</label>
                         <select class="form-control @error('parents_status_id') is-invalid @enderror"
                             name="parents_status_id" value="{{ old('parents_status_id') }}">
-                            <option value="" disabled selected>Choose Parent Status</option>
+                            <option value="" disabled selected></option>
                             @foreach ($parents_status as $parent_statu)
                             <option value="{{$parent_statu->id}}">{{$parent_statu->status}}</option>
                             @endforeach

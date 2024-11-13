@@ -40,14 +40,14 @@
                         Generate Reports
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
-                    <div class="collapse" id="collapseReports" aria-labelledby="headingThree" data-bs-parent="#collapseStudents">
-                        <nav class="sb-sidenav-menu-nested nav">
+                    <sswewew div class="collapse" id="collapseReports" aria-labelledby="headingThree" data-bs-parent="#collapseStudents">
+                        <nav v vclass="sb-sidenav-menu-nested nav">
                             <a class="nav-link" href="{{route('admin.students.soloparentdisplay')}}">Solo Parent</a>
                             <a class="nav-link" href="{{route('admin.students.ipsdisplay')}}">IP's</a>
                             <a class="nav-link" href="{{route('admin.students.pwddisplay')}}">PWD</a>
                             <a class="nav-link" href="{{route('admin.incomeFirstReport.display')}}">Income Basis</a>
                         </nav>
-                    </div>
+                        </sswewewdiv>
                 </nav>
             </div>
 
@@ -87,6 +87,28 @@
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{route('admin.clearance.create')}}">Create Clearance</a>
                     <a class="nav-link" href="{{route('admin.clearance.display')}}">View Clearance</a>
+                </nav>
+            </div>
+
+            <!--Features-->
+            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFeatures" aria-expanded="false" aria-controls="collapseFeatures">
+                <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
+                Features
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+            </a>
+            <div class="collapse" id="collapseFeatures" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                    <a class="nav-link" href="{{route('admin.gender.display')}}">Gender Type</a>
+                    <a class="nav-link" href="{{route('admin.income.display')}}">Income Type</a>
+                    <a class="nav-link" href="{{route('admin.religion.display')}}">Religion Type</a>
+                    <a class="nav-link" href="{{route('admin.violation_type.display')}}">Violation Type</a>
+                    <a class="nav-link" href="{{route('admin.organization_type.display')}}">Oragnization Type</a>
+                    <a class="nav-link" href="{{route('admin.parent_status.display')}}">Parent Status Type</a>
+                    <a class="nav-link" href="{{route('admin.course.display')}}">Course Type</a>
+                    <a class="nav-link" href="{{route('admin.school_year.display')}}">School Year</a>
+                    <a class="nav-link" href="{{route('admin.dialect.display')}}">Dialogue Type</a>
+                    <a class="nav-link" href="{{route('admin.stay.display')}}">Living Type</a>
+                    <a class="nav-link" href="{{route('admin.position.display')}}">Position Type</a>
                 </nav>
             </div>
         </div>

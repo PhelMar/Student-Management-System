@@ -7,9 +7,17 @@
     <li class="breadcrumb-item active">Add Students Organization</li>
 </ol>
 @if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            Swal.fire({
+                title: 'Success!',
+                text: "{{session('success')}}",
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 1200
+            });
+        });
+    </script>
 @endif
 <div class="card">
     <div class="card-header bg-secondary text-white">Student Organization</div>

@@ -10,6 +10,9 @@ class ViolationsType extends Model
     use HasFactory;
 
     protected $table = 'violations_type';
+    protected $fillable = [
+        'violation_type_name'
+    ];
 
     public function violations(){
         return $this->hasMany(Violation::class, 'violations_type_id');
