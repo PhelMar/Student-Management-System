@@ -49,8 +49,18 @@ class ViolationController extends Controller
             'school_year_id' => 'required|exists:school_years,id'
         ]);
 
-        $existingViolations = Violation::where('student_id', $request->student_id)->count();
-        $violationsLevel = $existingViolations + 1;
+        $lastViolation = Violation::where('student_id', $request->student_id)
+            ->latest('created_at')
+            ->first();
+
+        $violationsLevel = 1;
+
+        if ($lastViolation) {
+            if ($lastViolation->semester_id == $request->semester_id && $lastViolation->school_year_id == $request->school_year_id) {
+
+                $violationsLevel = $lastViolation->violations_level + 1;
+            }
+        }
 
         $violations = Violation::create(array_merge($validateData, [
             'violations_level' => $violationsLevel,
@@ -61,6 +71,7 @@ class ViolationController extends Controller
                 ->with('success', 'Violation recorded successfully.');
         }
     }
+
 
 
     public function getStudent(Request $request)
@@ -86,6 +97,7 @@ class ViolationController extends Controller
 
         $violations = Violation::with(['violationType', 'course', 'year', 'semester', 'school_year'])
             ->orderBy('violations_date', 'desc')
+            ->orderBy('violations_level', 'desc')
             ->get();
 
         return view('admin.student-violation.display', compact('violations'));

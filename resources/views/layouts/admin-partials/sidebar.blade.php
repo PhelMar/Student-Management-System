@@ -87,6 +87,7 @@
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{route('admin.clearance.create')}}">Create Clearance</a>
                     <a class="nav-link" href="{{route('admin.clearance.display')}}">View Clearance</a>
+                    <a class="nav-link" href="{{route('admin.clearedStudentDisplay.display')}}">View Cleared Clearance</a>
                 </nav>
             </div>
 

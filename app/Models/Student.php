@@ -124,4 +124,8 @@ class Student extends Model
     public function violations(){
         return $this->hasMany(Violation::class, 'student_id', 'id_no');
     }
+
+    public function clearance(){
+        return $this->hasMany(Clearance::class);
+    }
 }

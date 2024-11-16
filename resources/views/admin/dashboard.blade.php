@@ -93,18 +93,29 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-bar me-1"></i>
+            Total of Students
+        </div>
+        <div class="card-body"><canvas id="myAreaChartStudents" width="100%" height="40"></canvas></div>
+    </div>
+</div>
 
 <script>
     const countPWDUrl = "{{ route('admin.students.countPWD') }}";
     const countSoloParentUrl = "{{ route('admin.students.countSoloParent') }}";
     const countIpsUrl = "{{ route('admin.students.countIps') }}";
     const countTotalStudents = "{{ route('admin.students.countActive') }}";
-    const violationsDataUrl = "{{ route('admin.violations.data') }}";
+    const violationsDataUrl = "{{ route('admin.violations.chart-data') }}";
+    const totalStudentsDataUrl = "{{ route('admin.totalStudents.chart-data') }}";
     const violationsBarDataUrl = "{{ route('admin.violations.bar-data') }}";
 </script>
 
 <script src="{{asset('admin/js/dashboardFunction.js')}}"></script>
-<script src="{{asset('admin/js/chart-area-demo.js')}}"></script>
+<script src="{{asset('admin/js/chart-area-demo-violations.js')}}"></script>
+<script src="{{asset('admin/js/chart-area-demo-total-students.js')}}"></script>
 <script src="{{asset('admin/js/chart-bar-demo.js')}}"></script>
 
 

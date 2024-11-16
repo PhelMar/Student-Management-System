@@ -21,15 +21,15 @@ class Clearance extends Model
     }
 
     public function course(){
-        return $this->belongsTo(Course::class,'course_id');
+        return $this->belongsTo(Course::class,'course_id', 'id');
     }
     public function year(){
-        return $this->belongsTo(Year::class,'year_id');
+        return $this->belongsTo(Year::class,'year_id', 'id');
     }
     public function semester(){
-        return $this->belongsTo(Semester::class,'semester_id');
+        return $this->belongsTo(Semester::class,'semester_id', 'id');
     }
     public function school_year(){
-        return $this->belongsTo(SchoolYear::class,'school_year_id');
+        return $this->belongsTo(SchoolYear::class,'school_year_id', 'id');
     }
 }

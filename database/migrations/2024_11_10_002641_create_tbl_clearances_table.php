@@ -22,11 +22,12 @@ return new class extends Migration
             $table->foreign('semester_id')->references('id')->on('semesters');
             $table->unsignedBigInteger('school_year_id');
             $table->foreign('school_year_id')->references('id')->on('school_years');
-            $table->bigInteger('control_no')->unique();
+            $table->bigInteger('control_no');
             $table->string('status')->default('released');
             $table->timestamps();
 
             $table->foreign('student_id')->references('id_no')->on('tbl_students')->onDelete('cascade');
+            $table->unique(['control_no', 'semester_id', 'school_year_id']);
         });
     }
 

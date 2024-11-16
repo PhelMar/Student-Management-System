@@ -18,6 +18,7 @@ use App\Models\Year;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -568,4 +569,16 @@ class StudentController extends Controller
 
         return $pdf->download('soloparent_students.pdf');
     }
+
+    public function getActiveStudentsStats()
+{
+    $activeStudents = DB::table('tbl_students')
+        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+        ->where('status', 'active')
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->get();
+
+    return response()->json($activeStudents);
+}
 }

@@ -48,9 +48,12 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/violations/create', [ViolationController::class, 'create'])->name('admin.violations.create');
     Route::post('/violations/store', [ViolationController::class, 'store'])->name('admin.violations.store');
     Route::get('/get-student', [ViolationController::class, 'getStudent'])->name('admin.violations.getStudent');
-    Route::get('/violations-data', [ViolationController::class, 'getViolationsData'])->name('admin.violations.data');
+
+    Route::get('/violations-data', [ViolationController::class, 'getViolationsData'])->name('admin.violations.chart-data');
     Route::get('/violations/data', [ViolationController::class, 'getBarViolationsData'])->name('admin.violations.bar-data');
     Route::get('/violations/display', [ViolationController::class, 'display'])->name('admin.violations.display');
+
+    Route::get('/total-students/data', [StudentController::class, 'getActiveStudentsStats'])->name('admin.totalStudents.chart-data');
 
     Route::get('/organizations/create', [OrganizationController::class, 'create'])->name('admin.organizations.create');
     Route::post('/organizations/store', [OrganizationController::class, 'store'])->name('admin.organizations.store');
@@ -63,6 +66,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/get-student', [Clearances::class, 'getStudent'])->name('admin.clearance.getStudent');
     Route::get('/clearance/display', [Clearances::class, 'display'])->name('admin.clearance.display');
     Route::get('/clearance/cleared/{id}', [Clearances::class, 'clearedStudent'])->name('admin.clearance.cleared');
+    Route::get('/clearance/clearedStudentDisplay', [Clearances::class, 'clearedStudentDisplay'])->name('admin.clearedStudentDisplay.display');
 
     Route::get('/income-base-report/firstDisplay', [StudentController::class, 'incomeFirstDisplay'])->name('admin.incomeFirstReport.display');
 

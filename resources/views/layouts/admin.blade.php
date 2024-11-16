@@ -7,11 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title')</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="{{asset('admin/css/data-table-style.min.css')}}" rel="stylesheet" />
     <link href="{{asset('admin/css/styles.css')}}" rel="stylesheet" />
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{asset('admin/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{asset('admin/css/sweetalert2.min.css')}}">
+    <script src="{{asset('admin/js/all.js')}}" crossorigin="anonymous"></script>
+    <script src="{{asset('admin/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('admin/js/sweetalert2.min.js')}}"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -34,10 +36,10 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{{asset('admin/js/Chart.min.js')}}"></script>
+    <script src="{{asset('admin/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('admin/js/scripts.js')}}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" integrity="sha384-AVZcTqzxUF2SmcoWpuCs3VerwWwAB1A7w6ewRpYO60DHIQnsVd3dhqOyXcP6b9sB" crossorigin="anonymous"></script>
+    <script src="{{asset('admin/js/simple-datatables.min.js')}}"></script>
     <script src="{{asset('admin/js/datatables-simple-demo.js')}}"></script>
 
 </body>
