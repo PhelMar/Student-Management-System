@@ -3,14 +3,25 @@
 
 @section('content')
 <h1 class="mt-4">Student List</h1>
-<ol class="breadcrumb mb-4">
+<ol class="breadcrumb">
     <li class="breadcrumb-item active">Student List</li>
 </ol>
 @if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
+        });
+    });
+</script>
 @endif
+<div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-primary btn-auto" href="{{ route('admin.students.create') }}">Add Students</a>
+</div>
 <div class="card card-mb-4">
     <div class="card-header">
         <i class="fas fa-table me-1"></i>

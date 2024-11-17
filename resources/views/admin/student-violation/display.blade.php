@@ -19,6 +19,10 @@
         });
     </script>
 @endif
+
+<div class="d-flex justify-content-end mb-3">
+<a class="btn btn-primary btn-auto" href="{{route('admin.violations.create')}}">Add Violations</a>
+</div>
 <div class="card card-mb-4">
     <div class="card-header">
         <i class="fas fa-table me-1"></i>

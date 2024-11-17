@@ -9,6 +9,7 @@ use App\Models\Gender;
 use App\Models\HighestEducation;
 use App\Models\Income;
 use App\Models\ParentStatuses;
+use App\Models\Province;
 use App\Models\Religion;
 use App\Models\SchoolYear;
 use App\Models\Semester;
@@ -35,8 +36,9 @@ class StudentController extends Controller
         $highest_educations = HighestEducation::all();
         $incomes = Income::all();
         $parents_status = ParentStatuses::all();
+        $provinces = Province::all();
 
-        return view('admin.student-profile.create', compact(
+        return view('admin.student-profile.add-student.create', compact(
             'stays',
             'genders',
             'dialects',
@@ -47,7 +49,8 @@ class StudentController extends Controller
             'school_years',
             'highest_educations',
             'incomes',
-            'parents_status'
+            'parents_status',
+            'provinces'
         ));
     }
 
@@ -82,7 +85,7 @@ class StudentController extends Controller
         $students = Student::with(['course', 'year', 'semester', 'school_year'])
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('admin.student-profile.display', compact(
             'students'
@@ -125,8 +128,6 @@ class StudentController extends Controller
             'gender_id' => 'required|exists:genders,id',
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
-            'permanent_address' => 'required',
-            'current_address' => 'required',
             'birth_order_among_sibling' => 'required|integer',
             'contact_no' => 'required|digits:11',
             'email_address' => 'required|email|unique:tbl_students,email_address',
@@ -137,7 +138,6 @@ class StudentController extends Controller
             'fathers_name' => 'nullable|max:90',
             'fathers_birthdate' => 'nullable|date',
             'fathers_place_of_birth' => 'nullable',
-            'fathers_address' => 'nullable',
             'fathers_contact_no' => 'nullable|digits:11',
             'fathers_highest_education_id' => 'nullable|exists:highest_education,id',
             'fathers_occupation' => 'nullable|max:100',
@@ -146,7 +146,6 @@ class StudentController extends Controller
             'mothers_name' => 'nullable|max:90',
             'mothers_birthdate' => 'nullable|date',
             'mothers_place_of_birth' => 'nullable',
-            'mothers_address' => 'nullable',
             'mothers_contact_no' => 'nullable|digits:11',
             'mothers_highest_education_id' => 'nullable|exists:highest_education,id',
             'mothers_occupation' => 'nullable|max:100',
@@ -173,6 +172,22 @@ class StudentController extends Controller
             'year_id' => 'required|exists:years,id',
             'semester_id' => 'required|exists:semesters,id',
             'school_year_id' => 'required|exists:school_years,id',
+            'current_province_id' => 'required|exists:provinces,prov_code',
+            'current_municipality_id' => 'required|exists:municipalities,citymun_code',
+            'current_barangay_id' => 'required|exists:baranggays,brgy_code',
+            'current_purok' => 'nullable|string|max:100',
+            'permanent_province_id' => 'required|exists:provinces,prov_code',
+            'permanent_municipality_id' => 'required|exists:municipalities,citymun_code',
+            'permanent_barangay_id' => 'required|exists:baranggays,brgy_code',
+            'permanent_purok' => 'nullable|string|max:100',
+            'fathers_province_id' => 'nullable|exists:provinces,prov_code',
+            'fathers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
+            'fathers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
+            'fathers_purok' => 'nullable|string|max:100',
+            'mothers_province_id' => 'nullable|exists:provinces,prov_code',
+            'mothers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
+            'mothers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
+            'mothers_purok' => 'nullable|string|max:100',
         ]);
 
         $validatedData['age'] = Carbon::parse($validatedData['birthdate'])->age;
@@ -571,14 +586,14 @@ class StudentController extends Controller
     }
 
     public function getActiveStudentsStats()
-{
-    $activeStudents = DB::table('tbl_students')
-        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-        ->where('status', 'active')
-        ->groupBy('date')
-        ->orderBy('date', 'asc')
-        ->get();
+    {
+        $activeStudents = DB::table('tbl_students')
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+            ->where('status', 'active')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
 
-    return response()->json($activeStudents);
-}
+        return response()->json($activeStudents);
+    }
 }

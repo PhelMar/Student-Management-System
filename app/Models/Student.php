@@ -17,8 +17,14 @@ class Student extends Model
         'gender_id',
         'birthdate',
         'place_of_birth',
-        'permanent_address',
-        'current_address',
+        'current_province_id',
+        'current_municipality_id',
+        'current_barangay_id',
+        'current_purok',
+        'permanent_province_id',
+        'permanent_municipality_id',
+        'permanent_barangay_id',
+        'permanent_purok',
         'birth_order_among_sibling',
         'contact_no',
         'email_address',
@@ -29,7 +35,10 @@ class Student extends Model
         'fathers_name',
         'fathers_birthdate',
         'fathers_place_of_birth',
-        'fathers_address',
+        'fathers_province_id',
+        'fathers_municipality_id',
+        'fathers_barangay_id',
+        'fathers_purok',
         'fathers_contact_no',
         'fathers_highest_education_id',
         'fathers_occupation',
@@ -38,7 +47,10 @@ class Student extends Model
         'mothers_name',
         'mothers_birthdate',
         'mothers_place_of_birth',
-        'mothers_address',
+        'mothers_province_id',
+        'mothers_municipality_id',
+        'mothers_barangay_id',
+        'mothers_purok',
         'mothers_contact_no',
         'mothers_highest_education_id',
         'mothers_occupation',
@@ -127,5 +139,9 @@ class Student extends Model
 
     public function clearance(){
         return $this->hasMany(Clearance::class);
+    }
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'prov_code', 'prov_code');
     }
 }

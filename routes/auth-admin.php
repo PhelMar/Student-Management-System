@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ReligionController;
 use App\Http\Controllers\Admin\SchoolYearController;
 use App\Http\Controllers\Admin\StayController;
 use App\Http\Controllers\Admin\ViolationsController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Course;
 use Illuminate\Support\Facades\Route;
@@ -29,7 +30,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
 
     Route::get('/create', [StudentController::class, 'create'])->name('admin.students.create');
     Route::get('/students/display', [StudentController::class, 'display'])->name('admin.students.display');
-    
+
     Route::post('/students/store', [StudentController::class, 'store'])->name('admin.students.store');
     Route::post('/check-email', [StudentController::class, 'checkEmail'])->name('admin.students.checkEmail');
     Route::post('/check-idno', [StudentController::class, 'checkIDNo'])->name('admin.students.checkIDNo');
@@ -138,4 +139,8 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/export-pdf-Ips', [StudentController::class, 'exportIpsPdf'])->name('admin.export.IpsPdf');
     Route::get('/export-pdf-Pwd', [StudentController::class, 'exportPwdPdf'])->name('admin.export.Pwdpdf');
     Route::get('/export-pdf-Soloparent', [StudentController::class, 'exportSoloparentPdf'])->name('admin.export.soloparentpdf');
+
+    Route::get('/provinces', [LocationController::class, 'getProvinces'])->name('admin.provinces');
+    Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('admin.municipalities');
+    Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('admin.barangays');
 });

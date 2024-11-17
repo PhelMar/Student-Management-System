@@ -31,8 +31,8 @@
             </a>
             <div class="collapse" id="collapseStudents" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="{{route('admin.students.create')}}">Add Students</a>
                     <a class="nav-link" href="{{route('admin.students.display')}}">View Students</a>
+                    <a class="nav-link" href="{{route('admin.violations.display')}}">View Students Violations</a>
 
                     <!-- Generate Reports Submenu -->
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReports" aria-expanded="false" aria-controls="collapseReports">
@@ -48,19 +48,6 @@
                             <a class="nav-link" href="{{route('admin.incomeFirstReport.display')}}">Income Basis</a>
                         </nav>
                         </sswewewdiv>
-                </nav>
-            </div>
-
-            <!-- View Violations -->
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseViolations" aria-expanded="false" aria-controls="collapseViolations">
-                <div class="sb-nav-link-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                Violations
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="collapseViolations" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                    <a class="nav-link" href="{{route('admin.violations.display')}}">View Students</a>
-                    <a class="nav-link" href="{{route('admin.violations.create')}}">Add Student Violations</a>
                 </nav>
             </div>
 
@@ -91,13 +78,13 @@
                 </nav>
             </div>
 
-            <!--Features-->
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFeatures" aria-expanded="false" aria-controls="collapseFeatures">
-                <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
-                Features
+            <!--DataDiscription-->
+            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDataDiscription" aria-expanded="false" aria-controls="collapseDataDiscription">
+                <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
+                Data Discription
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            <div class="collapse" id="collapseFeatures" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+            <div class="collapse" id="collapseDataDiscription" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{route('admin.gender.display')}}">Gender Type</a>
                     <a class="nav-link" href="{{route('admin.income.display')}}">Income Type</a>

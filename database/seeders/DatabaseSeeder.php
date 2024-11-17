@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             OrganizationTypeSeeder::class,
             PositionSeeder::class,
+            ProvinceSeeder::class,
+            MunicipalitySeeder::class,
+            BaranggaySeeder::class,
         ]);
     }
 }
