@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Baranggay;
 use App\Models\Course;
 use App\Models\Dialect;
 use App\Models\Gender;
 use App\Models\HighestEducation;
 use App\Models\Income;
+use App\Models\Municipality;
 use App\Models\ParentStatuses;
 use App\Models\Province;
 use App\Models\Religion;
@@ -208,7 +210,7 @@ class StudentController extends Controller
             'FathersReligion',
             'MothersReligion',
             'FathersHighestEducation',
-            'MothersHighestEducation'
+            'MothersHighestEducation',
         ])->findOrFail($id);
 
         $stays = Stay::all();
@@ -222,8 +224,11 @@ class StudentController extends Controller
         $highest_educations = HighestEducation::all();
         $incomes = Income::all();
         $parents_status = ParentStatuses::all();
+        $provinces = Province::all();
+        $municipalities = Municipality::where('prov_code', $students->current_province_id)->get();
+        $barangays = Baranggay::where('citymun_code', $students->current_municipality_id)->get();
 
-        return view('admin.student-profile.edit', compact(
+        return view('admin.student-profile..edit-student.edit', compact(
             'stays',
             'genders',
             'dialects',
@@ -236,6 +241,9 @@ class StudentController extends Controller
             'incomes',
             'parents_status',
             'students',
+            'provinces',
+            'municipalities',
+            'barangays'
         ));
     }
 
@@ -260,6 +268,9 @@ class StudentController extends Controller
         $highest_educations = HighestEducation::all();
         $incomes = Income::all();
         $parents_status = ParentStatuses::all();
+        $provinces = Province::all();
+        $municipalities = Municipality::where('prov_code', $students->current_province_id)->get();
+        $barangays = Baranggay::where('citymun_code', $students->current_municipality_id)->get();
 
         return view('admin.student-profile.view', compact(
             'stays',
@@ -274,6 +285,9 @@ class StudentController extends Controller
             'incomes',
             'parents_status',
             'students',
+            'provinces',
+            'municipalities',
+            'barangays'
         ));
     }
     public function update(Request $request, $id)
@@ -288,8 +302,6 @@ class StudentController extends Controller
             'gender_id' => 'required|exists:genders,id',
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
-            'permanent_address' => 'required',
-            'current_address' => 'required',
             'birth_order_among_sibling' => 'required|integer',
             'contact_no' => 'required|digits:11',
             'email_address' => 'required|email|unique:tbl_students,email_address,' . $id,
@@ -300,7 +312,6 @@ class StudentController extends Controller
             'fathers_name' => 'nullable|max:90',
             'fathers_birthdate' => 'nullable|date',
             'fathers_place_of_birth' => 'nullable',
-            'fathers_address' => 'nullable',
             'fathers_contact_no' => 'nullable|digits:11',
             'fathers_highest_education_id' => 'nullable|exists:highest_education,id',
             'fathers_occupation' => 'nullable|max:100',
@@ -309,7 +320,6 @@ class StudentController extends Controller
             'mothers_name' => 'nullable|max:90',
             'mothers_birthdate' => 'nullable|date',
             'mothers_place_of_birth' => 'nullable',
-            'mothers_address' => 'nullable',
             'mothers_contact_no' => 'nullable|digits:11',
             'mothers_highest_education_id' => 'nullable|exists:highest_education,id',
             'mothers_occupation' => 'nullable|max:100',
@@ -336,6 +346,22 @@ class StudentController extends Controller
             'year_id' => 'required|exists:years,id',
             'semester_id' => 'required|exists:semesters,id',
             'school_year_id' => 'required|exists:school_years,id',
+            'current_province_id' => 'required|exists:provinces,prov_code',
+            'current_municipality_id' => 'required|exists:municipalities,citymun_code',
+            'current_barangay_id' => 'required|exists:baranggays,brgy_code',
+            'current_purok' => 'nullable|string|max:100',
+            'permanent_province_id' => 'required|exists:provinces,prov_code',
+            'permanent_municipality_id' => 'required|exists:municipalities,citymun_code',
+            'permanent_barangay_id' => 'required|exists:baranggays,brgy_code',
+            'permanent_purok' => 'nullable|string|max:100',
+            'fathers_province_id' => 'nullable|exists:provinces,prov_code',
+            'fathers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
+            'fathers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
+            'fathers_purok' => 'nullable|string|max:100',
+            'mothers_province_id' => 'nullable|exists:provinces,prov_code',
+            'mothers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
+            'mothers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
+            'mothers_purok' => 'nullable|string|max:100',
         ]);
 
         $student = Student::findOrFail($id);
@@ -348,8 +374,14 @@ class StudentController extends Controller
         $student->gender_id = $request->input('gender_id');
         $student->birthdate = $request->input('birthdate');
         $student->place_of_birth = $request->input('place_of_birth');
-        $student->permanent_address = $request->input('permanent_address');
-        $student->current_address = $request->input('current_address');
+        $student->permanent_province_id = $request->input('permanent_province_id');
+        $student->permanent_municipality_id = $request->input('permanent_municipality_id');
+        $student->permanent_barangay_id = $request->input('permanent_barangay_id');
+        $student->permanent_purok = $request->input('permanent_purok');
+        $student->current_province_id = $request->input('current_province_id');
+        $student->current_municipality_id = $request->input('current_municipality_id');
+        $student->current_barangay_id = $request->input('current_barangay_id');
+        $student->current_purok = $request->input('current_purok');
         $student->birth_order_among_sibling = $request->input('birth_order_among_sibling');
         $student->contact_no = $request->input('contact_no');
         $student->email_address = $request->input('email_address');
@@ -360,7 +392,10 @@ class StudentController extends Controller
         $student->fathers_name = $request->input('fathers_name');
         $student->fathers_birthdate = $request->input('fathers_birthdate');
         $student->fathers_place_of_birth = $request->input('fathers_place_of_birth');
-        $student->fathers_address = $request->input('fathers_address');
+        $student->fathers_province_id = $request->input('fathers_province_id');
+        $student->fathers_municipality_id = $request->input('fathers_municipality_id');
+        $student->fathers_barangay_id = $request->input('fathers_barangay_id');
+        $student->fathers_purok = $request->input('fathers_purok');
         $student->fathers_contact_no = $request->input('fathers_contact_no');
         $student->fathers_highest_education_id = $request->input('fathers_highest_education_id');
         $student->fathers_occupation = $request->input('fathers_occupation');
@@ -369,7 +404,10 @@ class StudentController extends Controller
         $student->mothers_name = $request->input('mothers_name');
         $student->mothers_birthdate = $request->input('mothers_birthdate');
         $student->mothers_place_of_birth = $request->input('mothers_place_of_birth');
-        $student->mothers_address = $request->input('mothers_address');
+        $student->mothers_province_id = $request->input('mothers_province_id');
+        $student->mothers_municipality_id = $request->input('mothers_municipality_id');
+        $student->mothers_barangay_id = $request->input('mothers_barangay_id');
+        $student->mothers_purok = $request->input('mothers_purok');
         $student->mothers_contact_no = $request->input('mothers_contact_no');
         $student->mothers_highest_education_id = $request->input('mothers_highest_education_id');
         $student->mothers_occupation = $request->input('mothers_occupation');
