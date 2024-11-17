@@ -143,4 +143,6 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/provinces', [LocationController::class, 'getProvinces'])->name('admin.provinces');
     Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('admin.municipalities');
     Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('admin.barangays');
+
+    Route::get('/students/{id}', [StudentController::class, 'show'])->name('admin.students.show');
 });

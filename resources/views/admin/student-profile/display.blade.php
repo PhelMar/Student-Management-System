@@ -67,7 +67,7 @@
                     <td>{{$student->semester->semester_name ?? 'N/A'}}</td>
                     <td>{{$student->school_year->school_year_name ?? 'N/A'}}</td>
                     <td class="align-middle">
-                        <a href="{{route('admin.students.StudentView', $student->id)}}" class="btn btn-info btn-md">View</a>
+                        <a href="{{route('admin.students.show', $student->id)}}" class="btn btn-info btn-md">View</a>
                         <a href="{{route('admin.students.edit', $student->id)}}" class="btn btn-warning btn-md">Edit</a>
                         <a href="javascript:void(0)" onclick="confirmDrop('{{ $student->id }}')" class="btn btn-danger btn-md">Drop</a>
                     </td>

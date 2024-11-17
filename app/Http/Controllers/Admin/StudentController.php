@@ -94,6 +94,47 @@ class StudentController extends Controller
         ));
     }
 
+    public function show($id)
+    {
+        $student = Student::with([
+            'gender',
+            'dialect',
+            'StudentsReligion',
+            'stay',
+            'currentProvince',
+            'currentBarangay',
+            'currentMunicipality',
+            'permanentMunicipality',
+            'permanentBarangay',
+            'permanentProvince',
+            'course', 
+            'year', 
+            'semester', 
+            'school_year',
+            'income',
+            'parent_status',
+            'fathersMunicipality',
+            'fathersBarangay',
+            'fathersProvince',
+            'FathersReligion',
+            'FathersHighestEducation',
+            'mothersMunicipality',
+            'mothersBarangay',
+            'mothersProvince',
+            'MothersReligion',
+            'MothersHighestEducation',
+        ])
+            ->find($id);
+
+        // Check if the student exists
+        if (!$student) {
+            return redirect()->route('admin.student-profile.display')->with('error', 'Student not found.');
+        }
+
+        // Return the student data to the view
+        return view('admin.student-profile.show', compact('student'));
+    }
+
     public function checkEmail(Request $request)
     {
         $email = $request->email;

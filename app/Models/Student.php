@@ -79,6 +79,108 @@ class Student extends Model
         'school_year_id',
         'age',
     ];
+
+    public function setFirstNameAttribute($value)
+    {
+        $this->attributes['first_name'] = ucwords(strtolower($value));
+    }
+
+    public function setMiddleNameAttribute($value)
+    {
+        $this->attributes['middle_name'] = ucwords(strtolower($value));
+    }
+
+    public function setLastNameAttribute($value)
+    {
+        $this->attributes['last_name'] = ucwords(strtolower($value));
+    }
+
+    public function setNickNameAttribute($value)
+    {
+        $this->attributes['nick_name'] = ucwords(strtolower($value));
+    }
+
+    public function setFathersNameAttribute($value)
+    {
+        $this->attributes['fathers_name'] = ucwords(strtolower($value));
+    }
+
+    public function setMothersNameAttribute($value)
+    {
+        $this->attributes['mothers_name'] = ucwords(strtolower($value));
+    }
+
+    public function setIncaseOfEmergencyAttribute($value)
+    {
+        $this->attributes['incase_of_emergency_name'] = ucwords(strtolower($value));
+    }
+    public function setPlaceOfBirthAttribute($value)
+    {
+        $this->attributes['place_of_birth'] = ucwords(strtolower($value));
+    }
+    public function setCurrentPurokAttribute($value)
+    {
+        $this->attributes['current_purok'] = ucwords(strtolower($value));
+    }
+    public function setPermanentPurokAttribute($value)
+    {
+        $this->attributes['permanent_purok'] = ucwords(strtolower($value));
+    }
+    public function setFacebookAccountAttribute($value)
+    {
+        $this->attributes['facebook_account'] = ucwords(strtolower($value));
+    }
+    public function setFathersPlaceOfBirthAttribute($value)
+    {
+        $this->attributes['fathers_place_of_birth'] = ucwords(strtolower($value));
+    }
+    public function setMothersPlaceOfBirthAttribute($value)
+    {
+        $this->attributes['mothers_place_of_birth'] = ucwords(strtolower($value));
+    }
+    public function setFathersPurokAttribute($value)
+    {
+        $this->attributes['fathers_purok'] = ucwords(strtolower($value));
+    }
+    public function setMothersPurokAttribute($value)
+    {
+        $this->attributes['mothers_purok'] = ucwords(strtolower($value));
+    }
+    public function setFathersOccupationAttribute($value)
+    {
+        $this->attributes['fathers_occupation'] = ucwords(strtolower($value));
+    }
+    public function setMothersOccupationAttribute($value)
+    {
+        $this->attributes['mothers_occupation'] = ucwords(strtolower($value));
+    }
+    public function setKindergartenAttribute($value)
+    {
+        $this->attributes['kindergarten'] = ucwords(strtolower($value));
+    }
+    public function setElementaryAttribute($value)
+    {
+        $this->attributes['elementary'] = ucwords(strtolower($value));
+    }
+    public function setJuniorHighAttribute($value)
+    {
+        $this->attributes['junior_high'] = ucwords(strtolower($value));
+    }
+    public function setSeniorHighAttribute($value)
+    {
+        $this->attributes['senior_high'] = ucwords(strtolower($value));
+    }
+    public function setPwdRemarksAttribute($value)
+    {
+        $this->attributes['pwd_remarks'] = ucwords(strtolower($value));
+    }
+    public function setIpsRemarksAttribute($value)
+    {
+        $this->attributes['ips_remarks'] = ucwords(strtolower($value));
+    }
+
+
+
     public function dialect()
     {
         return $this->belongsTo(Dialect::class, 'dialect_id');
@@ -127,21 +229,75 @@ class Student extends Model
     {
         return $this->belongsTo(Semester::class, 'semester_id');
     }
-    public function parent_status(){
+    public function parent_status()
+    {
         return $this->belongsTo(ParentStatuses::class, 'parents_status_id');
     }
-    public function school_year(){
+    public function school_year()
+    {
         return $this->belongsTo(SchoolYear::class, 'school_year_id');
     }
-    public function violations(){
+    public function violations()
+    {
         return $this->hasMany(Violation::class, 'student_id', 'id_no');
     }
 
-    public function clearance(){
+    public function clearance()
+    {
         return $this->hasMany(Clearance::class);
     }
     public function province()
     {
         return $this->belongsTo(Province::class, 'prov_code', 'prov_code');
+    }
+    public function currentProvince()
+    {
+        return $this->belongsTo(Province::class, 'current_province_id', 'prov_code');
+    }
+    public function currentMunicipality()
+    {
+        return $this->belongsTo(Municipality::class, 'current_municipality_id', 'citymun_code');
+    }
+    public function currentBarangay()
+    {
+        return $this->belongsTo(Baranggay::class, 'current_barangay_id', 'brgy_code');
+    }
+    public function permanentProvince()
+    {
+        return $this->belongsTo(Province::class, 'permanent_province_id', 'prov_code');
+    }
+    public function permanentMunicipality()
+    {
+        return $this->belongsTo(Municipality::class, 'permanent_municipality_id', 'citymun_code');
+    }
+    public function permanentBarangay()
+    {
+        return $this->belongsTo(Baranggay::class, 'permanent_barangay_id', 'brgy_code');
+    }
+
+    public function fathersProvince()
+    {
+        return $this->belongsTo(Province::class, 'fathers_province_id', 'prov_code');
+    }
+    public function fathersMunicipality()
+    {
+        return $this->belongsTo(Municipality::class, 'fathers_municipality_id', 'citymun_code');
+    }
+    public function fathersBarangay()
+    {
+        return $this->belongsTo(Baranggay::class, 'fathers_barangay_id', 'brgy_code');
+    }
+
+    public function mothersProvince()
+    {
+        return $this->belongsTo(Province::class, 'mothers_province_id', 'prov_code');
+    }
+    public function mothersMunicipality()
+    {
+        return $this->belongsTo(Municipality::class, 'mothers_municipality_id', 'citymun_code');
+    }
+    public function mothersBarangay()
+    {
+        return $this->belongsTo(Baranggay::class, 'mothers_barangay_id', 'brgy_code');
     }
 }
