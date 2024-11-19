@@ -75,6 +75,7 @@
             <h2>Legacy College of Compostela, Inc.</h2>
             <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
             <p>Quality Education Within Reach</p>
+            <p>Solo Parent Students List</p>
         </div>
     </div>
     <table>

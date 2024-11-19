@@ -20,8 +20,11 @@
 </script>
 @endif
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary btn-auto" href="{{ route('admin.students.create') }}">Add Students</a>
+    <a class="btn btn-primary btn-auto" href="{{ route('admin.students.create') }}">
+        <i class="fa fa-user-plus me-2"></i> Add Students
+    </a>
 </div>
+
 <div class="card card-mb-4">
     <div class="card-header">
         <i class="fas fa-table me-1"></i>
@@ -66,10 +69,30 @@
                     <td>{{$student->year->year_name ?? 'N/A'}}</td>
                     <td>{{$student->semester->semester_name ?? 'N/A'}}</td>
                     <td>{{$student->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td class="align-middle">
-                        <a href="{{route('admin.students.show', $student->id)}}" class="btn btn-info btn-md">View</a>
-                        <a href="{{route('admin.students.edit', $student->id)}}" class="btn btn-warning btn-md">Edit</a>
-                        <a href="javascript:void(0)" onclick="confirmDrop('{{ $student->id }}')" class="btn btn-danger btn-md">Drop</a>
+                    <td>
+                        <div class="dropdown">
+                            <!-- Dropdown button with an icon and color -->
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton{{$student->id}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-cogs"></i> Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$student->id}}">
+                                <li>
+                                    <a href="{{route('admin.students.show', $student->id)}}" class="dropdown-item">
+                                        <i class="fa fa-eye me-2"></i> View
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{route('admin.students.edit', $student->id)}}" class="dropdown-item">
+                                        <i class="fa fa-pencil me-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" onclick="confirmDrop('{{ $student->id }}')" class="dropdown-item text-danger">
+                                        <i class="fa fa-trash me-2"></i> Drop
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

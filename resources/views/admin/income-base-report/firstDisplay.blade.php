@@ -29,33 +29,28 @@
         <!-- 10k Below Tab -->
         <div class="tab-pane fade show active" id="below_10k" role="tabpanel" aria-labelledby="below_10k-tab">
             @include('admin.income-base-report.table', ['students' => $below10k, 'title' => 'Below 10k'])
-            <button id="printButton" class="btn btn-primary mt-3 w-25">Print</button>
+            <a href="{{ route('admin.below10k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <!-- Between 10k-20k Tab -->
         <div class="tab-pane fade" id="tenk_to_twenty" role="tabpanel" aria-labelledby="tenk_to_twenty-tab">
             @include('admin.income-base-report.table2', ['students' => $tenkToTwentyk, 'title' => '10k-20k'])
-            <button id="printButton2" class="btn btn-primary mt-3 w-25">Print</button>
+            <a href="{{ route('admin.between10k-20k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <!-- Between 20k-30k Tab -->
         <div class="tab-pane fade" id="twentyk_to_thirty" role="tabpanel" aria-labelledby="twentyk_to_thirty-tab">
             @include('admin.income-base-report.table3', ['students' => $twentykToThirtyk, 'title' => '20k-30k'])
-            <button id="printButton3" class="btn btn-primary mt-3 w-25">Print</button>
+            <a href="{{ route('admin.between20k-30k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <!-- Above 30k Tab -->
         <div class="tab-pane fade" id="above_30k" role="tabpanel" aria-labelledby="above_30k-tab">
             @include('admin.income-base-report.table4', ['students' => $above30k, 'title' => 'Above 30k'])
-            <button id="printButton4" class="btn btn-primary mt-3 w-25">Print</button>
+            <a href="{{ route('admin.above-30k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
     </div>
 </div>
-
-<script src="{{asset('admin/js/tableOneFunction.js')}}" ></script>
-<script src="{{asset('admin/js/tableTwoFunction.js')}}" ></script>
-<script src="{{asset('admin/js/tableThreeFunction.js')}}" ></script>
-<script src="{{asset('admin/js/tableFourFunction.js')}}" ></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var myTabs = new bootstrap.Tab(document.querySelector('#incomeTabs a.active'), {});

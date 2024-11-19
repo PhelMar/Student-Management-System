@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWD Students List</title>
+    <title>Print IPS Students</title>
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.min.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,33 +15,19 @@
 
         .header {
             text-align: center;
-            margin: 0;
-            /* Remove default margin for header */
-            padding: 10px 0;
-            /* Add a small amount of padding for spacing */
             display: flex;
-            /* Use flexbox to align logo and text */
             justify-content: center;
-            /* Center content horizontally */
             align-items: center;
-            /* Vertically align items */
         }
 
         .header img {
-            height: 85px;
-            width: auto;
+            height: 115px;
             margin-right: 15px;
-            /* Space between logo and text */
         }
 
-        h2 {
-            margin: 5px 0;
-            padding: 0;
-        }
-
+        h2,
         p {
-            margin: 2px 0;
-            padding: 0;
+            margin: 5px 0;
         }
 
         table {
@@ -65,20 +52,19 @@
             text-align: right;
         }
     </style>
-
 </head>
 
 <body>
     <div class="header">
-        <img src="{{ public_path('images/lccLogo.png') }}" alt="School Logo"> <!-- School logo -->
+        <img src="/images/lccLogo.png" alt="School Logo">
         <div>
             <h2>Legacy College of Compostela, Inc.</h2>
             <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
             <p>Quality Education Within Reach</p>
-            <p>Pwd Students List</p>
+            <p>IP's Students List</p>
         </div>
     </div>
-    <table>
+    <table border="1">
         <thead>
             <tr>
                 <th>#</th>
@@ -92,20 +78,34 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($pwdData as $pwddata)
+            @foreach ($ipsData as $ipsdata)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $pwddata->last_name }}</td>
-                <td>{{ $pwddata->first_name }}</td>
-                <td>{{ $pwddata->course->course_name }}</td>
-                <td>{{ $pwddata->year->year_name }}</td>
-                <td>{{ $pwddata->semester->semester_name }}</td>
-                <td>{{ $pwddata->school_year->school_year_name }}</td>
-                <td>{{ $pwddata->pwd_remarks }}</td>
+                <td>{{ $ipsdata->last_name }}</td>
+                <td>{{ $ipsdata->first_name }}</td>
+                <td>{{ $ipsdata->course->course_name }}</td>
+                <td>{{ $ipsdata->year->year_name }}</td>
+                <td>{{ $ipsdata->semester->semester_name }}</td>
+                <td>{{ $ipsdata->school_year->school_year_name }}</td>
+                <td>{{ $ipsdata->ips_remarks }}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="7" class="total">Total IPS Students</td>
+                <td class="total">{{ $ipsData->count() }}</td>
+            </tr>
         </tbody>
     </table>
+    <script>
+        // Trigger the browser's print dialog on page load
+        window.onload = function() {
+            window.print();
+            // Redirect back to the main page after printing
+            window.onafterprint = function() {
+                window.close();
+            };
+        };
+    </script>
 </body>
 
 </html>

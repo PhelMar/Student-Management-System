@@ -21,7 +21,7 @@
         </select>
     </div>
     <div class="col-sm-auto">
-        <button id="printButton" class="btn btn-primary">Print</button>
+        <a id="printButton" href="{{ route('admin.solo-parent-student.print') }}" target="_blank" class="btn btn-primary">Print</a>
         <button id="pdfDownload" class="btn btn-success">PDF</button>
     </div>
 </div>
@@ -74,12 +74,21 @@
         </table>
     </div>
 </div>
-<script src="{{asset('admin/js/soloparentFunction.js')}}" ></script>
 <script>
     document.getElementById('pdfDownload').addEventListener('click', function() {
         var schoolYearId = document.getElementById('school_year_id').value;
         if (schoolYearId) {
             window.location.href = "{{ route('admin.export.soloparentpdf') }}?school_year_id=" + schoolYearId;
+        } else {
+            alert("Please select a school year.");
+        }
+    });
+
+    document.getElementById('printButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default href behavior
+        var schoolYearId = document.getElementById('school_year_id').value;
+        if (schoolYearId) {
+            window.open("{{ route('admin.solo-parent-student.print') }}?school_year_id=" + schoolYearId);
         } else {
             alert("Please select a school year.");
         }

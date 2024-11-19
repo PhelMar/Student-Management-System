@@ -145,4 +145,11 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('admin.barangays');
 
     Route::get('/students/{id}', [StudentController::class, 'show'])->name('admin.students.show');
+    Route::get('/ips/print', [StudentController::class, 'ipsPrint'])->name('admin.ips-student.print');
+    Route::get('/pwd/print', [StudentController::class, 'pwdPrint'])->name('admin.pwd-student.print');
+    Route::get('/solo-parent/print', [StudentController::class, 'soloParentPrint'])->name('admin.solo-parent-student.print');
+    Route::get('/below-10K/print', [StudentController::class, 'tenKPrint'])->name('admin.below10k.print');
+    Route::get('/between10K-20k/print', [StudentController::class, 'tenKandtweentyKPrint'])->name('admin.between10k-20k.print');
+    Route::get('/between20K-30k/print', [StudentController::class, 'tweentyKandThirtyKPrint'])->name('admin.between20k-30k.print');
+    Route::get('/above30k/print', [StudentController::class, 'aboveThirtyKPrint'])->name('admin.above-30k.print');
 });

@@ -87,7 +87,7 @@ class StudentController extends Controller
         $students = Student::with(['course', 'year', 'semester', 'school_year'])
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate();
 
         return view('admin.student-profile.display', compact(
             'students'
@@ -107,9 +107,9 @@ class StudentController extends Controller
             'permanentMunicipality',
             'permanentBarangay',
             'permanentProvince',
-            'course', 
-            'year', 
-            'semester', 
+            'course',
+            'year',
+            'semester',
             'school_year',
             'income',
             'parent_status',
@@ -674,5 +674,91 @@ class StudentController extends Controller
             ->get();
 
         return response()->json($activeStudents);
+    }
+
+    public function ipsPrint()
+    {
+
+        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('ips', 'Yes')
+            ->orderBy('course_id', 'asc')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.ips-student.print', compact('ipsData'));
+    }
+
+    public function pwdPrint()
+    {
+
+        $pwdData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('pwd', 'Yes')
+            ->orderBy('course_id', 'asc')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.pwd-student.print', compact('pwdData'));
+    }
+    public function soloParentPrint()
+    {
+
+        $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('solo_parent', 'Yes')
+            ->orderBy('course_id', 'asc')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.solo-parent-student.print', compact('soloparentData'));
+    }
+
+    public function tenKPrint()
+    {
+        $belowTenK = Student::whereHas('income', function ($query) {
+            $query->where('income_base', 'Below ₱10,000');
+        })->with(['course', 'year', 'school_year'])
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.income-base-report.print1', compact('belowTenK'));
+    }
+    public function tenKandtweentyKPrint()
+    {
+
+        $tenkToTwentyk = Student::whereHas('income', function ($query) {
+            $query->where('income_base', '₱10,000-₱20,000');
+        })->with(['course', 'year', 'school_year'])
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.income-base-report.print2', compact('tenkToTwentyk'));
+    }
+    public function tweentyKandThirtyKPrint()
+    {
+
+        $twentykToThirtyk = Student::whereHas('income', function ($query) {
+            $query->where('income_base', '₱20,000-₱30,000');
+        })->with(['course', 'year', 'school_year'])
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.income-base-report.print3', compact('twentykToThirtyk'));
+    }
+    public function aboveThirtyKPrint()
+    {
+
+        $above30k = Student::whereHas('income', function ($query) {
+            $query->where('income_base', 'Above ₱30,000');
+        })->with(['course', 'year', 'school_year'])
+            ->where('status', 'active')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.income-base-report.print4', compact('above30k'));
     }
 }
