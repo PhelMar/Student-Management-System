@@ -31,9 +31,9 @@
     });
 </script>
 @endif
-<div class="card">
+<div class="card shadow-xl">
     <div class="card-header bg-secondary text-white">Add Student Information</div>
-    <div class="card-body">
+    <div class="card-body overflow-auto" style="max-height: 500px;">
         <form action="{{ route('admin.students.store') }}" method="post" id="addStudentForm">
             @csrf
             <div class="step" data-step="1">
@@ -73,6 +73,7 @@
         </form>
     </div>
 </div>
+
 <script>
     const checkEmailUrl = "{{ route('admin.students.checkEmail') }}";
     const csrfToken = '{{ csrf_token() }}';
