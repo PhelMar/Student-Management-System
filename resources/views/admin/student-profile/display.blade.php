@@ -19,11 +19,48 @@
     });
 </script>
 @endif
+
 <div class="d-flex justify-content-end mb-3">
+    <div class="dropdown me-2">
+        <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-file-alt me-2"></i> Generate Reports
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <!-- Income Basis Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('admin.incomeFirstReport.display')}}">
+                    <i class="fa fa-pound-sign me-2"></i> <span>&#8369;</span> Income Basis
+                </a>
+            </li>
+
+            <!-- PWD Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('admin.students.pwddisplay')}}">
+                    <i class="fa fa-wheelchair me-2"></i> PWD Report
+                </a>
+            </li>
+
+            <!-- IP's Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('admin.students.ipsdisplay')}}">
+                    <i class="fa fa-users me-2"></i> IP's Report
+                </a>
+            </li>
+
+            <!-- Solo Parent Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('admin.students.soloparentdisplay')}}">
+                    <i class="fa fa-female me-2"></i> Solo Parent Report
+                </a>
+            </li>
+        </ul>
+    </div>
+
     <a class="btn btn-primary btn-auto" href="{{ route('admin.students.create') }}">
         <i class="fa fa-user-plus me-2"></i> Add Students
     </a>
 </div>
+
 
 <div class="card card-mb-4">
     <div class="card-header">

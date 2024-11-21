@@ -17,47 +17,19 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit($id)
     {
-        // Check if the user is an admin
-        if ($request->user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
-        }
-
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = User::findOrFail($id);
+        return view('profile.edit', compact('user'));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request, $id)
     {
-        // Check if the user is an admin
-        if ($request->user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
-        }
+        $user = User::findOrFail($id);
 
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('admin.profile.edit')->with('status', 'profile-updated');
-    }
-
-    public function updatePassword(Request $request): RedirectResponse
-    {
-        // Check if the user is an admin
-        if ($request->user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
-        }
-
-        // Validate the password fields
         $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => [
@@ -70,28 +42,38 @@ class ProfileController extends Controller
                 'regex:/[@$!%*#?&]/',
                 'confirmed',
             ],
+            'role' => ['required', 'in:admin,user'],
         ]);
 
-        // Update the password
-        $request->user()->update([
-            'password' => Hash::make($request->input('password')),
+        $queryValidation = $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
 
-        return Redirect::route('admin.profile.edit')->with('status', 'password-updated');
+        if ($queryValidation) {
+            return redirect()->route('admin.profile.display')->with('success', 'User updated successfully.');
+        } else {
+            return redirect()->route('admin.profile.display')->with('error', 'Please fill up correctly.');
+        }
     }
+
+
 
     /**
      * Delete the user's account.
      */
-    public function destroy($id){
+    public function destroy($id)
+    {
 
         $profileData = User::find($id);
 
-        if($profileData){
+        if ($profileData) {
             $profileData->delete();
             return response()->json(['success' => true, 'message' => 'Pofile data has been deleted!']);
         }
-        return response()->json(['success'=> false,'message'=> 'Profile not found!']);
+        return response()->json(['success' => false, 'message' => 'Profile not found!']);
     }
 
     public function display()
@@ -101,5 +83,20 @@ class ProfileController extends Controller
             ->get();
 
         return view('profile.display', compact('profileData'));
+    }
+
+    public function validateCurrentPassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required'],
+        ]);
+
+        $user = Auth::user(); // Auth already validated through middleware
+
+        if (Hash::check($request->current_password, $user->password)) {
+            return response()->json(['valid' => true]);
+        }
+
+        return response()->json(['valid' => false]);
     }
 }

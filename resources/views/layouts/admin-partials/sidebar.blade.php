@@ -19,7 +19,6 @@
             <div class="collapse" id="collapseUsers" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{route('admin.profile.display')}}">View Users</a>
-                    <a class="nav-link" href="{{route('admin.register.create')}}">Register New Users</a>
                 </nav>
             </div>
 
@@ -33,21 +32,6 @@
                 <nav class="sb-sidenav-menu-nested nav">
                     <a class="nav-link" href="{{route('admin.students.display')}}">View Students</a>
                     <a class="nav-link" href="{{route('admin.violations.display')}}">View Students Violations</a>
-
-                    <!-- Generate Reports Submenu -->
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReports" aria-expanded="false" aria-controls="collapseReports">
-                        <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
-                        Generate Reports
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <sswewew div class="collapse" id="collapseReports" aria-labelledby="headingThree" data-bs-parent="#collapseStudents">
-                        <nav v vclass="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="{{route('admin.students.soloparentdisplay')}}">Solo Parent</a>
-                            <a class="nav-link" href="{{route('admin.students.ipsdisplay')}}">IP's</a>
-                            <a class="nav-link" href="{{route('admin.students.pwddisplay')}}">PWD</a>
-                            <a class="nav-link" href="{{route('admin.incomeFirstReport.display')}}">Income Basis</a>
-                        </nav>
-                        </sswewewdiv>
                 </nav>
             </div>
 
@@ -60,7 +44,6 @@
             <div class="collapse" id="collapseOrganizations" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{route('admin.organizations.display')}}">View Organizations</a>
-                    <a class="nav-link" href="{{route('admin.organizations.create')}}">Add Student Organizations</a>
                 </nav>
             </div>
 
@@ -72,9 +55,7 @@
             </a>
             <div class="collapse" id="collapseClearance" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                    <a class="nav-link" href="{{route('admin.clearance.create')}}">Create Clearance</a>
                     <a class="nav-link" href="{{route('admin.clearance.display')}}">View Clearance</a>
-                    <a class="nav-link" href="{{route('admin.clearedStudentDisplay.display')}}">View Cleared Clearance</a>
                 </nav>
             </div>
 

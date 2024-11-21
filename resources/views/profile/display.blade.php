@@ -7,11 +7,22 @@
     <li class="breadcrumb-item active">Profile View</li>
 </ol>
 @if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
+        });
+    });
+</script>
 @endif
-
+<div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-primary" href="{{route('admin.register.create')}}">
+        <i class="fa fa-user-plus me-2"></i>Register New Users</a>
+</div>
 <div class="card card-mb-4">
     <div class="card-header">
         <i class="fas fa-table me-1"></i>
@@ -48,7 +59,7 @@
                     <td>{{$profile->created_at}}</td>
                     <td>{{$profile->updated_at}}</td>
                     <td>
-                        <a href="{{route('admin.profile.edit')}}" class="btn btn-warning">Edit</a>
+                        <a href="{{route('admin.profile.edit', ['id' => $profile->id])}}" class="btn btn-warning">Edit</a>
                         <a href="javascript:void(0)" onclick="confirmDelete('{{$profile->id}}')" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>

@@ -75,9 +75,11 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/students/pwddisplay', [StudentController::class, 'pwdDisplay'])->name('admin.students.pwddisplay');
     Route::get('/students/soloparentdisplay', [StudentController::class, 'soloparentDisplay'])->name('admin.students.soloparentdisplay');
 
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::post('/validate-current-password', [ProfileController::class, 'validateCurrentPassword'])->name('admin.validateCurrentPassword');
+
+    Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::put('/profile/{id}', [ProfileController::class, 'update'])->name('admin.profile.update');
     Route::get('/profile/display', [ProfileController::class, 'display'])->name('admin.profile.display');
-    Route::patch('/profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
     Route::patch('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('admin.profile.update-password');
     Route::delete('/profile/delete/{id}', [ProfileController::class, 'destroy'])->name('admin.profile.destroy');
 
