@@ -260,7 +260,7 @@ class Clearances extends Controller
             ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
             ->get();
 
-        return view('admin.student-clearance.bsed-values-print', compact('BSED_VALUES '));
+        return view('admin.student-clearance.bsed-values-print', compact('BSED_VALUES'));
     }
 
     public function bsedsocialstudiesClearedPrint()
@@ -273,7 +273,7 @@ class Clearances extends Controller
             ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
             ->get();
 
-        return view('admin.student-clearance.bsed-social-studies-print', compact('BSED_SOCIAL_STUDIES '));
+        return view('admin.student-clearance.bsed-social-studies-print', compact('BSED_SOCIAL_STUDIES'));
     }
     public function bsedenglishClearedPrint()
     {

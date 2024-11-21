@@ -42,6 +42,8 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::put('/edit/{id}', [StudentController::class, 'update'])->name('admin.students.update');
     Route::get('/StudentView/{id}', [StudentController::class, 'StudentView'])->name('admin.students.StudentView');
     Route::get('/students/drop/{id}', [StudentController::class, 'droppedStudent'])->name('admin.students.drop');
+    Route::get('/students/active/{id}', [StudentController::class, 'activeStudent'])->name('admin.students.active');
+    Route::get('/students/drop', [StudentController::class, 'dropStudentdisplay'])->name('admin.students.dropView');
     Route::get('/students/graduate/{id}', [StudentController::class, 'graduatedStudent'])->name('admin.students.graduated');
     Route::delete('/students/delete/{id}', [StudentController::class, 'delete'])->name('admin.students.delete');
     //Route::get('/get-students/{school_year_id}', [StudentController::class, 'getStudents']);

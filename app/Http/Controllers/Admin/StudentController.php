@@ -94,6 +94,19 @@ class StudentController extends Controller
         ));
     }
 
+    public function dropStudentdisplay()
+    {
+
+        $students = Student::with(['course', 'year', 'semester', 'school_year'])
+            ->where('status', 'dropped')
+            ->orderBy('created_at', 'desc')
+            ->paginate();
+
+        return view('admin.student-profile.drop-student.display', compact(
+            'students'
+        ));
+    }
+
     public function show($id)
     {
         $student = Student::with([
@@ -498,6 +511,23 @@ class StudentController extends Controller
             $students->save();
 
             session()->flash('success', 'Drop Successfully');
+            return redirect()->route('admin.students.display');
+        } else {
+            session()->flash('error', 'Error occured');
+            return redirect()->route('admin.students.display');
+        }
+    }
+
+    public function activeStudent($id)
+    {
+
+        $students = Student::find($id);
+
+        if ($students) {
+            $students->status = "active";
+            $students->save();
+
+            session()->flash('success', 'Successfully');
             return redirect()->route('admin.students.display');
         } else {
             session()->flash('error', 'Error occured');

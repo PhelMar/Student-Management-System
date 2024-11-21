@@ -53,6 +53,11 @@
                     <i class="fa fa-female me-2"></i> Solo Parent Report
                 </a>
             </li>
+            <li>
+                <a class="dropdown-item" href="{{route('admin.students.dropView')}}">
+                    <i class="fa fa-user-times me-2"></i> Dropped Student
+                </a>
+            </li>
         </ul>
     </div>
 
