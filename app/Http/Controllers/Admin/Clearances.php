@@ -125,6 +125,7 @@ class Clearances extends Controller
             ->where('status', 'cleared')
             ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
             ->get();
+
         $BSED_VALUES = Clearance::whereHas('course', function ($query) {
             $query->where('course_name', 'BSED VALUES');
         })
@@ -182,5 +183,120 @@ class Clearances extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Error occurred while clearing student.']);
         }
+    }
+
+    public function bsitClearedPrint()
+    {
+        $BSIT = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSIT');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsit-print', compact('BSIT'));
+    }
+
+    public function bsbammClearedPrint()
+    {
+        $BSBA_MM = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSBA MM');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsba-mm-print', compact('BSBA_MM'));
+    }
+
+    public function bstmClearedPrint()
+    {
+        $BSTM = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSTM');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bstm-print', compact('BSTM'));
+    }
+
+    public function bsbafmClearedPrint()
+    {
+        $BSBA_FM = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSBA FM');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsba-fm-print', compact('BSBA_FM'));
+    }
+
+    public function beedClearedPrint()
+    {
+        $BEED = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BEED');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.beed-print', compact('BEED'));
+    }
+
+    public function bsedvaluesClearedPrint()
+    {
+        $BSED_VALUES = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSED VALUES');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsed-values-print', compact('BSED_VALUES '));
+    }
+
+    public function bsedsocialstudiesClearedPrint()
+    {
+        $BSED_SOCIAL_STUDIES = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSED SOCIAL STUDIES');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsed-social-studies-print', compact('BSED_SOCIAL_STUDIES '));
+    }
+    public function bsedenglishClearedPrint()
+    {
+        $BSED_ENGLISH = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSED ENGLISH');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsed-english-print', compact('BSED_ENGLISH'));
+    }
+    public function bscrimClearedPrint()
+    {
+        $BSCRIM = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSCRIM');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bscrim-print', compact('BSCRIM'));
     }
 }

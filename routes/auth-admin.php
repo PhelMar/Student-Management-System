@@ -152,4 +152,14 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/between10K-20k/print', [StudentController::class, 'tenKandtweentyKPrint'])->name('admin.between10k-20k.print');
     Route::get('/between20K-30k/print', [StudentController::class, 'tweentyKandThirtyKPrint'])->name('admin.between20k-30k.print');
     Route::get('/above30k/print', [StudentController::class, 'aboveThirtyKPrint'])->name('admin.above-30k.print');
+
+    Route::get('/bsit/print', [Clearances::class, 'bsitClearedPrint'])->name('admin.bsit.print');
+    Route::get('/bsbafm/print', [Clearances::class, 'bsbafmClearedPrint'])->name('admin.bsbafm.print');
+    Route::get('/bsbamm/print', [Clearances::class, 'bsbammClearedPrint'])->name('admin.bsbamm.print');
+    Route::get('/bstm/print', [Clearances::class, 'bstmClearedPrint'])->name('admin.bstm.print');
+    Route::get('/bsedenglish/print', [Clearances::class, 'bsedenglishClearedPrint'])->name('admin.bsedenglish.print');
+    Route::get('/bsedvalues/print', [Clearances::class, 'bsedvaluesClearedPrint'])->name('admin.bsedvalues.print');
+    Route::get('/bsedsocialstudies/print', [Clearances::class, 'bsedsocialstudiesClearedPrint'])->name('admin.bsedsocialstudies.print');
+    Route::get('/bscrim/print', [Clearances::class, 'bscrimClearedPrint'])->name('admin.bscrim.print');
+    Route::get('/beed/print', [Clearances::class, 'beedClearedPrint'])->name('admin.beed.print');
 });

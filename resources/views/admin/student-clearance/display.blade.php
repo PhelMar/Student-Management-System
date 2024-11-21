@@ -7,17 +7,17 @@
     <li class="breadcrumb-item active">Clearance Student List</li>
 </ol>
 @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            Swal.fire({
-                title: 'Success!',
-                text: "{{session('success')}}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
         });
-    </script>
+    });
+</script>
 @endif
 <div class="card card-mb-4">
     <div class="card-header">
@@ -68,10 +68,15 @@
                     <td>{{$clearance->updated_at}}</td>
                     <td>
                         @if ($clearance->status !== 'cleared')
-                        <a href="javascript:void(0)" class="btn btn-warning" onclick="confirmCleared('{{$clearance->id}}')">Cleared</a>
+                        <a href="javascript:void(0)" class="btn btn-warning" onclick="confirmCleared('{{$clearance->id}}')">
+                            <i class="fas fa-check-circle"></i> Cleared
+                        </a>
                         @else
-                        <button class="btn btn-secondary" disabled>Cleared</button>
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-check"></i> Cleared
+                        </button>
                         @endif
+
                     </td>
                 </tr>
                 @endforeach
