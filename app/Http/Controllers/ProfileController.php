@@ -42,7 +42,7 @@ class ProfileController extends Controller
                 'regex:/[@$!%*#?&]/',
                 'confirmed',
             ],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:admin,user,guard'],
         ]);
 
         $queryValidation = $user->update([

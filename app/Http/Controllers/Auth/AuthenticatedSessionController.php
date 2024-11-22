@@ -31,6 +31,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('admin.dashboard');
         } elseif ($request->user()->role === 'user') {
             return redirect()->route('user.dashboard');
+        } elseif ($request->user()->role === 'guard') {
+            return redirect()->route('guard.violations.display');
         }
 
         $intendedUrl = $request->session()->get('url.intended');
@@ -38,7 +40,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->forget('url.intended');
         }
 
-        return redirect()->intended($request->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard'));
+        return redirect()->intended($request->user()->role === 'admin' ? route('admin.dashboard') : ($request->user()->role === 'guard' ? route('guard.violations.create') : route('user.dashboard')));
     }
 
 

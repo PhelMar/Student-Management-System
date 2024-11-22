@@ -42,7 +42,8 @@ class RegisteredUserController extends Controller
                 'regex:/[@$!%*#?&]/',
                 'confirmed', Rules\Password::defaults()
             ],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', 'in:admin,user,guard'],
+
         ]);
 
         $user = User::create([

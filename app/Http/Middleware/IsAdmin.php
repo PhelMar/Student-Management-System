@@ -19,6 +19,6 @@ class IsAdmin
         if (Auth::check() && Auth::user()->role === "admin"){
             return $next($request);
         }
-        return redirect('/dashboard')->with('error', 'Access Denied!')->setStatusCode(403);
+        return redirect('/')->with('error', 'Access Denied!')->setStatusCode(403);
     }
 }

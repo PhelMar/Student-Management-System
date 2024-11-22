@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsUser
+class IsGuard
 {
     /**
      * Handle an incoming request.
@@ -16,7 +16,7 @@ class IsUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === "user"){
+        if (Auth::check() && Auth::user()->role === "guard"){
             return $next($request);
         }
         return redirect('/')->with('error', 'Access Denied!')->setStatusCode(403);

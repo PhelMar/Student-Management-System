@@ -59,6 +59,7 @@
                         <option value="" disabled selected>{{ __('Select a Role') }}</option>
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                        <option value="guard" {{ old('role') == 'guard' ? 'selected' : '' }}>Guard</option>
                     </select>
                     @error('role')
                     <div class="invalid-feedback">{{ $message }}</div>

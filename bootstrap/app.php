@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'is_admin' => App\Http\Middleware\IsAdmin::class,
             'is_user' => App\Http\Middleware\IsUser::class,
+            'is_guard' => App\Http\Middleware\IsGuard::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -490,8 +490,7 @@ class StudentController extends Controller
 
         $validatedData['age'] = Carbon::parse($validatedData['birthdate'])->age;
 
-        $student->fill($validatedData);
-        $student->save();
+        $student->update($validatedData);
 
         if ($student) {
             session()->flash('success', 'Updated Successfully');
