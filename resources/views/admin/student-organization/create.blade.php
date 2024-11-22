@@ -19,8 +19,8 @@
         });
     </script>
 @endif
-<div class="card">
-    <div class="card-header bg-secondary text-white">Student Organization</div>
+<div class="card shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">Student Organization</div>
     <div class="card-body">
         <form action="{{ route('admin.organizations.store') }}" method="post" id="addStudentOrganizationForm">
             @csrf

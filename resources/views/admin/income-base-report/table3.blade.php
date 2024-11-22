@@ -1,5 +1,5 @@
-<div class="card">
-    <div class="card-header">
+<div class="card shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         <h5>Below 10k total Income of Parents</h5>
     </div>

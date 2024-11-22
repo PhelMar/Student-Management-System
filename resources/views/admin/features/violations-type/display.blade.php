@@ -21,8 +21,8 @@
     </script>
 @endif
 
-<div class="card card-mb-4">
-    <div class="card-header">
+<div class="card card-mb-4 shadow">
+    <div class="card-header text-white">
         <i class="fas fa-table me-1"></i>
         Violations Type
     </div>

@@ -12,7 +12,7 @@
 <div class="row">
 
     <div class="col-xl-3 col-md-6">
-        <div class="card bg-primary text-white mb-4">
+        <div class="card bg-primary text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between">
                 <div>
                     <i class="fas fa-users"></i> Total of Students
@@ -27,7 +27,7 @@
     </div>
 
     <div class="col-xl-3 col-md-6">
-        <div class="card bg-warning text-white mb-4">
+        <div class="card bg-warning text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between">
                 <div>
                     <i class="fas fa-people-group"></i> Total of IP's
@@ -42,7 +42,7 @@
     </div>
 
     <div class="col-xl-3 col-md-6">
-        <div class="card bg-success text-white mb-4">
+        <div class="card bg-success text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-wheelchair"></i> Total of PWD:
@@ -58,7 +58,7 @@
 
 
     <div class="col-xl-3 col-md-6">
-        <div class="card bg-secondary text-white mb-4">
+        <div class="card bg-secondary text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-user-friends"></i> Total of Solo Parent
@@ -75,8 +75,8 @@
 </div>
 <div class="row">
     <div class="col-xl-6">
-        <div class="card mb-4">
-            <div class="card-header">
+        <div class="card mb-4 shadow">
+            <div class="card-header text-white" style="background-color: #0A7075">
                 <i class="fas fa-chart-area me-1"></i>
                 Violations Chart Data Daily
             </div>
@@ -84,8 +84,8 @@
         </div>
     </div>
     <div class="col-xl-6">
-        <div class="card mb-4">
-            <div class="card-header">
+        <div class="card mb-4 shadow">
+            <div class="card-header text-white" style="background-color: #0A7075">
                 <i class="fas fa-chart-bar me-1"></i>
                 Violations Chart Data Monthly
             </div>
@@ -93,13 +93,15 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-chart-bar me-1"></i>
-            Total of Students
+<div class="row d-flex align-items-center justify-content-center">
+    <div class="col-xl-9">
+        <div class="card mb-4 shadow">
+            <div class="card-header text-white" style="background-color: #0A7075">
+                <i class="fas fa-chart-bar me-1"></i>
+                Total of Students
+            </div>
+            <div class="card-body"><canvas id="myAreaChartStudents" width="100%" height="40"></canvas></div>
         </div>
-        <div class="card-body"><canvas id="myAreaChartStudents" width="100%" height="40"></canvas></div>
     </div>
 </div>
 

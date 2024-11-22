@@ -19,8 +19,8 @@
         });
     </script>
 @endif
-<div class="card card-mb-4">
-    <div class="card-header">
+<div class="card card-mb-4 shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         Student Position View
     </div>

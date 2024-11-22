@@ -46,8 +46,8 @@
 </script>
 @section('content')
 <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card" style="width: 400px;">
-        <div class="card-header text-center">Update Login Credentials</div>
+    <div class="card shadow" style="width: 400px;">
+        <div class="card-header text-center text-white" style="background-color: #0A7075"><h5>Update Login Credentials</h5></div>
         <div class="card-body">
             <!-- Error and Success Alert Messages -->
             @if(session('success'))

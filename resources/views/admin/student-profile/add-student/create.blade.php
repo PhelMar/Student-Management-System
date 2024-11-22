@@ -32,7 +32,7 @@
 </script>
 @endif
 <div class="card shadow-xl">
-    <div class="card-header bg-secondary text-white">Add Student Information</div>
+    <div class="card-header text-white" style="background-color: #0A7075">Add Student Information</div>
     <div class="card-body overflow-auto" style="max-height: 500px;">
         <form action="{{ route('admin.students.store') }}" method="post" id="addStudentForm">
             @csrf

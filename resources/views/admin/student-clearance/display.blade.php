@@ -20,14 +20,14 @@
 </script>
 @endif
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-success btn-auto me-2" href="{{route('admin.clearedStudentDisplay.display')}}">
+    <a class="btn btn-success btn-auto me-2 shadow" href="{{route('admin.clearedStudentDisplay.display')}}">
         <i class="fa fa-file-alt me-2"></i>View Cleared Clearance</a>
-    <a class="btn btn-primary btn-auto" href="{{ route('admin.clearance.create') }}">
+    <a class="btn btn-primary btn-auto shadow" href="{{ route('admin.clearance.create') }}">
         <i class="fa fa-user-plus me-2"></i> Add
     </a>
 </div>
-<div class="card card-mb-4">
-    <div class="card-header">
+<div class="card card-mb-4 shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         Clearance Student View
     </div>
