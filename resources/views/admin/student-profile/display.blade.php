@@ -119,17 +119,17 @@
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$student->id}}">
                                 <li>
-                                    <a href="{{route('admin.students.show', $student->id)}}" class="dropdown-item">
+                                    <a href="{{route('admin.students.show', Hashids::encode($student->id))}}" class="dropdown-item">
                                         <i class="fa fa-eye me-2"></i> View
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{route('admin.students.edit', $student->id)}}" class="dropdown-item">
+                                    <a href="{{route('admin.students.edit', Hashids::encode($student->id))}}" class="dropdown-item">
                                         <i class="fa fa-pencil me-2"></i> Edit
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0)" onclick="confirmDrop('{{ $student->id }}')" class="dropdown-item text-danger">
+                                    <a href="javascript:void(0)" onclick="confirmDrop('{{ \Vinkla\Hashids\Facades\Hashids::encode($student->id)}}')" class="dropdown-item text-danger">
                                         <i class="fa fa-trash me-2"></i> Drop
                                     </a>
                                 </li>
@@ -152,7 +152,7 @@
         }
     });
 
-    function confirmDrop(studentId) {
+    function confirmDrop(hashId) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -163,7 +163,7 @@
             confirmButtonText: 'Yes, drop student!'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "{{ url('admin/students/drop') }}/" + studentId;
+                window.location.href = "{{ url('admin/students/drop') }}/" + hashId;
             }
         });
     }

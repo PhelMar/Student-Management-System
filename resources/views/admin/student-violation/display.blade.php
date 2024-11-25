@@ -21,7 +21,7 @@
 @endif
 
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary btn-auto shadow" href="{{route('admin.violations.create')}}">
+    <a class="btn btn-primary btn-auto" href="{{route('admin.violations.create')}}">
         <i class="fa fa-user-plus me-2"></i>Add Violations</a>
 </div>
 <div class="card card-mb-4 shadow">

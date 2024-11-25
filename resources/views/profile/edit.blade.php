@@ -72,7 +72,7 @@
             @endif
 
             <!-- Form -->
-            <form action="{{ route('admin.profile.update', $user->id) }}" method="POST" id="updateForm">
+            <form action="{{ route('admin.profile.update', Hashids::encode($user->id)) }}" method="POST" id="updateForm">
                 @csrf
                 @method('PUT')
 

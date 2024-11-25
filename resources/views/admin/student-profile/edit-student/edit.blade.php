@@ -14,7 +14,7 @@
 <div class="card">
     <div class="card-header text-white" style="background-color: #0A7075">Edit Student Information</div>
     <div class="card-body">
-        <form action="{{ route('admin.students.update',  $students->id) }}" method="post" id="updateStudentForm">
+        <form action="{{ route('admin.students.update',  Hashids::encode($students->id)) }}" method="post" id="updateStudentForm">
             @csrf
             @method('PUT')
             <div class="step" data-step="1">

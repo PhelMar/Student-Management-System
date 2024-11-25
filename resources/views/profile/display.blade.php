@@ -59,7 +59,7 @@
                     <td>{{$profile->created_at}}</td>
                     <td>{{$profile->updated_at}}</td>
                     <td>
-                        <a href="{{route('admin.profile.edit', ['id' => $profile->id])}}" class="btn btn-warning">Edit</a>
+                        <a href="{{route('admin.profile.edit', Hashids::encode([$profile->id]))}}" class="btn btn-warning">Edit</a>
                         <a href="javascript:void(0)" onclick="confirmDelete('{{$profile->id}}')" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>

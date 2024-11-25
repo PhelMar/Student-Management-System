@@ -9,10 +9,13 @@
     <title>@yield('title')</title>
     <link href="{{asset('admin/css/data-table-style.min.css')}}" rel="stylesheet" />
     <link href="{{asset('admin/css/styles.css')}}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('admin/css/dataTables.bootstrap5.min.css')}}">
     <link rel="stylesheet" href="{{asset('admin/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('admin/css/sweetalert2.min.css')}}">
     <script src="{{asset('admin/js/all.js')}}" crossorigin="anonymous"></script>
     <script src="{{asset('admin/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('admin/js/jquery.dataTables.min.js')}}"></script>
+    <script src="{{asset('admin/js/dataTables.bootstrap5.min.css')}}"></script>
     <script src="{{asset('admin/js/sweetalert2.min.js')}}"></script>
 </head>
 
@@ -41,7 +44,7 @@
     <script src="{{asset('admin/js/scripts.js')}}"></script>
     <script src="{{asset('admin/js/simple-datatables.min.js')}}"></script>
     <script src="{{asset('admin/js/datatables-simple-demo.js')}}"></script>
-    
+
 </body>
 
 </html>
