@@ -7,16 +7,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title')</title>
-    <link href="{{asset('admin/css/data-table-style.min.css')}}" rel="stylesheet" />
-    <link href="{{asset('admin/css/styles.css')}}" rel="stylesheet" />
-    <link rel="stylesheet" href="{{asset('admin/css/dataTables.bootstrap5.min.css')}}">
-    <link rel="stylesheet" href="{{asset('admin/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('admin/css/sweetalert2.min.css')}}">
-    <script src="{{asset('admin/js/all.js')}}" crossorigin="anonymous"></script>
-    <script src="{{asset('admin/js/jquery-3.6.0.min.js')}}"></script>
-    <script src="{{asset('admin/js/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('admin/js/dataTables.bootstrap5.min.css')}}"></script>
-    <script src="{{asset('admin/js/sweetalert2.min.js')}}"></script>
+    <link rel="icon" type="image/png" href="{{ asset('favicon_io/favicon.ico') }}">
+    <link href="{{asset('user/css/data-table-style.min.css')}}" rel="stylesheet" />
+    <link href="{{asset('user/css/styles.css')}}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('user/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{asset('user/css/sweetalert2.min.css')}}">
+    <script src="{{asset('user/js/all.js')}}" crossorigin="anonymous"></script>
+    <script src="{{asset('user/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('user/js/sweetalert2.min.js')}}"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -39,11 +37,11 @@
         </div>
     </div>
 
-    <script src="{{asset('admin/js/Chart.min.js')}}"></script>
-    <script src="{{asset('admin/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{asset('admin/js/scripts.js')}}"></script>
-    <script src="{{asset('admin/js/simple-datatables.min.js')}}"></script>
-    <script src="{{asset('admin/js/datatables-simple-demo.js')}}"></script>
+    <script src="{{asset('user/js/Chart.min.js')}}"></script>
+    <script src="{{asset('user/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{asset('user/js/scripts.js')}}"></script>
+    <script src="{{asset('user/js/simple-datatables.min.js')}}"></script>
+    <script src="{{asset('user/js/datatables-simple-demo.js')}}"></script>
 
 </body>
 

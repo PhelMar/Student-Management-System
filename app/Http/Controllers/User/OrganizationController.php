@@ -57,15 +57,12 @@ class OrganizationController extends Controller
                 ->with('success', 'Organization recorded successfully.');
         }
     }
-
-
     public function getStudent(Request $request)
     {
-
         $student = Student::where('id_no', $request->id_no)
-        ->whereNotIn('status', ['dropped', 'graduated'])
-        ->with('course', 'year', 'semester', 'school_year')
-        ->first();
+            ->whereNotIn('status', ['dropped', 'graduated'])
+            ->with('course', 'year', 'semester', 'school_year')
+            ->first();
 
         if ($student) {
             return response()->json([
@@ -76,16 +73,34 @@ class OrganizationController extends Controller
                 'school_year' => $student->school_year->id,
             ]);
         }
+
         return response()->json(['message' => 'Student not found'], 404);
     }
     public function display()
     {
-
-        $organizationData = Organization::with(['organizationType', 'position', 'course', 'year', 'semester', 'school_year'])
+        $organizationData = Organization::with([
+            'organizationType',
+            'position',
+            'course',
+            'year',
+            'semester',
+            'school_year'
+        ])
             ->orderBy('organization_date', 'desc')
             ->get();
 
         return view('users.student-organization.display', compact('organizationData'));
     }
-    
+
+    public function delete($id)
+    {
+        $organization = Organization::find($id);
+
+        if ($organization) {
+            $organization->delete();
+            return response()->json(['success' => true, 'message' => 'Organization deleted successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Organization not found.']);
+    }
 }

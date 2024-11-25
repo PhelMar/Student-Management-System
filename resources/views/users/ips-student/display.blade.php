@@ -6,11 +6,6 @@
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item active">IP's Students List</li>
 </ol>
-@if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
-@endif
 <div class="row justify-content-end align-items-center mb-3">
     <div class="col-sm-4">
         <select name="school_year_id" id="school_year_id" class="form-control">
@@ -21,13 +16,14 @@
         </select>
     </div>
     <div class="col-sm-auto">
-        <button id="printButton" class="btn btn-primary">Print</button>
+        <a id="printButton" href="{{ route('user.ips-student.print') }}" target="_blank" class="btn btn-primary">Print</a>
+        <button id="pdfDownload" class="btn btn-success">PDF</button>
     </div>
 </div>
 
 
-<div class="card card-mb-4">
-    <div class="card-header">
+<div class="card card-mb-4 shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         IP's Students
     </div>
@@ -76,6 +72,25 @@
         </table>
     </div>
 </div>
-<script src="{{asset('user/js/ipsFunction.js')}}" ></script>
+<script>
+    document.getElementById('pdfDownload').addEventListener('click', function() {
+        var schoolYearId = document.getElementById('school_year_id').value;
+        if (schoolYearId) {
+            window.location.href = "{{ route('user.export.IpsPdf') }}?school_year_id=" + schoolYearId;
+        } else {
+            alert("Please select a school year.");
+        }
+    });
+
+    document.getElementById('printButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default href behavior
+        var schoolYearId = document.getElementById('school_year_id').value;
+        if (schoolYearId) {
+            window.open("{{ route('user.ips-student.print') }}?school_year_id=" + schoolYearId);
+        } else {
+            alert("Please select a school year.");
+        }
+    });
+</script>
 
 @endsection

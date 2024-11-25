@@ -8,12 +8,17 @@ $(document).ready(function () {
     }
 });
 
-function toggleRemarks(remarksId, selectedValue) {
+function toggleRemarks(remarksId, value) {
     const remarksDiv = document.getElementById(remarksId);
-    if (selectedValue === "Yes") {
-        remarksDiv.style.display = "block"; // Show the remarks input
+    const remarksInput = remarksDiv.querySelector("input");
+
+    if (value === "Yes") {
+        remarksDiv.style.display = "block";
+        remarksInput.setAttribute("required", "required");
     } else {
-        remarksDiv.style.display = "none"; // Hide the remarks input
+        remarksDiv.style.display = "none";
+        remarksInput.removeAttribute("required");
+        remarksInput.value = "";
     }
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -22,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-$(document).ready(function() {
+$(document).ready(function () {
     function checkEmail() {
         const email = $('#email_address').val();
         const emailAddressErrorElement = $('#email_address_error');
@@ -35,7 +40,7 @@ $(document).ready(function() {
         if (!/^[a-zA-Z0-9._]+@gmail\.com$/.test(email)) {
             emailAddressErrorElement.text('Email address must end with @gmail.com');
             $('#email_address').addClass('is-invalid');
-            return; 
+            return;
         }
     }
     $('#email_address').on('input', checkEmail);
@@ -163,8 +168,8 @@ $(document).ready(function () {
     });
 });
 
-$(document).ready(function() {
-    $('#email_address').on('change', function() {
+$(document).ready(function () {
+    $('#email_address').on('change', function () {
         var email = $(this).val();
         var studentId = '{{ $student->id_no }}';
 
@@ -176,7 +181,7 @@ $(document).ready(function() {
                 student_id: studentId,
                 _token: csrfToken
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.exists) {
                     $('#emailError').text('This email address is already taken.').show();
                     $('#email_address').addClass('is-invalid');
@@ -189,8 +194,8 @@ $(document).ready(function() {
     });
 });
 
-$(document).ready(function() {
-    $('#id_no').on('change', function() {
+$(document).ready(function () {
+    $('#id_no').on('change', function () {
         var idNo = $(this).val();
         var studentId = '{{ $student->id }}';
 
@@ -202,7 +207,7 @@ $(document).ready(function() {
                 student_id: studentId,
                 _token: csrfToken
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.exists) {
                     $('#idNoError').text('This ID number is already taken.').show();
                     $('#id_no').addClass('is-invalid');
@@ -213,4 +218,90 @@ $(document).ready(function() {
             }
         });
     });
+
+    let currentStep = 1;
+
+    function showStep(step) {
+        $(".step").hide();
+        $(`[data-step="${step}"]`).show();
+    }
+
+    $(".next").click(function (e) {
+        e.preventDefault();
+
+        const valid = validateStep(currentStep);
+        if (valid) {
+            currentStep++;
+            showStep(currentStep);
+        }
+
+        toggleButtons();
+    });
+
+    $(".back").click(function (e) {
+        e.preventDefault();
+
+        currentStep--;
+        showStep(currentStep);
+
+        toggleButtons();
+    });
+
+    function validateStep(step) {
+        let isValid = true;
+
+        const fields = $(`[data-step="${step}"]`).find("[required]");
+
+        fields.each(function () {
+            const field = $(this);
+            const value = field.val()?.trim();
+            const errorMessage = field.siblings(".error-message");
+
+            if (!value) {
+                isValid = false;
+                errorMessage.text(`${field.attr("name").replace("_", " ")} is required.`);
+            } else {
+                errorMessage.text("");
+            }
+        });
+
+        return isValid;
+    }
+
+    $(document).keydown(function (e) {
+        if ((e.key === "Enter" || e.keyCode === 13) && $(".next:visible").length > 0) {
+            e.preventDefault();
+
+            const valid = validateStep(currentStep);
+            if (valid) {
+                $(".next:visible").click();
+            }
+        }
+    });
+
+    function toggleButtons() {
+        const totalSteps = $(".step").length;
+
+        if (currentStep === 1) {
+            $(".back").hide();
+            $(".next").show();
+        } else if (currentStep === totalSteps) {
+            $(".next").hide();
+            $(".back").show();
+            $("button[type='submit']").show();
+        } else {
+            $(".back").show();
+            $(".next").show();
+            $("button[type='submit']").hide();
+        }
+    }
+    showStep(currentStep);
+    toggleButtons();
+
 });
+
+
+
+
+
+

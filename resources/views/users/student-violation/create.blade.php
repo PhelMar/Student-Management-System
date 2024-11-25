@@ -11,8 +11,8 @@
     {{session('success')}}
 </div>
 @endif
-<div class="card">
-    <div class="card-header bg-secondary text-white">Student Violation</div>
+<div class="card shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">Student Violation</div>
     <div class="card-body">
         <form action="{{ route('user.violations.store') }}" method="post" id="addStudentViolationForm">
             @csrf

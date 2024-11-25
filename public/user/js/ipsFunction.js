@@ -1,40 +1,3 @@
-document.getElementById('school_year_id').addEventListener('change', function () {
-    var schoolYearId = this.value;
-
-    if (schoolYearId) {
-        fetch(`/user/get-students/${schoolYearId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const tbody = document.querySelector('#datatablesSimple tbody');
-                tbody.innerHTML = '';
-
-                data.forEach((student, index) => {
-                    const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${student.last_name}</td>
-                        <td>${student.first_name}</td>
-                        <td>${student.course.course_name}</td>
-                        <td>${student.year.year_name}</td>
-                        <td>${student.semester.semester_name}</td>
-                        <td>${student.school_year.school_year_name}</td>
-                        <td>${student.ips_remarks}</td>
-                    </tr>
-                `;
-                    tbody.innerHTML += row;
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching students:', error);
-            });
-    }
-});
-
 document.getElementById('printButton').addEventListener('click', function () {
     const printWindow = window.open('', '', 'width=800,height=600');
     const tableContent = document.querySelector('#datatablesSimple').outerHTML;
@@ -56,6 +19,14 @@ document.getElementById('printButton').addEventListener('click', function () {
                     text-align: center;
                     margin: 0; /* Remove default margin for header */
                     padding: 10px 0; /* Add a small amount of padding for spacing */
+                    display: flex; /* Use flexbox to align logo and text */
+                    justify-content: center; /* Center content horizontally */
+                    align-items: center; /* Vertically align items */
+                }
+                .header img {
+                    height: 85px; /* Set the height of the logo */
+                    width: auto; /* Maintain aspect ratio */
+                    margin-right: 15px; /* Space between logo and text */
                 }
                 h2 {
                     margin: 5px 0; /* Adjust the margin for the heading */
@@ -86,10 +57,13 @@ document.getElementById('printButton').addEventListener('click', function () {
         </head>
         <body>
             <div class="header">
-                <h2>Legacy College of Compostela, Inc.</h2>
-                <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
-                <p>Quality Education Within Reach</p>
-                <p>Students List for ${document.getElementById('school_year_id').selectedOptions[0].text}</p>
+                <img src="/images/lccLogo.png" alt="School Logo"> <!-- School logo -->
+                <div>
+                    <h2>Legacy College of Compostela, Inc.</h2>
+                    <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
+                    <p>Quality Education Within Reach</p>
+                    <p>IP's Students List for ${document.getElementById('school_year_id').selectedOptions[0].text}</p>
+                </div>
             </div>
             ${tableContent}
             <table>
@@ -109,5 +83,3 @@ document.getElementById('printButton').addEventListener('click', function () {
         printWindow.close();
     };
 });
-
-

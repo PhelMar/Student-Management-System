@@ -11,6 +11,7 @@ use App\Models\Violation;
 use App\Models\ViolationsType;
 use App\Models\Year;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class ViolationController extends Controller
@@ -26,11 +27,11 @@ class ViolationController extends Controller
         $schoolYears = SchoolYear::all();
 
         return view('users.student-violation.create', compact(
-            'students', 
-            'courses', 
-            'years', 
-            'semesters', 
-            'schoolYears', 
+            'students',
+            'courses',
+            'years',
+            'semesters',
+            'schoolYears',
             'violationsType'
         ));
     }
@@ -48,8 +49,18 @@ class ViolationController extends Controller
             'school_year_id' => 'required|exists:school_years,id'
         ]);
 
-        $existingViolations = Violation::where('student_id', $request->student_id)->count();
-        $violationsLevel = $existingViolations + 1;
+        $lastViolation = Violation::where('student_id', $request->student_id)
+            ->latest('created_at')
+            ->first();
+
+        $violationsLevel = 1;
+
+        if ($lastViolation) {
+            if ($lastViolation->semester_id == $request->semester_id && $lastViolation->school_year_id == $request->school_year_id) {
+
+                $violationsLevel = $lastViolation->violations_level + 1;
+            }
+        }
 
         $violations = Violation::create(array_merge($validateData, [
             'violations_level' => $violationsLevel,
@@ -62,13 +73,13 @@ class ViolationController extends Controller
     }
 
 
+
     public function getStudent(Request $request)
     {
-
         $student = Student::where('id_no', $request->id_no)
-        ->whereNotIn('status', ['dropped', 'graduated'])
-        ->with('course', 'year', 'semester', 'school_year')
-        ->first();
+            ->whereNotIn('status', ['dropped', 'graduated'])
+            ->with('course', 'year', 'semester', 'school_year')
+            ->first();
 
         if ($student) {
             return response()->json([
@@ -84,10 +95,42 @@ class ViolationController extends Controller
     public function display()
     {
 
-        $violations = Violation::with(['violationType','course','year','semester','school_year'])
+        $violations = Violation::with(['violationType', 'course', 'year', 'semester', 'school_year'])
             ->orderBy('violations_date', 'desc')
+            ->orderBy('violations_level', 'desc')
             ->get();
 
         return view('users.student-violation.display', compact('violations'));
+    }
+
+    public function getViolationsData()
+    {
+        $violationsData = DB::table('violations')
+            ->select(DB::raw('DATE(violations_date) as date'), DB::raw('count(*) as total_violations'))
+            ->groupBy(DB::raw('DATE(violations_date)'))
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Return data as JSON for JavaScript to use
+        return response()->json($violationsData);
+    }
+
+    public function getBarViolationsData()
+    {
+        $violations = DB::table('violations')
+            ->select(DB::raw('MONTH(violations_date) as month'), DB::raw('YEAR(violations_date) as year'), DB::raw('count(*) as violations'))
+            ->groupBy(DB::raw('MONTH(violations_date)'), DB::raw('YEAR(violations_date)'))
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        $formattedViolations = $violations->map(function ($item) {
+            return [
+                'month' => \Carbon\Carbon::createFromFormat('m', $item->month)->format('F'),
+                'violations' => $item->violations
+            ];
+        });
+
+        return response()->json($formattedViolations);
     }
 }

@@ -3,16 +3,72 @@
 
 @section('content')
 <h1 class="mt-4">Student List</h1>
-<ol class="breadcrumb mb-4">
+<ol class="breadcrumb">
     <li class="breadcrumb-item active">Student List</li>
 </ol>
 @if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
+        });
+    });
+</script>
 @endif
-<div class="card card-mb-4">
-    <div class="card-header">
+
+<div class="d-flex justify-content-end mb-3">
+    <div class="dropdown me-2">
+        <button class="btn btn-success dropdown-toggle shadow" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-file-alt me-2"></i> Generate Reports
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <!-- Income Basis Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('user.incomeFirstReport.display')}}">
+                    <i class="fa fa-pound-sign me-2"></i> <span>&#8369;</span> Income Basis
+                </a>
+            </li>
+
+            <!-- PWD Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('user.students.pwddisplay')}}">
+                    <i class="fa fa-wheelchair me-2"></i> PWD Report
+                </a>
+            </li>
+
+            <!-- IP's Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('user.students.ipsdisplay')}}">
+                    <i class="fa fa-users me-2"></i> IP's Report
+                </a>
+            </li>
+
+            <!-- Solo Parent Report -->
+            <li>
+                <a class="dropdown-item" href="{{route('user.students.soloparentdisplay')}}">
+                    <i class="fa fa-female me-2"></i> Solo Parent Report
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="{{route('user.students.dropView')}}">
+                    <i class="fa fa-user-times me-2"></i> Dropped Student
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <a class="btn btn-primary btn-auto shadow" href="{{ route('user.students.create') }}">
+        <i class="fa fa-user-plus me-2"></i> Add Students
+    </a>
+</div>
+
+
+<div class="card card-mb-4 shadow">
+    <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         Student View
     </div>
@@ -55,9 +111,30 @@
                     <td>{{$student->year->year_name ?? 'N/A'}}</td>
                     <td>{{$student->semester->semester_name ?? 'N/A'}}</td>
                     <td>{{$student->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td class="align-middle">
-                        <a href="{{route('user.students.StudentView', $student->id)}}" class="btn btn-info btn-md">View</a>
-                        <a href="{{route('user.students.edit', $student->id)}}" class="btn btn-warning btn-md">Edit</a>
+                    <td>
+                        <div class="dropdown">
+                            <!-- Dropdown button with an icon and color -->
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton{{$student->id}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-cogs"></i> Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$student->id}}">
+                                <li>
+                                    <a href="{{route('user.students.show', Hashids::encode($student->id))}}" class="dropdown-item">
+                                        <i class="fa fa-eye me-2"></i> View
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{route('user.students.edit', Hashids::encode($student->id))}}" class="dropdown-item">
+                                        <i class="fa fa-pencil me-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" onclick="confirmDrop('{{ \Vinkla\Hashids\Facades\Hashids::encode($student->id)}}')" class="dropdown-item text-danger">
+                                        <i class="fa fa-trash me-2"></i> Drop
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -74,5 +151,21 @@
             }, 3000);
         }
     });
+
+    function confirmDrop(hashId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, drop student!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ url('user/students/drop') }}/" + hashId;
+            }
+        });
+    }
 </script>
 @endsection

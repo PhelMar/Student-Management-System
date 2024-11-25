@@ -52,6 +52,6 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'role' => strtolower($request->role),
         ]);
-        return redirect(route('admin.dashboard'));
+        return redirect()->route('admin.profile.display')->with('success', 'Register new user successfully!');
     }
 }
