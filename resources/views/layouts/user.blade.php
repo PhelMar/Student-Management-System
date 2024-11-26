@@ -12,10 +12,20 @@
     <link href="{{asset('user/css/styles.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset('user/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('user/css/sweetalert2.min.css')}}">
+    <link rel="stylesheet" href="{{asset('user/css/dataTables.min.css')}}">
+    <link rel="stylesheet" href="{{asset('user/css/dataTables.bootstrap5.min.css')}}">
     <script src="{{asset('user/js/all.js')}}" crossorigin="anonymous"></script>
     <script src="{{asset('user/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('user/js/dataTables.min.js')}}"></script>
     <script src="{{asset('user/js/sweetalert2.min.js')}}"></script>
 </head>
+<style>
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+</style>
+
 
 <body class="sb-nav-fixed">
     @include('layouts.user-partials.navbar')
