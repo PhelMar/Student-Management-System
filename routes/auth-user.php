@@ -27,7 +27,7 @@ Route::middleware(['auth', 'is_user'])->prefix('user')->group(function () {
     Route::get('/StudentView/{id}', [StudentController::class, 'StudentView'])->name('user.students.StudentView');
     Route::get('/students/drop', [StudentController::class, 'dropStudentdisplay'])->name('user.students.dropView');
     Route::get('/students/drop/{id}', [StudentController::class, 'droppedStudent'])->name('user.students.drop');
-    Route::get('/students/active/{id}', [StudentController::class, 'activeStudent'])->name('user.students.active');
+    Route::get('/students/active/{hashId}', [StudentController::class, 'activeStudent'])->name('user.students.active');
     //Route::get('/get-students/{school_year_id}', [StudentController::class, 'getStudents']);
 
     Route::get('/violations/create', [ViolationController::class, 'create'])->name('user.violations.create');
@@ -67,7 +67,7 @@ Route::middleware(['auth', 'is_user'])->prefix('user')->group(function () {
     Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('user.municipalities');
     Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('user.barangays');
 
-    Route::get('/students/{id}', [StudentController::class, 'show'])->name('user.students.show');
+    Route::get('/students/{hashId}', [StudentController::class, 'show'])->name('user.students.show');
     Route::get('/ips/print', [StudentController::class, 'ipsPrint'])->name('user.ips-student.print');
     Route::get('/pwd/print', [StudentController::class, 'pwdPrint'])->name('user.pwd-student.print');
     Route::get('/solo-parent/print', [StudentController::class, 'soloParentPrint'])->name('user.solo-parent-student.print');

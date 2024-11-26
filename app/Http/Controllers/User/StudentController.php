@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Vinkla\Hashids\Facades\Hashids;
 
 class StudentController extends Controller
@@ -82,36 +83,133 @@ class StudentController extends Controller
         return response()->json(['count' => $activeCount]);
     }
 
-
-    public function display()
+    public function display(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
 
-        $students = Student::with(['course', 'year', 'semester', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->paginate();
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        return view('users.student-profile.display', compact(
-            'students'
-        ));
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active') // Always filter by active status
+                ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('id_no', 'like', "%{$search}")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'id_no' => $row->id_no,
+                        'name' => $row->last_name . ', ' . $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'hashed_id' => Hashids::encode($row->id),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-profile.display');
     }
 
-    public function dropStudentdisplay()
+
+    public function dropStudentDisplay(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
 
-        $students = Student::with(['course', 'year', 'semester', 'school_year'])
-            ->where('status', 'dropped')
-            ->orderBy('created_at', 'desc')
-            ->paginate();
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        return view('users.student-profile.drop-student.display', compact(
-            'students'
-        ));
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'dropped') // Filter by dropped students
+                ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->Where('id_no', 'like', "%{$search}%")
+                        ->orwhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'id_no' => $row->id_no,
+                        'name' => $row->last_name . ', ' . $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'hashed_id' => Hashids::encode($row->id),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-profile.drop-student.display');
     }
+
 
     public function show($hashId)
     {
         $id = Hashids::decode($hashId)[0] ?? null;
+
         $student = Student::with([
             'gender',
             'dialect',
@@ -547,8 +645,9 @@ class StudentController extends Controller
         }
     }
 
-    public function activeStudent($id)
+    public function activeStudent($hashId)
     {
+        $id = Hashids::decode($hashId)[0] ?? null;
 
         $students = Student::find($id);
 

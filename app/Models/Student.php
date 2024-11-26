@@ -300,4 +300,8 @@ class Student extends Model
     {
         return $this->belongsTo(Baranggay::class, 'mothers_barangay_id', 'brgy_code');
     }
+    public function organization()
+    {
+        return $this->hasMany(Organization::class, 'student_id', 'id_no');
+    }
 }

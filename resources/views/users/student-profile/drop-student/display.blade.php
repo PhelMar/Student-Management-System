@@ -1,17 +1,18 @@
 @extends('layouts.user')
-@section('title', 'View Student')
+@section('title', 'Dropped Students')
 
 @section('content')
-<h1 class="mt-4">Dropped Student List</h1>
+<h1 class="mt-4">Dropped Students</h1>
 <ol class="breadcrumb">
-    <li class="breadcrumb-item active">Dropped Student List</li>
+    <li class="breadcrumb-item active">Dropped Students</li>
 </ol>
+
 @if (session('success'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         Swal.fire({
             title: 'Success!',
-            text: "{{session('success')}}",
+            text: "{{ session('success') }}",
             icon: 'success',
             confirmButtonText: 'OK',
             timer: 1200
@@ -19,21 +20,23 @@
     });
 </script>
 @endif
+
 <div class="d-flex justify-content-end mb-3">
-    <button onclick="goBack()" class="btn btn-primary mt-1 shadow">Go Back</button>
+    <button onclick="goBack()" class="btn btn-primary shadow">Go Back</button>
 </div>
+
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
-        Dropped Student View
+        Dropped Students
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>ID NO</th>
-                    <th>STUDENT NAME</th>
+                    <th>NAME</th>
                     <th>COURSE</th>
                     <th>YEAR LEVEL</th>
                     <th>SEMESTER</th>
@@ -41,47 +44,71 @@
                     <th>ACTIONS</th>
                 </tr>
             </thead>
-            <tfoot>
-                <tr>
-                    <th>#</th>
-                    <th>ID NO</th>
-                    <th>STUDENT NAME</th>
-                    <th>COURSE</th>
-                    <th>YEAR LEVEL</th>
-                    <th>SEMESTER</th>
-                    <th>SCHOOL YEAR</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </tfoot>
-            <tbody>
-                @foreach ($students as $display => $student)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$student->id_no}}</td>
-                    <td>{{$student->first_name}} {{$student->last_name}}</td>
-                    <td>{{$student->course->course_name ?? 'N/A'}}</td>
-                    <td>{{$student->year->year_name ?? 'N/A'}}</td>
-                    <td>{{$student->semester->semester_name ?? 'N/A'}}</td>
-                    <td>{{$student->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td>
-                        <a href="javascript:void(0)" onclick="confirmActivate('{{ $student->id }}')" class="btn btn-success">
-                            <i class="fa fa-check me-2"></i> Activate
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
-        const successAlert = $('#success-alert');
-        if (successAlert.length) {
-            setTimeout(function() {
-                successAlert.fadeOut();
-            }, 3000);
-        }
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "{{ route('user.students.dropView') }}",
+                type: "GET",
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'id_no',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'course_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'semester_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'school_year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'hashed_id',
+                    render: function(data, type, row) {
+                        return `
+                            <a href="javascript:void(0)" onclick="confirmActivate('${data}')" class="btn btn-success">
+                                <i class="fa fa-check me-2"></i> Activate
+                            </a>
+                        `;
+                    }
+                }
+            ],
+            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            order: [
+                [0, 'desc']
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search students..."
+            }
+        });
     });
 
     function confirmActivate(studentId) {
@@ -95,10 +122,11 @@
             confirmButtonText: 'Yes, activate student!'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "{{ url('user/students/active') }}/" + studentId;
+                window.location.href = "{{ route('user.students.active', ':hashId') }}".replace(':hashId', studentId);
             }
         });
     }
+
 
     function goBack() {
         window.history.back();

@@ -74,15 +74,68 @@ class ClearancesController extends Controller
         return response()->json(['message' => 'Student not Found'], 404);
     }
 
-    public function display()
+    public function display(Request $request)
     {
+        // Validate inputs
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
 
-        $clearanceData = Clearance::with(['course', 'year', 'semester', 'school_year'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        return view('users.student-clearance.display', compact('clearanceData'));
+            // Build the query for clearance data with relations
+            $query = Clearance::with([
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'school_year:id,school_year_name',
+                'student:id,id_no,last_name,first_name',
+            ])
+                ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->whereHas('student', function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhere('control_no', 'like', "%{$search}%");
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($clearance, $index) use ($start) {
+                    return [
+                        'id' => $clearance->id,
+                        'DT_RowIndex' => $start + $index + 1,
+                        'control_no' => $clearance->control_no,
+                        'student_name' => $clearance->student ? $clearance->student->last_name . ', ' . $clearance->student->first_name : 'N/A',
+                        'course_name' => $clearance->course->course_name ?? 'N/A',
+                        'year_name' => $clearance->year->year_name ?? 'N/A',
+                        'semester_name' => $clearance->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $clearance->school_year->school_year_name ?? 'N/A',
+                        'status' => $clearance->status,
+                        'created_at' => $clearance->created_at->format('Y-m-d H:i:s'),
+                        'updated_at' => $clearance->updated_at->format('Y-m-d H:i:s'),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.display');
     }
+
 
     public function clearedStudentDisplay()
     {
