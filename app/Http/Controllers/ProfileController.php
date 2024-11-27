@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Vinkla\Hashids\Facades\Hashids;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProfileController extends Controller
 {
@@ -97,13 +93,49 @@ class ProfileController extends Controller
         return response()->json(['success' => false, 'message' => 'Profile not found!']);
     }
 
-    public function display()
+    public function display(Request $request)
     {
 
-        $profileData = User::orderBy('created_at', 'asc')
-            ->get();
+        if ($request->ajax()) {
+            $query = User::select(['id', 'name', 'role', 'created_at', 'updated_at']);
 
-        return view('profile.display', compact('profileData'));
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('role', 'like', "%{$search}%");
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'name' => $row->name,
+                        'role' => $row->role,
+                        'created_at' => $row->created_at->format('Y-m-d H:i:s'),
+                        'updated_at' => $row->updated_at->format('Y-m-d H:i:s'),
+                        'action' => '
+                            <a href="' . route('admin.profile.edit', Hashids::encode([$row->id])) . '" class="btn btn-warning">Edit</a>
+                            <a href="javascript:void(0)" onclick="confirmDelete(' . $row->id . ')" class="btn btn-danger">Delete</a>
+                        ',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('profile.display');
     }
 
     public function validateCurrentPassword(Request $request)

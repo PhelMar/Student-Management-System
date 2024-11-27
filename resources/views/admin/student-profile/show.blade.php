@@ -219,7 +219,7 @@
                 </div>
                 <div class="mb-3">
                     <span>
-                        <i class="fas fa-users me-2 text-success"></i>
+                        <i class="fas fa-user me-2 text-success"></i>
                         <strong>IP's:</strong> {{ $student->ips ?? 'N/A' }}
                     </span>
                 </div>
@@ -295,7 +295,7 @@
                 </div>
                 <div class="mb-3">
                     <span>
-                        <i class="fas fa-users me-2 text-success"></i>
+                        <i class="fas fa-user me-2 text-success"></i>
                         <strong>Number of Siblings:</strong> {{ $student->number_of_fathers_sibling ?? 'N/A' }}
                     </span>
                 </div>
@@ -365,7 +365,7 @@
                 </div>
                 <div class="mb-3">
                     <span>
-                        <i class="fas fa-users me-2 text-success"></i>
+                        <i class="fas fa-user me-2 text-success"></i>
                         <strong>Number of Siblings:</strong> {{ $student->number_of_mothers_sibling ?? 'N/A' }}
                     </span>
                 </div>
@@ -377,7 +377,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
-                    <i class="fas fa-users me-2"></i> Family Information
+                    <i class="fas fa-user me-2"></i> Family Information
                 </h5>
             </div>
             <div class="card-body">

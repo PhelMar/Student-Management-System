@@ -6,12 +6,13 @@
 <ol class="breadcrumb">
     <li class="breadcrumb-item active">Student List</li>
 </ol>
+
 @if (session('success'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         Swal.fire({
             title: 'Success!',
-            text: "{{session('success')}}",
+            text: "{{ session('success') }}",
             icon: 'success',
             confirmButtonText: 'OK',
             timer: 1200
@@ -43,7 +44,7 @@
             <!-- IP's Report -->
             <li>
                 <a class="dropdown-item" href="{{route('admin.students.ipsdisplay')}}">
-                    <i class="fa fa-users me-2"></i> IP's Report
+                    <i class="fa fa-admins me-2"></i> IP's Report
                 </a>
             </li>
 
@@ -55,31 +56,28 @@
             </li>
             <li>
                 <a class="dropdown-item" href="{{route('admin.students.dropView')}}">
-                    <i class="fa fa-user-times me-2"></i> Dropped Student
+                    <i class="fa fa-admin-times me-2"></i> Dropped Student
                 </a>
             </li>
         </ul>
     </div>
 
     <a class="btn btn-primary btn-auto shadow" href="{{ route('admin.students.create') }}">
-        <i class="fa fa-user-plus me-2"></i> Add Students
+        <i class="fas fa-user-plus me-2"></i> Add Students
     </a>
 </div>
-
-
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
         Student View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>ID NO</th>
-                    <th>FIRST NAME</th>
-                    <th>LAST NAME</th>
+                    <th>NAME</th>
                     <th>COURSE</th>
                     <th>YEAR LEVEL</th>
                     <th>SEMESTER</th>
@@ -91,8 +89,7 @@
                 <tr>
                     <th>#</th>
                     <th>ID NO</th>
-                    <th>FIRST NAME</th>
-                    <th>LAST NAME</th>
+                    <th>NAME</th>
                     <th>COURSE</th>
                     <th>YEAR LEVEL</th>
                     <th>SEMESTER</th>
@@ -100,59 +97,101 @@
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($students as $display => $student)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$student->id_no}}</td>
-                    <td>{{$student->first_name}}</td>
-                    <td>{{$student->last_name}}</td>
-                    <td>{{$student->course->course_name ?? 'N/A'}}</td>
-                    <td>{{$student->year->year_name ?? 'N/A'}}</td>
-                    <td>{{$student->semester->semester_name ?? 'N/A'}}</td>
-                    <td>{{$student->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td>
-                        <div class="dropdown">
-                            <!-- Dropdown button with an icon and color -->
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton{{$student->id}}" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa fa-cogs"></i> Actions
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$student->id}}">
-                                <li>
-                                    <a href="{{route('admin.students.show', Hashids::encode($student->id))}}" class="dropdown-item">
-                                        <i class="fa fa-eye me-2"></i> View
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{route('admin.students.edit', Hashids::encode($student->id))}}" class="dropdown-item">
-                                        <i class="fa fa-pencil me-2"></i> Edit
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0)" onclick="confirmDrop('{{ \Vinkla\Hashids\Facades\Hashids::encode($student->id)}}')" class="dropdown-item text-danger">
-                                        <i class="fa fa-trash me-2"></i> Drop
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
-        const successAlert = $('#success-alert');
-        if (successAlert.length) {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            ajax: {
+                url: "{{ route('admin.students.display') }}",
+                type: "GET",
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'id_no',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'course_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'semester_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'school_year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'hashed_id',
+                    render: function(data, type, row) {
+                        return `
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton${data}" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-cogs"></i> Actions
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${data}">
+                <li>
+                    <a href="{{ url('admin/students') }}/${data}" class="dropdown-item">
+                        <i class="fa fa-eye me-2"></i> View
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url('admin/edit') }}/${data}" class="dropdown-item">
+                        <i class="fa fa-pencil me-2"></i> Edit
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" onclick="confirmDrop('${data}')" class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2"></i> Drop
+                    </a>
+                </li>
+            </ul>
+        </div>
+    `;
+                    }
+
+                }
+            ],
+            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            order: [
+                [0, 'desc']
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search students..."
+            }
+        });
+        $('#sidebarToggle').on('click', function() {
             setTimeout(function() {
-                successAlert.fadeOut();
-            }, 3000);
-        }
+                table.columns.adjust().draw();
+            }, 300);
+        });
     });
 
-    function confirmDrop(hashId) {
+
+    function confirmDrop(studentId) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -163,7 +202,7 @@
             confirmButtonText: 'Yes, drop student!'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "{{ url('admin/students/drop') }}/" + hashId;
+                window.location.href = "{{ url('admin/students/drop') }}/" + studentId;
             }
         });
     }

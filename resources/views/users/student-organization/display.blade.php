@@ -74,6 +74,7 @@
             processing: true,
             serverSide: true,
             responsive: true,
+            scrollX: true,
             ajax: {
                 url: "{{ route('user.organizations.display') }}",
                 type: "GET",
@@ -129,6 +130,11 @@
                 search: "_INPUT_",
                 searchPlaceholder: "Search organizations..."
             }
+        });
+        $('#sidebarToggle').on('click', function() {
+            setTimeout(function() {
+                table.columns.adjust().draw();
+            }, 300);
         });
     });
 </script>

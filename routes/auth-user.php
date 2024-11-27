@@ -53,7 +53,21 @@ Route::middleware(['auth', 'is_user'])->prefix('user')->group(function () {
     Route::get('/clearance/cleared/{id}', [ClearancesController::class, 'clearedStudent'])->name('user.clearance.cleared');
     Route::get('/clearance/clearedStudentDisplay', [ClearancesController::class, 'clearedStudentDisplay'])->name('user.clearedStudentDisplay.display');
 
+    Route::get('/clearance/BSITclearedStudentDisplay', [ClearancesController::class, 'BSITcleared'])->name('user.BSITcleared.display');
+    Route::get('/clearance/BSTMclearedStudentDisplay', [ClearancesController::class, 'BSTMcleared'])->name('user.BSTMcleared.display');
+    Route::get('/clearance/BSBA-FMclearedStudentDisplay', [ClearancesController::class, 'BSBAFMcleared'])->name('user.BSBAFMcleared.display');
+    Route::get('/clearance/BSBA-MMclearedStudentDisplay', [ClearancesController::class, 'BSBAMMcleared'])->name('user.BSBAMMcleared.display');
+    Route::get('/clearance/BEEDclearedStudentDisplay', [ClearancesController::class, 'BEEDcleared'])->name('user.BEEDcleared.display');
+    Route::get('/clearance/BSED-SOCIAL-STUDIESclearedStudentDisplay', [ClearancesController::class, 'BSEDSOCIALSTUDIEScleared'])->name('user.BSEDSOCIALSTUDIEScleared.display');
+    Route::get('/clearance/BSED-ENGLISHclearedStudentDisplay', [ClearancesController::class, 'BSEDENGLISHcleared'])->name('user.BSEDENGLISHcleared.display');
+    Route::get('/clearance/BSED-VALUESclearedStudentDisplay', [ClearancesController::class, 'BSEDVALUEScleared'])->name('user.BSEDVALUEScleared.display');
+    Route::get('/clearance/BSCRIMclearedStudentDisplay', [ClearancesController::class, 'BSCRIMcleared'])->name('user.BSCRIMcleared.display');
+
     Route::get('/income-base-report/firstDisplay', [StudentController::class, 'incomeFirstDisplay'])->name('user.incomeFirstReport.display');
+    Route::get('/income-base-report/belowTenK', [StudentController::class, 'belowTenK'])->name('user.belowTenK.display');
+    Route::get('/income-base-report/between10kto20k', [StudentController::class, 'betweenTenAndTwenty'])->name('user.betweenTenToTwentyThousand.display');
+    Route::get('/income-base-report/between20kto30k', [StudentController::class, 'betweenTwentyAndThirty'])->name('user.betweenTwentyToThirtyThousand.display');
+    Route::get('/income-base-report/above30k', [StudentController::class, 'aboveThirty'])->name('user.aboveThirtyThousand.display');
 
     Route::get('/students/ipsdisplay', [StudentController::class, 'ipsDisplay'])->name('user.students.ipsdisplay');
     Route::get('/students/pwddisplay', [StudentController::class, 'pwdDisplay'])->name('user.students.pwddisplay');

@@ -11,6 +11,7 @@
     <link href="{{asset('user/css/data-table-style.min.css')}}" rel="stylesheet" />
     <link href="{{asset('user/css/styles.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset('user/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{asset('user/css/all.min.css')}}">
     <link rel="stylesheet" href="{{asset('user/css/sweetalert2.min.css')}}">
     <link rel="stylesheet" href="{{asset('user/css/dataTables.min.css')}}">
     <link rel="stylesheet" href="{{asset('user/css/dataTables.bootstrap5.min.css')}}">
@@ -50,8 +51,6 @@
     <script src="{{asset('user/js/Chart.min.js')}}"></script>
     <script src="{{asset('user/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('user/js/scripts.js')}}"></script>
-    <script src="{{asset('user/js/simple-datatables.min.js')}}"></script>
-    <script src="{{asset('user/js/datatables-simple-demo.js')}}"></script>
 
 </body>
 

@@ -43,61 +43,79 @@
     <div class="tab-content mt-3" id="clearedTabsContent">
 
         <div class="tab-pane fade show active" id="BSIT" role="tabpanel" aria-labelledby="BSIT-tab">
-            @include('users.student-clearance.bsit-table', ['students' => $BSIT, 'title' => 'BSIT'])
+            @include('users.student-clearance.bsit-table')
             <a href="{{ route('user.bsit.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
 
         <div class="tab-pane fade" id="BSTM" role="tabpanel" aria-labelledby="BSTM-tab">
-            @include('users.student-clearance.bstm-table2', ['students' => $BSTM, 'title' => 'BSTM'])
+            @include('users.student-clearance.bstm-table2')
             <a href="{{ route('user.bstm.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
 
         <div class="tab-pane fade" id="BSBA_MM" role="tabpanel" aria-labelledby="BSBA_MM-tab">
-            @include('users.student-clearance.bsba-mm-table3', ['students' => $BSBA_MM, 'title' => 'BSBA MM'])
+            @include('users.student-clearance.bsba-mm-table3')
             <a href="{{ route('user.bsbamm.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
 
         <div class="tab-pane fade" id="BSBA_FM" role="tabpanel" aria-labelledby="BSBA_FM-tab">
-            @include('users.student-clearance.bsba-fm-table4', ['students' => $BSBA_FM, 'title' => 'BSBA FM'])
+            @include('users.student-clearance.bsba-fm-table4')
             <a href="{{ route('user.bsbafm.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
         <!-- -->
         <div class="tab-pane fade" id="BEED" role="tabpanel" aria-labelledby="BEED-tab">
-            @include('users.student-clearance.beed-table5', ['students' => $BEED, 'title' => 'BEED'])
+            @include('users.student-clearance.beed-table5')
             <a href="{{ route('user.beed.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <div class="tab-pane fade" id="BSED_ENGLISH" role="tabpanel" aria-labelledby="BSED_ENGLISH-tab">
-            @include('users.student-clearance.bsed_english-table6', ['students' => $BSED_ENGLISH, 'title' => 'BSED_ENGLISH'])
+            @include('users.student-clearance.bsed_english-table6')
             <a href="{{ route('user.bsedenglish.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <div class="tab-pane fade" id="BSED_VALUES" role="tabpanel" aria-labelledby="BSED_VALUES-tab">
-            @include('users.student-clearance.bsed-values-table7', ['students' => $BSED_VALUES, 'title' => 'BSED_VALUES'])
+            @include('users.student-clearance.bsed-values-table7')
             <a href="{{ route('user.bsedvalues.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <div class="tab-pane fade" id="BSED_SOCIAL_STUDIES" role="tabpanel" aria-labelledby="BSED_SOCIAL_STUDIES-tab">
-            @include('users.student-clearance.bsed_social_studies-table8', ['students' => $BSED_SOCIAL_STUDIES, 'title' => 'BSED_SOCIAL_STUDIES'])
+            @include('users.student-clearance.bsed_social_studies-table8')
             <a href="{{ route('user.bsedsocialstudies.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
 
         <div class="tab-pane fade" id="BSCRIM" role="tabpanel" aria-labelledby="BSCRIM-tab">
-            @include('users.student-clearance.bscrim-table9', ['students' => $BSCRIM, 'title' => 'BSCRIM'])
+            @include('users.student-clearance.bscrim-table9')
             <a href="{{ route('user.bscrim.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
     </div>
 </div>
 
 <script>
+    const BSITUrl = "{{route('user.BSITcleared.display')}}";
+    const BSTMUrl = "{{route('user.BSTMcleared.display')}}";
+    const BSBAFMUrl = "{{route('user.BSBAFMcleared.display')}}";
+    const BSBAMMUrl = "{{route('user.BSBAMMcleared.display')}}";
+    const BEEDUrl = "{{route('user.BEEDcleared.display')}}";
+    const BSEDSOCIALSTUDIESUrl = "{{route('user.BSEDSOCIALSTUDIEScleared.display')}}";
+    const BSEDENGLISHUrl = "{{route('user.BSEDENGLISHcleared.display')}}";
+    const BSEDVALUESUrl = "{{route('user.BSEDVALUEScleared.display')}}";
+    const BSCRIMUrl = "{{route('user.BSCRIMcleared.display')}}";
     document.addEventListener('DOMContentLoaded', function() {
         var myTabs = new bootstrap.Tab(document.querySelector('#clearedTabs a.active'), {});
 
         document.querySelector('#BSIT').classList.add('show', 'active');
     });
 </script>
+<script src="{{asset('user/js/BSIT.js')}}"></script>
+<script src="{{asset('user/js/BSTM.js')}}"></script>
+<script src="{{asset('user/js/BSBA_FM.js')}}"></script>
+<script src="{{asset('user/js/BSBA_MM.js')}}"></script>
+<script src="{{asset('user/js/BEED.js')}}"></script>
+<script src="{{asset('user/js/BSED_SOCIAL_STUDIES.js')}}"></script>
+<script src="{{asset('user/js/BSED_ENGLISH.js')}}"></script>
+<script src="{{asset('user/js/BSED_VALUES.js')}}"></script>
+<script src="{{asset('user/js/BSCRIM.js')}}"></script>
 
 @endsection

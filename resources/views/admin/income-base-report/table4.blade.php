@@ -4,7 +4,7 @@
         <h5>Below 10k total Income of Parents</h5>
     </div>
     <div class="card-body">
-        <table id="datatablesSimple4">
+        <table id="above30ThousandTable" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -14,17 +14,15 @@
                     <th>School Year</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach ($students as $student)
+            <tfoot>
                 <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$student->first_name}} {{$student->last_name}}</td>
-                    <td>{{$student->course->course_name}}</td>
-                    <td>{{$student->year->year_name}}</td>
-                    <td>{{$student->school_year->school_year_name}}</td>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>School Year</th>
                 </tr>
-                @endforeach
-            </tbody>
+            </tfoot>
         </table>
     </div>
 </div>

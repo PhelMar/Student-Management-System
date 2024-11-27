@@ -4,7 +4,7 @@
         <h5>BSCRIM Cleared Students</h5>
     </div>
     <div class="card-body">
-        <table id="datatablesSimple9">
+    <table id="BSCRIMTABLES" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -16,16 +16,6 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($students as $student)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$student->student->first_name}} {{$student->student->last_name}}</td>
-                    <td>{{$student->course->course_name}}</td>
-                    <td>{{$student->year->year_name}}</td>
-                    <td>{{$student->school_year->school_year_name}}</td>
-                    <td>{{$student->status}}</td>
-                </tr>
-                @endforeach
             </tbody>
         </table>
     </div>

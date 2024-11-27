@@ -107,6 +107,7 @@
             processing: true,
             serverSide: true,
             responsive: true,
+            scrollX: true,
             ajax: {
                 url: "{{ route('user.students.display') }}",
                 type: "GET",
@@ -181,6 +182,11 @@
                 search: "_INPUT_",
                 searchPlaceholder: "Search students..."
             }
+        });
+        $('#sidebarToggle').on('click', function() {
+            setTimeout(function() {
+                table.columns.adjust().draw();
+            }, 300);
         });
     });
 

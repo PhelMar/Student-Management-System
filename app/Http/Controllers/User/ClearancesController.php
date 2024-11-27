@@ -86,7 +86,6 @@ class ClearancesController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            // Build the query for clearance data with relations
             $query = Clearance::with([
                 'course:id,course_name',
                 'year:id,year_name',
@@ -140,90 +139,511 @@ class ClearancesController extends Controller
 
     public function clearedStudentDisplay()
     {
-        $BSIT = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSIT');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+        return view('users.student-clearance.clearedClearance');
+    }
 
-        $BSBA_MM = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSBA MM');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+    public function BSITcleared(Request $request)
+    {
+        if ($request->ajax()) {
 
-        $BSTM = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSTM');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSIT');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
 
-        $BSBA_FM = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSBA FM');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            $totalData = $query->count();
 
-        $BEED = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BEED');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
 
-        $BSED_VALUES = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSED VALUES');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
 
-        $BSED_SOCIAL_STUDIES = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSED SOCIAL STUDIES');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
 
-        $BSED_ENGLISH = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSED ENGLISH');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
 
+        return view('users.student-clearance.clearedClearance');
+    }
 
-        $BSCRIM = Clearance::whereHas('course', function ($query) {
-            $query->where('course_name', 'BSCRIM');
-        })
-            ->with(['course', 'year', 'semester', 'school_year', 'student'])
-            ->where('status', 'cleared')
-            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
-            ->get();
+    public function BSTMcleared(Request $request)
+    {
+        if ($request->ajax()) {
 
-        return view('users.student-clearance.clearedClearance', compact(
-            'BSIT',
-            'BSTM',
-            'BSBA_FM',
-            'BSBA_MM',
-            'BEED',
-            'BSED_ENGLISH',
-            'BSED_VALUES',
-            'BSED_SOCIAL_STUDIES',
-            'BSCRIM'
-        ));
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSTM');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSBAFMcleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSBA FM');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSBAMMcleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSBA MM');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BEEDcleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BEED');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSEDSOCIALSTUDIEScleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSED SOCIAL STUDIES');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSEDENGLISHcleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSED ENGLISH');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSEDVALUEScleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSED VALUES');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
+    }
+
+    public function BSCRIMcleared(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSCRIM');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('users.student-clearance.clearedClearance');
     }
     public function clearedStudent($id)
     {

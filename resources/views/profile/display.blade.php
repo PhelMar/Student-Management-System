@@ -11,7 +11,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         Swal.fire({
             title: 'Success!',
-            text: "{{session('success')}}",
+            text: "{{ session('success') }}",
             icon: 'success',
             confirmButtonText: 'OK',
             timer: 1200
@@ -20,7 +20,7 @@
 </script>
 @endif
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary shadow" href="{{route('admin.register.create')}}">
+    <a class="btn btn-primary shadow" href="{{ route('admin.register.create') }}">
         <i class="fa fa-user-plus me-2"></i>Register New Users</a>
 </div>
 <div class="card card-mb-4 shadow">
@@ -29,46 +29,66 @@
         Users View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="userTable" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>NAME</th>
-                    <th>ROLE</th>
-                    <th>CREATED</th>
-                    <th>UPDATED</th>
-                    <th>ACTION</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tfoot>
-                <tr>
-                    <th>#</th>
-                    <th>NAME</th>
-                    <th>ROLE</th>
-                    <th>CREATED</th>
-                    <th>UPDATED</th>
-                    <th>ACTION</th>
-                </tr>
-            </tfoot>
-            <tbody>
-                @foreach ($profileData as $profile)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$profile->name}}</td>
-                    <td>{{$profile->role}}</td>
-                    <td>{{$profile->created_at}}</td>
-                    <td>{{$profile->updated_at}}</td>
-                    <td>
-                        <a href="{{route('admin.profile.edit', Hashids::encode([$profile->id]))}}" class="btn btn-warning">Edit</a>
-                        <a href="javascript:void(0)" onclick="confirmDelete('{{$profile->id}}')" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#userTable').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            ajax: "{{ route('admin.profile.display') }}",
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'role',
+                    name: 'role'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return data; // Render HTML content for action buttons
+                    }
+                }
+            ],
+            order: [
+                [3, 'desc']
+            ] // Default sorting by created_at descending
+        });
+    });
+
     function confirmDelete(profileId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -90,7 +110,7 @@
                     .then(data => {
                         if (data.success) {
                             Swal.fire('Deleted!', 'Profile User has been deleted.', 'success');
-                            window.location.href = "{{ route('admin.profile.display') }}";
+                            $('#userTable').DataTable().ajax.reload();
                         } else {
                             Swal.fire('Error', 'There was an issue deleting the user.', 'error');
                         }

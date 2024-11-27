@@ -32,7 +32,7 @@
         Clearance Student View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>CONTROL NO</th>
@@ -61,45 +61,85 @@
                     <th>ACTION</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($clearanceData as $clearance)
-                <tr>
-                    <td>{{$clearance->control_no}}</td>
-                    <td>{{$clearance->student ? $clearance->student->last_name . ', ' . $clearance->student->first_name : 'N/A'}}</td>
-                    <td>{{$clearance->course->course_name ?? 'N/A'}}</td>
-                    <td>{{$clearance->year->year_name ?? 'N/A'}}</td>
-                    <td>{{$clearance->semester->semester_name ?? 'N/A'}}</td>
-                    <td>{{$clearance->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td>{{$clearance->status}}</td>
-                    <td>{{$clearance->created_at}}</td>
-                    <td>{{$clearance->updated_at}}</td>
-                    <td>
-                        @if ($clearance->status !== 'cleared')
-                        <a href="javascript:void(0)" class="btn btn-warning" onclick="confirmCleared('{{$clearance->id}}')">
-                            <i class="fas fa-check-circle"></i> Cleared
-                        </a>
-                        @else
-                        <button class="btn btn-secondary" disabled>
-                            <i class="fas fa-check"></i> Cleared
-                        </button>
-                        @endif
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
-        const successAlert = $('#success-alert');
-        if (successAlert.length) {
+        var table = $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            ajax: {
+                url: "{{ route('admin.clearance.display') }}",
+                type: "GET",
+            },
+            columns: [{
+                    data: 'control_no'
+                },
+                {
+                    data: 'student_name'
+                },
+                {
+                    data: 'course_name'
+                },
+                {
+                    data: 'year_name'
+                },
+                {
+                    data: 'semester_name'
+                },
+                {
+                    data: 'school_year_name'
+                },
+                {
+                    data: 'status'
+                },
+                {
+                    data: 'created_at'
+                },
+                {
+                    data: 'updated_at'
+                },
+                {
+                    data: 'action'
+                },
+            ],
+            columnDefs: [{
+                targets: -1, // Action column
+                data: 'action',
+                render: function(data, type, row) {
+                    if (row.status !== 'cleared') {
+                        return `<a href="javascript:void(0)" class="btn btn-warning" onclick="confirmCleared('${row.id}')">
+                            <i class="fas fa-check-circle"></i> Cleared
+                        </a>`;
+                    } else {
+                        return '<button class="btn btn-secondary" disabled><i class="fas fa-check"></i> Cleared</button>';
+                    }
+                }
+            }],
+            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            order: [
+                [10, 'desc']
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search students..."
+            }
+        });
+
+        $('#sidebarToggle').on('click', function() {
             setTimeout(function() {
-                successAlert.fadeOut();
-            }, 3000);
-        }
+                table.columns.adjust().responsive.recalc();
+            }, 300);
+        });
     });
+
 
     function confirmCleared(clearanceId) {
         Swal.fire({
@@ -120,9 +160,15 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data); // For debugging
+                        console.log(data);
                         if (data.success) {
-                            Swal.fire('Cleared!', data.message, 'success');
+                            Swal.fire({
+                                title: 'Cleared!',
+                                text: data.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false,
+                            });
                             location.reload();
                         } else {
                             Swal.fire('Error', data.message, 'error');
@@ -136,6 +182,4 @@
         });
     }
 </script>
-
-
 @endsection

@@ -1,10 +1,10 @@
 <div class="card shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
-        <h5>Below 10k total Income of Parents</h5>
+        <h5>Between 20k to 30k Income of Parents</h5>
     </div>
     <div class="card-body">
-        <table id="datatablesSimple3">
+        <table id="between20to30ThousandTable" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -15,15 +15,6 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($students as $student)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$student->first_name}} {{$student->last_name}}</td>
-                    <td>{{$student->course->course_name}}</td>
-                    <td>{{$student->year->year_name}}</td>
-                    <td>{{$student->school_year->school_year_name}}</td>
-                </tr>
-                @endforeach
             </tbody>
         </table>
     </div>

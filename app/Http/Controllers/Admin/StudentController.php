@@ -83,36 +83,133 @@ class StudentController extends Controller
         return response()->json(['count' => $activeCount]);
     }
 
-
-    public function display()
+    public function display(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
 
-        $students = Student::with(['course', 'year', 'semester', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->paginate();
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        return view('admin.student-profile.display', compact(
-            'students'
-        ));
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active') // Always filter by active status
+                ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw("CAST(id_no AS CHAR) LIKE ?", ["%{$search}%"])
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'id_no' => $row->id_no,
+                        'name' => $row->last_name . ', ' . $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'hashed_id' => Hashids::encode($row->id),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.student-profile.display');
     }
 
-    public function dropStudentdisplay()
+
+    public function dropStudentDisplay(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
 
-        $students = Student::with(['course', 'year', 'semester', 'school_year'])
-            ->where('status', 'dropped')
-            ->orderBy('created_at', 'desc')
-            ->paginate();
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        return view('admin.student-profile.drop-student.display', compact(
-            'students'
-        ));
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'dropped') // Filter by dropped students
+                ->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw("CAST(id_no AS CHAR) LIKE ?", ["%{$search}%"])
+                        ->orwhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'id_no' => $row->id_no,
+                        'name' => $row->last_name . ', ' . $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'hashed_id' => Hashids::encode($row->id),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.student-profile.drop-student.display');
     }
+
 
     public function show($hashId)
     {
         $id = Hashids::decode($hashId)[0] ?? null;
+
         $student = Student::with([
             'gender',
             'dialect',
@@ -548,8 +645,9 @@ class StudentController extends Controller
         }
     }
 
-    public function activeStudent($id)
+    public function activeStudent($hashId)
     {
+        $id = Hashids::decode($hashId)[0] ?? null;
 
         $students = Student::find($id);
 
@@ -581,68 +679,190 @@ class StudentController extends Controller
         }
     }
 
-    public function ipsDisplay()
+    public function ipsDisplay(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
+
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'ips_remarks')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active')
+                ->where('ips', 'Yes')
+                ->orderBy('last_name', 'asc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'last_name' => $row->last_name,
+                        'first_name' => $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'ips_remarks' => $row->ips_remarks ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
 
         $school_years = SchoolYear::all();
-
-        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('status', 'active')
-            ->where('ips', 'Yes')
-            ->orderBy('last_name', 'asc')
-            ->get();
-
-        return view('admin.ips-student.display', compact('ipsData', 'school_years'));
+        return view('admin.ips-student.display', compact('school_years'));
     }
 
-    public function pwdDisplay()
+
+    public function pwdDisplay(Request $request)
     {
 
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
+
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'pwd_remarks')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active')
+                ->where('pwd', 'Yes')
+                ->orderBy('last_name', 'asc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'last_name' => $row->last_name,
+                        'first_name' => $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'pwd_remarks' => $row->pwd_remarks ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
         $school_years = SchoolYear::all();
-
-        $pwdData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('status', 'active')
-            ->where('pwd', 'Yes')
-            ->orderBy('last_name', 'asc')
-            ->get();
-
-        return view('admin.pwd-student.display', compact('pwdData', 'school_years'));
+        return view('admin.pwd-student.display', compact('school_years'));
     }
 
-    public function soloparentDisplay()
+    public function soloparentDisplay(Request $request)
     {
 
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
+
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'ips_remarks')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active')
+                ->where('solo_parent', 'Yes')
+                ->orderBy('last_name', 'asc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'last_name' => $row->last_name,
+                        'first_name' => $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
         $school_years = SchoolYear::all();
-
-        $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('status', 'active')
-            ->where('solo_parent', 'Yes')
-            ->orderBy('last_name', 'asc')
-            ->get();
-
-        return view('admin.solo-parent-student.display', compact('soloparentData', 'school_years'));
+        return view('admin.solo-parent-student.display', compact('school_years'));
     }
-
-    // public function getIpsStudents($school_year_id)
-    // {
-    //     $ipsData = Student::with('course', 'year', 'semester', 'school_year')
-    //         ->where('school_year_id', $school_year_id)
-    //         ->where('status', 'active')
-    //         ->where('ips', 'Yes')
-    //         ->get();
-
-    //     return response()->json($ipsData);
-    // }
-    // public function getPwdStudents($school_year_id)
-    // {
-    //     $pwdData = Student::with('course', 'year', 'semester', 'school_year')
-    //         ->where('school_year_id', $school_year_id)
-    //         ->where('status', 'active')
-    //         ->where('pwd', 'Yes')
-    //         ->get();
-
-    //     return response()->json($pwdData);
-    // }
     public function delete($id)
     {
         $students = Student::find($id);
@@ -656,35 +876,195 @@ class StudentController extends Controller
     }
     public function incomeFirstDisplay()
     {
-        $below10k = Student::whereHas('income', function ($query) {
-            $query->where('income_base', 'Below ₱10,000');
-        })->with(['course', 'year', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        return view('admin.income-base-report.firstDisplay');
+    }
 
-        $tenkToTwentyk = Student::whereHas('income', function ($query) {
-            $query->where('income_base', '₱10,000-₱20,000');
-        })->with(['course', 'year', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+    public function belowTenK(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Student::whereHas('income', function ($q) {
+                $q->where('income_base', 'Below ₱10,000');
+            })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                ->where('status', 'active')
+                ->orderBy('last_name', 'asc');
 
-        $twentykToThirtyk = Student::whereHas('income', function ($query) {
-            $query->where('income_base', '₱20,000-₱30,000');
-        })->with(['course', 'year', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            $totalData = $query->count();
 
-        $above30k = Student::whereHas('income', function ($query) {
-            $query->where('income_base', 'Above ₱30,000');
-        })->with(['course', 'year', 'school_year'])
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
 
-        return view('admin.income-base-report.firstDisplay', compact('below10k', 'tenkToTwentyk', 'twentykToThirtyk', 'above30k'));
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($student, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$student->last_name}, {$student->first_name}",
+                        'course_name' => $student->course->course_name ?? 'N/A',
+                        'year_name' => $student->year->year_name ?? 'N/A',
+                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.income-base-report.firstDisplay');
+    }
+    public function betweenTenAndTwenty(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Student::whereHas('income', function ($q) {
+                $q->where('income_base', '₱10,000-₱20,000');
+            })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                ->where('status', 'active')
+                ->orderBy('last_name', 'asc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($student, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$student->last_name}, {$student->first_name}",
+                        'course_name' => $student->course->course_name ?? 'N/A',
+                        'year_name' => $student->year->year_name ?? 'N/A',
+                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.income-base-report.firstDisplay');
+    }
+
+    public function betweenTwentyAndThirty(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->whereHas('income', function ($q) {
+                    $q->where('income_base', '₱20,000-₱30,000');
+                })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                ->where('status', 'active')
+                ->orderBy('last_name', 'asc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($student, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$student->last_name}, {$student->first_name}",
+                        'course_name' => $student->course->course_name ?? 'N/A',
+                        'year_name' => $student->year->year_name ?? 'N/A',
+                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.income-base-report.firstDisplay');
+    }
+    public function aboveThirty(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
+                ->whereHas('income', function ($q) {
+                    $q->where('income_base', 'Above ₱30,000');
+                })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                ->where('status', 'active')
+                ->orderBy('last_name', 'asc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($student, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$student->last_name}, {$student->first_name}",
+                        'course_name' => $student->course->course_name ?? 'N/A',
+                        'year_name' => $student->year->year_name ?? 'N/A',
+                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.income-base-report.firstDisplay');
     }
 
     public function exportIpsPdf(Request $request)
@@ -822,3 +1202,4 @@ class StudentController extends Controller
         return view('admin.income-base-report.print4', compact('above30k'));
     }
 }
+

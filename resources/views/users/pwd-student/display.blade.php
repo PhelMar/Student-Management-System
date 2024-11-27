@@ -21,7 +21,7 @@
         </select>
     </div>
     <div class="col-sm-auto">
-    <a id="printButton" href="{{ route('user.pwd-student.print') }}" target="_blank" class="btn btn-primary">Print</a>
+        <a id="printButton" href="{{ route('user.pwd-student.print') }}" target="_blank" class="btn btn-primary">Print</a>
         <button id="pdfDownload" class="btn btn-success">PDF</button>
     </div>
 </div>
@@ -33,7 +33,7 @@
         PWD Students
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -57,28 +57,75 @@
                     <th>SEMESTER</th>
                     <th>SCHOOL YEAR</th>
                     <th>REMARKS</th>
-
                 </tr>
             </tfoot>
             <tbody>
-                @foreach ($pwdData as $pwddata)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$pwddata->last_name}}</td>
-                    <td>{{$pwddata->first_name}}</td>
-                    <td>{{$pwddata->course->course_name}}</td>
-                    <td>{{$pwddata->year->year_name}}</td>
-                    <td>{{$pwddata->semester->semester_name}}</td>
-                    <td>{{$pwddata->school_year->school_year_name}}</td>
-                    <td>{{$pwddata->pwd_remarks}}</td>
-                </tr>
-                @endforeach
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            ajax: {
+                url: "{{ route('user.students.pwddisplay') }}",
+                type: "GET",
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'last_name'
+                },
+                {
+                    data: 'first_name'
+                },
+                {
+                    data: 'course_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'semester_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'school_year_name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'pwd_remarks',
+                    defaultContent: 'N/A'
+                }
+            ],
+            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            order: [
+                [1, 'asc']
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search IP students..."
+            }
+        });
+        $('#sidebarToggle').on('click', function() {
+            setTimeout(function() {
+                table.columns.adjust().draw();
+            }, 300);
+        });
+    });
+
     document.getElementById('pdfDownload').addEventListener('click', function() {
         var schoolYearId = document.getElementById('school_year_id').value;
         if (schoolYearId) {
