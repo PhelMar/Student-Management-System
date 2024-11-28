@@ -24,6 +24,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Vinkla\Hashids\Facades\Hashids;
 
 class StudentController extends Controller
@@ -83,6 +84,29 @@ class StudentController extends Controller
         $activeCount = Student::where('status', 'active')->count();
         return response()->json(['count' => $activeCount]);
     }
+    public function getMunicipalStudentCount()
+    {
+        $municipalityCounts = Student::select('current_municipality_id', DB::raw('count(*) as count'))
+            ->groupBy('current_municipality_id')
+            ->get();
+
+        // Prepare an array to hold the municipality name and its student count
+        $municipalityStudentCounts = [];
+
+        foreach ($municipalityCounts as $count) {
+            // Retrieve the municipality name using the 'current_municipality_id'
+            $municipality = Municipality::where('citymun_code', trim($count->current_municipality_id))->first();
+            $municipalityStudentCounts[] = [
+                'municipality' => $municipality ? $municipality->citymun_desc : 'Unknown',
+                'count' => $count->count,
+            ];
+        }
+
+        return response()->json($municipalityStudentCounts);
+    }
+
+
+
 
     public function display(Request $request)
     {
@@ -1203,4 +1227,3 @@ class StudentController extends Controller
         return view('admin.income-base-report.print4', compact('above30k'));
     }
 }
-

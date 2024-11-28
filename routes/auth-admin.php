@@ -38,6 +38,9 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::post('/count-solo-parent', [StudentController::class, 'countSoloParentStudents'])->name('admin.students.countSoloParent');
     Route::post('/count-ips', [StudentController::class, 'countIpsStudents'])->name('admin.students.countIps');
     Route::post('/count-active-students', [StudentController::class, 'countActiveStudents'])->name('admin.students.countActive');
+
+    Route::get('/student-counts', [StudentController::class, 'getMunicipalStudentCount'])->name('admin.students.getMunicipalStudentCount');
+
     Route::get('/edit/{id}', [StudentController::class, 'edit'])->name('admin.students.edit');
     Route::put('/edit/{id}', [StudentController::class, 'update'])->name('admin.students.update');
     Route::get('/StudentView/{id}', [StudentController::class, 'StudentView'])->name('admin.students.StudentView');

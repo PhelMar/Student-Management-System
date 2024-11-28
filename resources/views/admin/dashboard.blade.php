@@ -104,6 +104,11 @@
         </div>
     </div>
 </div>
+<div id="municipality-cards-container">
+    <div class="row">
+
+    </div>
+</div>
 
 <script>
     const countPWDUrl = "{{ route('admin.students.countPWD') }}";
@@ -113,6 +118,7 @@
     const violationsDataUrl = "{{ route('admin.violations.chart-data') }}";
     const totalStudentsDataUrl = "{{ route('admin.totalStudents.chart-data') }}";
     const violationsBarDataUrl = "{{ route('admin.violations.bar-data') }}";
+    const countByMunicipalDataUrl = "{{ route('admin.students.getMunicipalStudentCount') }}";
 </script>
 
 <script src="{{asset('admin/js/dashboardFunction.js')}}"></script>

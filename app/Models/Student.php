@@ -250,6 +250,10 @@ class Student extends Model
     {
         return $this->belongsTo(Province::class, 'prov_code', 'prov_code');
     }
+    public function municipality()
+    {
+        return $this->belongsTo(Municipality::class, 'current_municipality_id', 'citymun_code');
+    }
     public function currentProvince()
     {
         return $this->belongsTo(Province::class, 'current_province_id', 'prov_code');

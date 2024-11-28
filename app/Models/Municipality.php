@@ -21,4 +21,7 @@ class Municipality extends Model
     {
         return $this->belongsTo(Province::class, 'prov_code', 'prov_code');
     }
+    public function students(){
+        return $this->hasMany(Student::class, 'current_municipality_id', 'citymun_code');
+    }
 }
