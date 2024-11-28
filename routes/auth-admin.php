@@ -148,7 +148,6 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/export-pdf-Pwd', [StudentController::class, 'exportPwdPdf'])->name('admin.export.Pwdpdf');
     Route::get('/export-pdf-Soloparent', [StudentController::class, 'exportSoloparentPdf'])->name('admin.export.soloparentpdf');
 
-    Route::get('/provinces', [LocationController::class, 'getProvinces'])->name('admin.provinces');
     Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('admin.municipalities');
     Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('admin.barangays');
 
