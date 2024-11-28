@@ -91,15 +91,69 @@ class ViolationsController extends Controller
         }
         return response()->json(['message' => 'Student not found'], 404);
     }
-    public function display()
+    public function display(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50',
+        ]);
+        if ($request->ajax()) {
 
-        $violations = Violation::with(['violationType', 'course', 'year', 'semester', 'school_year'])
-            ->orderBy('violations_date', 'desc')
-            ->orderBy('violations_level', 'desc')
-            ->get();
+            $search = $request->input('search.value', '');
 
-        return view('guard.student-violation.display', compact('violations'));
+            $query = Violation::with([
+                'violationType:id,violation_type_name',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'school_year:id,school_year_name',
+                'student:id,id_no,last_name,first_name',
+            ])
+                ->orderBy('violations_date', 'desc')
+                ->orderBy('violations_level', 'desc');
+
+            if ($search) {
+                $query->whereHas('student', function ($q) use ($search) {
+                    $q->whereRaw("CAST(id_no AS CHAR) LIKE ?", ["%{$search}%"])
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%");
+                });
+                $query->orWhereHas('course', function ($q) use ($search) {
+                    $q->where('course_name', 'like', "%{$search}%");
+                });
+            }
+
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'id_no' => $row->student->id_no ?? 'N/A',
+                        'name' => $row->student ? $row->student->last_name . ', ' . $row->student->first_name : 'N/A',
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'semester_name' => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'violation_type_name' => $row->violationType ? $row->violationType->violation_type_name : 'N/A',
+                        'violations_level' => $row->violations_level,
+                        'remarks' => $row->remarks,
+                        'violations_date' => $row->violations_date,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('guard.student-violation.display');
     }
 
     public function getViolationsData()

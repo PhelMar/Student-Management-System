@@ -30,7 +30,7 @@
         Violations Student View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-striped table-hover table-bordered table-responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -61,34 +61,96 @@
                     <th>DATE</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($violations as $violation)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$violation->student->id_no ?? 'N/A'}}</td>
-                    <td>{{$violation->student ? $violation->student->last_name . ', ' . $violation->student->first_name : 'N/A'}}</td>
-                    <td>{{$violation->course->course_name ?? 'N/A'}}</td>
-                    <td>{{$violation->year->year_name ?? 'N/A'}}</td>
-                    <td>{{$violation->semester->semester_name ?? 'N/A'}}</td>
-                    <td>{{$violation->school_year->school_year_name ?? 'N/A'}}</td>
-                    <td>{{$violation->violationType->violation_type_name ?? 'N/A'}}</td>
-                    <td>{{ $violation->violations_level }}</td>
-                    <td>{{$violation->remarks}}</td>
-                    <td>{{$violation->violations_date}}</td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
 <script>
     $(document).ready(function() {
-        const successAlert = $('#success-alert');
-        if (successAlert.length) {
+        var table = $('#dataTables').DataTable({
+            scrollX: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('guard.violations.display') }}",
+                type: "GET",
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'id_no'
+                },
+                {
+                    data: 'name'
+                },
+                {
+                    data: 'course_name'
+                },
+                {
+                    data: 'year_name'
+                },
+                {
+                    data: 'semester_name'
+                },
+                {
+                    data: 'school_year_name'
+                },
+                {
+                    data: 'violation_type_name'
+                },
+                {
+                    data: 'violations_level',
+                    render: function(data, type, row) {
+                        let color = '';
+                        if (data === 1) color = 'yellow';
+                        else if (data === 2) color = 'orange';
+                        else if (data >= 3) color = 'red';
+
+                        return `
+                    <div style="width: 100%; background-color: #e9ecef; border-radius: 4px; overflow: hidden; position: relative; height: 20px;">
+                        <div style="width: ${data * 33}%; background-color: ${color}; height: 100%; border-radius: 4px;"></div>
+                    </div>`;
+                    }
+                },
+                {
+                    data: 'remarks'
+                },
+                {
+                    data: 'violations_date',
+                    render: function(data, type, row) {
+                        if (data) {
+                            const date = new Date(data);
+                            return date.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: '2-digit',
+                                year: 'numeric'
+                            }).replace(',', '');
+                        }
+                        return 'N/A';
+                    }
+                },
+            ],
+            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            order: [
+                [10, 'desc']
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search violations..."
+            }
+
+        });
+
+        $('#sidebarToggle').on('click', function() {
             setTimeout(function() {
-                successAlert.fadeOut();
-            }, 3000);
-        }
+                table.columns.adjust().draw();
+            }, 300);
+        });
     });
 </script>
 
