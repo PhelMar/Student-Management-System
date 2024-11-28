@@ -41,7 +41,7 @@ class StudentController extends Controller
         $highest_educations = HighestEducation::all();
         $incomes = Income::all();
         $parents_status = ParentStatuses::all();
-        $provinces = Province::all();
+        $provinces = Province::orderBy('prov_desc', 'asc')->get();
 
         return view('users.student-profile.add-student.create', compact(
             'stays',
@@ -387,7 +387,7 @@ class StudentController extends Controller
             $highest_educations = HighestEducation::all();
             $incomes = Income::all();
             $parents_status = ParentStatuses::all();
-            $provinces = Province::all();
+            $provinces = Province::orderBy('prov_desc', 'asc')->get();
             $municipalities = Municipality::where('prov_code', $students->current_province_id)->get();
             $barangays = Baranggay::where('citymun_code', $students->current_municipality_id)->get();
 
