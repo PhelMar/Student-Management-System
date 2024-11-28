@@ -7,17 +7,17 @@
     <li class="breadcrumb-item active">Base Income View</li>
 </ol>
 @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            Swal.fire({
-                title: 'Success!',
-                text: "{{session('success')}}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
         });
-    </script>
+    });
+</script>
 @endif
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
@@ -25,7 +25,7 @@
         Base Income View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-bordered table-hover w-100">
             <thead>
                 <tr>
                     <th>#</th>
@@ -40,23 +40,6 @@
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($incomes as $income)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$income->income_base}}</td>
-                    <td>
-                        <button class="btn btn-warning editIncomeBtn"
-                            data-id="{{ $income->id }}"
-                            data-name="{{ $income->income_base }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editIncomeModal">Edit</button>
-
-                        <a href="javascript:void(0)" class="btn btn-danger" onclick="confirmDelete('{{$income->id}}')">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
         <button id="addFeatures" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addIncomeModal">Add</button>
     </div>
@@ -107,6 +90,40 @@
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("admin.income.display") }}',
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'income_name',
+                    name: 'income_name'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        $(document).on('click', '.editIncomeBtn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#edit_income_id').val(id);
+            $('#edit_income_name').val(name);
+
+            $('#editIncomeForm').attr('action', `{{ url('admin/income/update') }}/${id}`);
+        });
+    });
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-alert').fadeOut('slow');

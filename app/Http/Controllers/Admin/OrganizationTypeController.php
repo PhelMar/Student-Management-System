@@ -8,12 +8,38 @@ use Illuminate\Http\Request;
 
 class OrganizationTypeController extends Controller
 {
-    public function display()
+    public function display(Request $request)
     {
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
 
-        $organization_types = OrganizationType::all();
+            $query = OrganizationType::query()->orderBy('created_at', 'desc');
 
-        return view('admin.features.organization-type.display', compact('organization_types'));
+            if ($search) {
+                $query->where('organization_name', 'like', "%{$search}%");
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($organization_types, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'organization_types_name' => $organization_types->organization_name,
+                        'actions' => view('admin.features.organization-type.partials.actions', compact('organization_types'))->render(),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.features.organization-type.display');
     }
 
     public function store(Request $request)
@@ -38,10 +64,11 @@ class OrganizationTypeController extends Controller
         return redirect()->route('admin.organization_type.display')->with('success', 'Data has been updated successfully!');
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
 
         $organizationType = OrganizationType::findOrFail($id);
-        if($organizationType){
+        if ($organizationType) {
             $organizationType->delete();
             return response()->json(['success' => true, 'message' => 'Data has been deleted succesfully!']);
         }

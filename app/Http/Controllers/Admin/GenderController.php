@@ -8,10 +8,38 @@ use Illuminate\Http\Request;
 
 class GenderController extends Controller
 {
-    public function display()
+    public function display(Request $request)
     {
-        $genders = Gender::all();
-        return view('admin.features.gender.display', compact('genders'));
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Gender::query()->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where('gender_name', 'like', "%{$search}%");
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($gender, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'gender_name' => $gender->gender_name,
+                        'actions' => view('admin.features.gender.partials.actions', compact('gender'))->render(),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.features.gender.display');
     }
 
     public function store(Request $request)

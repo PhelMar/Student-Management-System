@@ -8,17 +8,17 @@
 </ol>
 
 @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            Swal.fire({
-                title: 'Success!',
-                text: "{{session('success')}}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
         });
-    </script>
+    });
+</script>
 @endif
 
 <div class="card card-mb-4 shadow">
@@ -27,38 +27,21 @@
         Student Live View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-bordered table-hover w-100">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>STAY AT</th>
+                    <th>STAY TYPE</th>
                     <th>ACTIONS</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>STAY AT</th>
+                    <th>STAY TYPE</th>
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($stays as $stay)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$stay->stay_name}}</td>
-                    <td>
-                        <button class="btn btn-warning editStayBtn"
-                            data-id="{{ $stay->id }}"
-                            data-name="{{ $stay->stay_name }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editStayModal">Edit</button>
-
-                        <a href="javascript:void(0)" class="btn btn-danger" onclick="confirmDelete('{{$stay->id}}')">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
         <button id="addFeatures" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addStayModal">Add</button>
     </div>
@@ -109,6 +92,40 @@
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("admin.stay.display") }}',
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'stay_name',
+                    name: 'stay_name'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        $(document).on('click', '.editStayBtn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#edit_stay_id').val(id);
+            $('#edit_stay_name').val(name);
+
+            $('#editStayForm').attr('action', `{{ url('admin/stay/update') }}/${id}`);
+        });
+    });
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-alert').fadeOut('slow');

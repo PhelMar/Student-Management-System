@@ -7,17 +7,17 @@
     <li class="breadcrumb-item active">Parent Status View</li>
 </ol>
 @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            Swal.fire({
-                title: 'Success!',
-                text: "{{session('success')}}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
         });
-    </script>
+    });
+</script>
 @endif
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
@@ -25,38 +25,21 @@
         Parent Status View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-bordered table-hover w-100">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>PARENT STATUS TYPE</th>
+                    <th>PARENT STATUS</th>
                     <th>ACTIONS</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>PARENT STATUS TYPE</th>
+                    <th>PARENT STATUS</th>
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($parent_statuses as $parent_status)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$parent_status->status}}</td>
-                    <td>
-                        <button class="btn btn-warning editParentStatusBtn"
-                            data-id="{{ $parent_status->id }}"
-                            data-name="{{ $parent_status->status }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editParentStatusModal">Edit</button>
-
-                        <a href="javascript:void(0)" class="btn btn-danger" onclick="confirmDelete('{{$parent_status->id}}')">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
         <button id="addFeatures" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addParentStatusModal">Add</button>
     </div>
@@ -107,6 +90,40 @@
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("admin.parent_status.display") }}',
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'parent_status_name',
+                    name: 'parent_status_name'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        $(document).on('click', '.editParentStatusBtn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#edit_parent_status_id').val(id);
+            $('#edit_parent_status_name').val(name);
+
+            $('#editParentStatusForm').attr('action', `{{ url('admin/parent_status/update') }}/${id}`);
+        });
+    });
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-alert').fadeOut('slow');

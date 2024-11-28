@@ -8,11 +8,40 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    public function display()
+    public function display(Request $request)
     {
-        $courses = Course::all();
-        return view('admin.features.course.display', compact('courses'));
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Course::query()->orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where('course_name', 'like', "%{$search}%");
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($course, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'course_name' => $course->course_name,
+                        'actions' => view('admin.features.course.partials.actions', compact('course'))->render(),
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.features.course.display');
     }
+
 
     public function store(Request $request)
     {

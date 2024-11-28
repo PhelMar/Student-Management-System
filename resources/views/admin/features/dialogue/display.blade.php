@@ -9,13 +9,13 @@
 @if (session('success'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                title: 'Success!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+        Swal.fire({
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
+        });
     });
 </script>
 @endif
@@ -25,38 +25,21 @@
         Dialect
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-bordered table-hover w-100">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>DIALECT TYPE</th>
+                    <th>DIALOGUE TYPE</th>
                     <th>ACTIONS</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>DIALECT TYPE</th>
+                    <th>DIALOGUE TYPE</th>
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($dialects as $dialect)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$dialect->dialect_name}}</td>
-                    <td>
-                        <button class="btn btn-warning editDialectBtn"
-                            data-id="{{ $dialect->id }}"
-                            data-name="{{ $dialect->dialect_name }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editDialectModal">Edit</button>
-
-                        <a href="javascript:void(0)" class="btn btn-danger" onclick="confirmDelete('{{$dialect->id}}')">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
         <button id="addFeatures" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addDialectModal">Add</button>
     </div>
@@ -107,6 +90,40 @@
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("admin.dialect.display") }}',
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'dialect_name',
+                    name: 'dialect_name'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        $(document).on('click', '.editDialectBtn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#edit_dialect_id').val(id);
+            $('#edit_dialect_name').val(name);
+
+            $('#editDialectForm').attr('action', `{{ url('admin/dialect/update') }}/${id}`);
+        });
+    });
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-alert').fadeOut('slow');

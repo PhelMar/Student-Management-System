@@ -7,17 +7,17 @@
     <li class="breadcrumb-item active">School Year View</li>
 </ol>
 @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            Swal.fire({
-                title: 'Success!',
-                text: "{{session('success')}}",
-                icon: 'success',
-                confirmButtonText: 'OK',
-                timer: 1200
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1200
         });
-    </script>
+    });
+</script>
 @endif
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
@@ -25,38 +25,21 @@
         School Year View
     </div>
     <div class="card-body">
-        <table id="datatablesSimple">
+        <table id="dataTables" class="table table-bordered table-hover w-100">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>SCHOOL YEAR</th>
+                    <th>SCHOOL_YEAR</th>
                     <th>ACTIONS</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>SCHOOL YEAR</th>
+                    <th>SCHOOL_YEAR</th>
                     <th>ACTIONS</th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach ($school_years as $school_year)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$school_year->school_year_name}}</td>
-                    <td>
-                        <button class="btn btn-warning editSchoolYearBtn"
-                            data-id="{{ $school_year->id }}"
-                            data-name="{{ $school_year->school_year_name }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editSchoolYearModal">Edit</button>
-
-                        <a href="javascript:void(0)" class="btn btn-danger" onclick="confirmDelete('{{$school_year->id}}')">Delete</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
         <button id="addFeatures" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addSchoolYearModal">Add</button>
     </div>
@@ -107,6 +90,41 @@
     </div>
 </div>
 <script>
+    $(document).ready(function() {
+        $('#dataTables').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("admin.school_year.display") }}',
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'school_year_name',
+                    name: 'school_year_name'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+        });
+        $(document).on('click', '.editSchoolYearBtn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#edit_school_year_id').val(id);
+            $('#edit_school_year_name').val(name);
+
+            $('#editSchoolYearForm').attr('action', `{{ url('admin/school_year/update') }}/${id}`);
+        });
+    });
+
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-alert').fadeOut('slow');
