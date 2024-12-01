@@ -19,7 +19,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('admin.register-user.register');
+        return view('auth.register');
     }
 
     /**
@@ -40,9 +40,9 @@ class RegisteredUserController extends Controller
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
                 'regex:/[@$!%*#?&]/',
-                'confirmed', Rules\Password::defaults()
+                'confirmed',
+                Rules\Password::defaults()
             ],
-            'role' => ['required', 'string', 'in:admin,user,guard'],
 
         ]);
 
@@ -50,8 +50,10 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => strtolower($request->role),
         ]);
-        return redirect()->route('admin.profile.display')->with('success', 'Register new user successfully!');
+        event(new Registered($user));
+
+        Auth::login($user);
+        return redirect(route('user.dashboard', absolute: false));
     }
 }

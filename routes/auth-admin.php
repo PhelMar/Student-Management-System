@@ -18,12 +18,9 @@ use App\Http\Controllers\Admin\StayController;
 use App\Http\Controllers\Admin\ViolationsController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Course;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {
-    Route::get('/register', [RegisteredUserController::class, 'create'])->name('admin.register.create');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.store');
+Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');

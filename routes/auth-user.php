@@ -7,7 +7,7 @@ use App\Http\Controllers\User\StudentController;
 use App\Http\Controllers\User\ViolationController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'is_user'])->prefix('user')->group(function () {
+Route::middleware(['auth', 'verified', 'is_user'])->prefix('user')->group(function () {
     Route::get('dashboard', function () {
         return view('users.dashboard');
     })->name('user.dashboard');

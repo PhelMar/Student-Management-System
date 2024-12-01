@@ -56,14 +56,12 @@ class ProfileController extends Controller
                     'regex:/[@$!%*#?&]/',
                     'confirmed',
                 ],
-                'role' => ['required', 'in:admin,user,guard'],
             ]);
 
             $queryValidation = $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => $request->role,
             ]);
 
             if ($queryValidation) {
