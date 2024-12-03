@@ -24,6 +24,7 @@ function toggleRemarks(remarksId, value) {
 
 
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
     function checkEmail() {
         const email = $('#email_address').val();
         const emailAddressErrorElement = $('#email_address_error');
@@ -61,6 +62,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
     $('#id_no').on('change', function () {
         var idNo = $(this).val();
         var studentId = '{{ $student->id }}';
@@ -160,7 +162,7 @@ $(document).ready(function () {
         $(this).removeClass('is-invalid');
 
         if (!/^202\d{7}$/.test(idNoInput)) {
-            idNoError.text('ID No must be 10 digits and starts number 202');
+            idNoError.text('Invalid input ID type!');
             $(this).addClass('is-invalid');
         }
     });

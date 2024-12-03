@@ -1,5 +1,5 @@
 <x-guest-layout>
-<div class="card-header text-center text-white" style="background-color: #0A7075;">
+    <div class="card-header text-center text-white" style="background-color: #0A7075;">
         <h5 class="mb-0">{{ __('Log In') }}</h5>
     </div>
     <div class="card-body p-4">
@@ -10,7 +10,10 @@
         </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <!-- Error Message Placeholder -->
+        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+        <form id="loginForm" method="POST" action="{{ route('login') }}">
             @csrf
 
             <!-- Email Address -->
@@ -18,9 +21,7 @@
                 <label for="email" class="form-label fw-bold">{{ __('Email') }}</label>
                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                     name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
-                @error('email')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <div class="invalid-feedback"></div>
             </div>
 
             <!-- Password -->
@@ -28,9 +29,7 @@
                 <label for="password" class="form-label fw-bold">{{ __('Password') }}</label>
                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
                     name="password" required autocomplete="current-password">
-                @error('password')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <div class="invalid-feedback"></div>
             </div>
 
             <!-- Remember Me -->
@@ -52,5 +51,48 @@
             </div>
         </form>
     </div>
+    <script>
+        $(document).ready(function() {
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
 
+                const formData = {
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    remember: $('#remember_me').is(':checked') ? 'on' : 'off'
+                };
+
+                $.ajax({
+                    url: "{{ route('login') }}",
+                    method: "POST",
+                    data: formData,
+                    success: function(response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            $('#errorMessage').text('Unexpected response. Please try again.').show();
+                        }
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+                        if (errors.email) {
+                            $('#email').addClass('is-invalid').siblings('.invalid-feedback').text(errors.email[0]);
+                        }
+                        if (errors.password) {
+                            $('#password').addClass('is-invalid').siblings('.invalid-feedback').text(errors.password[0]);
+                        }
+                        if (!errors.email && !errors.password) {
+                            $('#errorMessage').text(xhr.responseJSON?.message || 'An error occurred.').show();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </x-guest-layout>

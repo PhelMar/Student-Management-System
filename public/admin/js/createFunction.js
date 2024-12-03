@@ -24,6 +24,8 @@ function toggleRemarks(remarksId, value) {
 
 
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
     function checkEmail() {
         const email = $('#email_address').val();
         const emailAddressErrorElement = $('#email_address_error');
@@ -33,11 +35,12 @@ $(document).ready(function () {
         emailErrorElement.hide();
         $('#email_address').removeClass('is-invalid');
 
-        if (!/^[a-zA-Z0-9._]+@gmail\.com$/.test(email)) {
-            emailAddressErrorElement.text('Email address must end with @gmail.com');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailAddressErrorElement.text('Please enter a valid email address');
             $('#email_address').addClass('is-invalid');
             return;
         }
+
         if (email && email.length > 0) {
             $.ajax({
                 url: checkEmailUrl,
@@ -53,6 +56,10 @@ $(document).ready(function () {
                     } else {
                         emailErrorElement.hide();
                     }
+                },
+                error: function (xhr, status, error) {
+                    $('#email_address').addClass('is-invalid');
+                    emailErrorElement.text('An error occurred while checking the email. Please try again.').show();
                 }
             });
         }
@@ -60,10 +67,19 @@ $(document).ready(function () {
     $('#email_address').on('input', checkEmail);
 });
 
+
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
     $('#id_no').on('change', function () {
         var idNo = $(this).val();
         var studentId = '{{ $student->id }}';
+
+        if (!/^[a-zA-Z0-9]+$/.test(idNo)) {
+            $('#idNoError').text('Invalid ID format.').show();
+            $('#id_no').addClass('is-invalid');
+            return;
+        }
 
         $.ajax({
             url: checkIDNoUrl,
@@ -81,10 +97,15 @@ $(document).ready(function () {
                     $('#idNoError').hide();
                     $('#id_no').removeClass('is-invalid');
                 }
+            },
+            error: function (xhr, status, error) {
+                $('#idNoError').text('An error occurred while checking the ID number. Please try again.').show();
+                $('#id_no').addClass('is-invalid');
             }
         });
     });
 });
+
 
 $(document).ready(function () {
     $('#contact_no').on('input', function () {
@@ -160,7 +181,7 @@ $(document).ready(function () {
         $(this).removeClass('is-invalid');
 
         if (!/^202\d{7}$/.test(idNoInput)) {
-            idNoError.text('ID No must be 10 digits and starts number 202');
+            idNoError.text('Invalid input ID type!');
             $(this).addClass('is-invalid');
         }
     });

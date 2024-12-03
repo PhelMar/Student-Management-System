@@ -8,12 +8,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         return view('auth.login');
@@ -22,37 +20,35 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request): JsonResponse|RedirectResponse
     {
-        $request->authenticate();
-        $request->session()->regenerate();
+        try {
+            $request->authenticate();
+            
+            $request->session()->regenerate();
 
-        if (!$request->user()->hasVerifiedEmail()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-    
-            return redirect()->route('verification.notice')
-                ->with('error', 'Please verify your email address before logging in.');
+            if (!$request->user()->hasVerifiedEmail()) {
+                Auth::logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return response()->json(['error' => 'Please verify your email address before logging in.'], 403);
+            }
+
+            $redirectUrl = match ($request->user()->role) {
+                'admin' => route('admin.dashboard'),
+                'user' => route('user.dashboard'),
+                'guard' => route('guard.violations.display'),
+                default => route('home')
+            };
+
+            return response()->json(['redirect' => $redirectUrl]);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Invalid credentials. Please try again.'], 401);
         }
-        
-
-        if ($request->user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        } elseif ($request->user()->role === 'user') {
-            return redirect()->route('user.dashboard');
-        } elseif ($request->user()->role === 'guard') {
-            return redirect()->route('guard.violations.display');
-        }
-
-        $intendedUrl = $request->session()->get('url.intended');
-        if (str_contains($intendedUrl, '/admin') || str_contains($intendedUrl, '/user')) {
-            $request->session()->forget('url.intended');
-        }
-
-        return redirect()->intended($request->user()->role === 'admin' ? route('admin.dashboard') : ($request->user()->role === 'guard' ? route('guard.violations.create') : route('user.dashboard')));
     }
-
 
     /**
      * Destroy an authenticated session.
@@ -62,7 +58,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

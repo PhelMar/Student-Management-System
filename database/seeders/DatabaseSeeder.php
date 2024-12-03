@@ -26,7 +26,6 @@ class DatabaseSeeder extends Seeder
             YearSeeder::class,
             SchoolYearSeeder::class,
             ViolationsTypeSeeder::class,
-            AdminSeeder::class,
             OrganizationTypeSeeder::class,
             PositionSeeder::class,
             ProvinceSeeder::class,

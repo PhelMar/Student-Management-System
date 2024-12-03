@@ -10,6 +10,7 @@
 
     <link rel="icon" type="image/png" href="{{ asset('favicon_io/favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('user/css/bootstrap.min.css') }}">
+    <script src="{{asset('admin/js/jquery-3.6.0.min.js')}}"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

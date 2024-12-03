@@ -7,27 +7,26 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class VerifyEmailController extends Controller
 {
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
-        Log::info('Verifying email for user: ' . $request->user()->email);
 
         if ($request->user()->hasVerifiedEmail()) {
-            Log::info('Email already verified.');
-            return redirect()->route('user.dashboard');
+            return redirect()->route('login')->with('status', 'Your email is already verified.');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
-            Log::info('Email successfully verified for user: ' . $request->user()->email);
+        
             Auth::login($request->user());
-        } else {
-            Log::error('Email verification failed for user: ' . $request->user()->email);
-        }
+        
+            session()->regenerate();
+        
+            return redirect()->route('user.dashboard')->with('status', 'Your email has been successfully verified.');
+        }        
 
-        return redirect()->route('user.dashboard');
+        return redirect()->route('login')->with('error', 'Email verification failed. Please try again.');
     }
 }

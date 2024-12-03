@@ -169,35 +169,61 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#email_address').on('change', function () {
-        var email = $(this).val();
-        var studentId = '{{ $student->id_no }}';
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-        $.ajax({
-            url: checkEmailUrl,
-            type: 'POST',
-            data: {
-                email: email,
-                student_id: studentId,
-                _token: csrfToken
-            },
-            success: function (response) {
-                if (response.exists) {
-                    $('#emailError').text('This email address is already taken.').show();
+    function checkEmail() {
+        const email = $('#email_address').val();
+        const emailAddressErrorElement = $('#email_address_error');
+        const emailErrorElement = $('#email_error');
+
+        emailAddressErrorElement.text('');
+        emailErrorElement.hide();
+        $('#email_address').removeClass('is-invalid');
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailAddressErrorElement.text('Please enter a valid email address');
+            $('#email_address').addClass('is-invalid');
+            return;
+        }
+
+        if (email && email.length > 0) {
+            $.ajax({
+                url: checkEmailUrl,
+                method: 'POST',
+                data: {
+                    email: email,
+                    _token: csrfToken
+                },
+                success: function (response) {
+                    if (response.exists) {
+                        $('#email_address').addClass('is-invalid');
+                        emailErrorElement.show();
+                    } else {
+                        emailErrorElement.hide();
+                    }
+                },
+                error: function (xhr, status, error) {
                     $('#email_address').addClass('is-invalid');
-                } else {
-                    $('#emailError').hide();
-                    $('#email_address').removeClass('is-invalid');
+                    emailErrorElement.text('An error occurred while checking the email. Please try again.').show();
                 }
-            }
-        });
-    });
+            });
+        }
+    }
+    $('#email_address').on('input', checkEmail);
 });
 
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
     $('#id_no').on('change', function () {
         var idNo = $(this).val();
         var studentId = '{{ $student->id }}';
+
+        if (!/^[a-zA-Z0-9]+$/.test(idNo)) {
+            $('#idNoError').text('Invalid ID format.').show();
+            $('#id_no').addClass('is-invalid');
+            return;
+        }
 
         $.ajax({
             url: checkIDNoUrl,
@@ -215,6 +241,10 @@ $(document).ready(function () {
                     $('#idNoError').hide();
                     $('#id_no').removeClass('is-invalid');
                 }
+            },
+            error: function (xhr, status, error) {
+                $('#idNoError').text('An error occurred while checking the ID number. Please try again.').show();
+                $('#id_no').addClass('is-invalid');
             }
         });
     });
