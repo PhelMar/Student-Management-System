@@ -1,7 +1,4 @@
 <x-guest-layout>
-    <div class="card-header text-center text-white" style="background-color: #0A7075;">
-        <h5 class="mb-0">{{ __('Log In') }}</h5>
-    </div>
     <div class="card-body p-4">
         <!-- Session Status -->
         @if (session('status'))

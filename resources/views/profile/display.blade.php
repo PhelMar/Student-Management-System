@@ -20,7 +20,7 @@
 </script>
 @endif
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary shadow" href="{{ route('admin.register.create') }}">
+    <a class="btn btn-primary shadow" href="">
         <i class="fa fa-user-plus me-2"></i>Register New Users</a>
 </div>
 <div class="card card-mb-4 shadow">
