@@ -1,12 +1,3 @@
-$(document).ready(function () {
-    const successAlert = $('#success-alert');
-    if (successAlert.length) {
-        setTimeout(function () {
-            successAlert.fadeOut();
-            $('#updateStudentForm')[0].reset();
-        }, 3000);
-    }
-});
 
 function toggleRemarks(remarksId, value) {
     const remarksDiv = document.getElementById(remarksId);
@@ -28,6 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     function checkEmail() {
         const email = $('#email_address').val();
         const emailAddressErrorElement = $('#email_address_error');
@@ -48,6 +44,11 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $('#contact_no').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const contactNoInput = $(this).val();
         const contact_no_errorElement = $('#contactNoError');
 
@@ -61,6 +62,11 @@ $(document).ready(function () {
     });
 
     $('#incase_of_emergency_contact').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const emergencyContactInput = $(this).val();
         const emergencyContactError = $('#incase_of_emergency_contact_Error');
 
@@ -74,6 +80,11 @@ $(document).ready(function () {
     });
 
     $('#fathers_contact_no').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const fathersContactInput = $(this).val();
         const fathersContactError = $('#fathers_contactNoError');
 
@@ -87,6 +98,11 @@ $(document).ready(function () {
     });
 
     $('#mothers_contact_no').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const mothersContactInput = $(this).val();
         const mothersContactError = $('#mothers_contactNoError');
 
@@ -100,6 +116,11 @@ $(document).ready(function () {
     });
 
     $('#birth_order_among_sibling').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const birthOrderInput = $(this).val();
         const birthOrderError = $('#birth_order_Error');
 
@@ -113,6 +134,11 @@ $(document).ready(function () {
     });
 
     $('#id_no').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const idNoInput = $(this).val();
         const idNoError = $('#idNoError');
 
@@ -126,6 +152,11 @@ $(document).ready(function () {
     });
 
     $('#number_of_fathers_sibling').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const numberOfFathersSiblingInput = $(this).val();
         const numberOfFathersSiblingError = $('#number_of_fathers_sibling_Error');
 
@@ -139,6 +170,11 @@ $(document).ready(function () {
     });
 
     $('#number_of_mothers_sibling').on('input', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         const numberOfMothersSiblingInput = $(this).val();
         const numberOfMothersSiblingError = $('#number_of_mothers_sibling_Error');
 
@@ -153,6 +189,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#email_address').on('input', function () {
         const emailAddressInput = $(this).val();
         const email_address_errorElement = $('#email_address_error');

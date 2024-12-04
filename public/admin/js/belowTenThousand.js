@@ -1,5 +1,10 @@
 let below10ThousandTable;
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     below10ThousandTable = $('#below10ThousandTable').DataTable({
         processing: true,
         serverSide: true,

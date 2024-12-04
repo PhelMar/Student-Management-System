@@ -108,6 +108,11 @@ $(document).ready(function () {
 
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#contact_no').on('input', function () {
         const contactNoInput = $(this).val();
         const contact_no_errorElement = $('#contactNoError');
@@ -294,6 +299,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#permanent_province').change(function () {
         let provinceId = $(this).val();
         $('#permanent_municipality').html('<option value="">Loading...</option>');
@@ -332,6 +342,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#current_province').change(function () {
         let provinceId = $(this).val();
         $('#current_municipality').html('<option value="">Loading...</option>');
@@ -370,7 +385,17 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#fathers_province').change(function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         let provinceId = $(this).val();
         $('#fathers_municipality').html('<option value="">Loading...</option>');
         $('#fathers_barangay').html('<option value="">Select Barangay</option>');
@@ -390,6 +415,11 @@ $(document).ready(function () {
     });
 
     $('#fathers_municipality').change(function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         let municipalityId = $(this).val();
         $('#fathers_barangay').html('<option value="">Loading...</option>');
         if (municipalityId) {
@@ -408,6 +438,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#mothers_province').change(function () {
         let provinceId = $(this).val();
         $('#mothers_municipality').html('<option value="">Loading...</option>');

@@ -1,5 +1,10 @@
 let BSEDSOCIALSTUDIESTABLES;
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     BSEDSOCIALSTUDIESTABLES = $('#BSEDSOCIALSTUDIESTABLES').DataTable({
         processing: true,
         serverSide: true,

@@ -76,11 +76,10 @@ class Clearances extends Controller
 
     public function display(Request $request)
     {
-        // Validate inputs
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -200,6 +199,12 @@ class Clearances extends Controller
 
     public function BSTMcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -256,6 +261,12 @@ class Clearances extends Controller
 
     public function BSBAFMcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -312,6 +323,12 @@ class Clearances extends Controller
 
     public function BSBAMMcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -368,6 +385,12 @@ class Clearances extends Controller
 
     public function BEEDcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -424,6 +447,12 @@ class Clearances extends Controller
 
     public function BSEDSOCIALSTUDIEScleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -480,6 +509,12 @@ class Clearances extends Controller
 
     public function BSEDENGLISHcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -536,6 +571,12 @@ class Clearances extends Controller
 
     public function BSEDVALUEScleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {
@@ -592,6 +633,12 @@ class Clearances extends Controller
 
     public function BSCRIMcleared(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+        
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {

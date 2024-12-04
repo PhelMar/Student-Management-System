@@ -67,7 +67,13 @@
 
 <script>
     $(document).ready(function() {
-        $('#dataTables').DataTable({
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        const table = $('#dataTables').DataTable({
             processing: true,
             serverSide: true,
             responsive: true,

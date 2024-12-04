@@ -1,13 +1,3 @@
-$(document).ready(function () {
-    const successAlert = $('#success-alert');
-    if (successAlert.length) {
-        setTimeout(function () {
-            successAlert.fadeOut();
-            $('#addStudentForm')[0].reset();
-        }, 3000);
-    }
-});
-
 function toggleRemarks(remarksId, value) {
     const remarksDiv = document.getElementById(remarksId);
     const remarksInput = remarksDiv.querySelector("input");
@@ -89,6 +79,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#contact_no').on('input', function () {
         const contactNoInput = $(this).val();
         const contact_no_errorElement = $('#contactNoError');

@@ -68,6 +68,11 @@
 
 <script>
     $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $('#student_id').on('change', function() {
             const id_no = $(this).val();
 

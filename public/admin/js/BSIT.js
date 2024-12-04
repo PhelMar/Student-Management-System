@@ -1,5 +1,10 @@
 let BSITTABLES;
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     
     BSITTABLES = $('#BSITTABLES').DataTable({
         processing: true,

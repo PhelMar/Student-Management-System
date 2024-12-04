@@ -1,5 +1,10 @@
 let BSEDENGLISHTABLES;
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     BSEDENGLISHTABLES = $('#BSEDENGLISHTABLES').DataTable({
         processing: true,
         serverSide: true,

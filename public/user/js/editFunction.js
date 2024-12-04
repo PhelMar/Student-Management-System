@@ -1,12 +1,3 @@
-$(document).ready(function () {
-    const successAlert = $('#success-alert');
-    if (successAlert.length) {
-        setTimeout(function () {
-            successAlert.fadeOut();
-            $('#updateStudentForm')[0].reset();
-        }, 3000);
-    }
-});
 
 function toggleRemarks(remarksId, value) {
     const remarksDiv = document.getElementById(remarksId);
@@ -28,6 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     function checkEmail() {
         const email = $('#email_address').val();
         const emailAddressErrorElement = $('#email_address_error');
@@ -47,6 +43,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#contact_no').on('input', function () {
         const contactNoInput = $(this).val();
         const contact_no_errorElement = $('#contactNoError');
@@ -153,6 +154,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $('#email_address').on('input', function () {
         const emailAddressInput = $(this).val();
         const email_address_errorElement = $('#email_address_error');
@@ -169,6 +175,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
     function checkEmail() {

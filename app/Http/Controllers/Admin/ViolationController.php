@@ -97,7 +97,7 @@ class ViolationController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
         if ($request->ajax()) {
 

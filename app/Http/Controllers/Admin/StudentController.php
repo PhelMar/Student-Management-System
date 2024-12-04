@@ -22,9 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Vinkla\Hashids\Facades\Hashids;
 
 class StudentController extends Controller
@@ -113,7 +111,7 @@ class StudentController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -174,7 +172,7 @@ class StudentController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -709,7 +707,7 @@ class StudentController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -772,7 +770,7 @@ class StudentController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -834,7 +832,7 @@ class StudentController extends Controller
         $request->validate([
             'start' => 'integer|min:0',
             'length' => 'integer|min:1|max:100',
-            'search.value' => 'nullable|string|max:50',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
         if ($request->ajax()) {
@@ -906,6 +904,12 @@ class StudentController extends Controller
 
     public function belowTenK(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
             $query = Student::whereHas('income', function ($q) {
                 $q->where('income_base', 'Below ₱10,000');
@@ -952,6 +956,12 @@ class StudentController extends Controller
     }
     public function betweenTenAndTwenty(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
             $query = Student::whereHas('income', function ($q) {
                 $q->where('income_base', '₱10,000-₱20,000');
@@ -999,6 +1009,12 @@ class StudentController extends Controller
 
     public function betweenTwentyAndThirty(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
         if ($request->ajax()) {
             $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
                 ->whereHas('income', function ($q) {
@@ -1046,6 +1062,12 @@ class StudentController extends Controller
     }
     public function aboveThirty(Request $request)
     {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+        
         if ($request->ajax()) {
             $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
                 ->whereHas('income', function ($q) {

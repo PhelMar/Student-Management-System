@@ -1,6 +1,11 @@
 let between10to20ThousandTable;
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     between10to20ThousandTable = $('#between10to20ThousandTable').DataTable({
         processing: true,
         serverSide: true,
