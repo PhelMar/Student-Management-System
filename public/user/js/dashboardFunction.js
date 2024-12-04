@@ -52,13 +52,6 @@ $(document).ready(function () {
     countSoloParentStudents();
     countIpsStudents();
     countActiveStudents();
-
-    setInterval(function () {
-        countPWDStudents();
-        countSoloParentStudents();
-        countIpsStudents();
-        countActiveStudents();
-    }, 5000);
 });
 
 function countActiveStudents() {

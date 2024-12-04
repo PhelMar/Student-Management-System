@@ -13,6 +13,30 @@
     <script src="{{asset('admin/js/jquery-3.6.0.min.js')}}"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('images/lccAnex.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.6);
+            z-index: -1;
+        }
+    </style>
 </head>
 
 <body class="bg-light text-dark">

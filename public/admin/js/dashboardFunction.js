@@ -93,14 +93,7 @@ $(document).ready(function () {
     countSoloParentStudents();
     countIpsStudents();
     countActiveStudents();
-    fetchMunicipalityStudentCounts()
-
-    setInterval(function () {
-        countPWDStudents();
-        countSoloParentStudents();
-        countIpsStudents();
-        countActiveStudents();
-    }, 5000);
+    fetchMunicipalityStudentCounts();
 });
 
 function countActiveStudents() {
