@@ -23,7 +23,8 @@
 
 <div class="d-flex justify-content-end mb-3">
     <div class="dropdown me-2">
-        <button class="btn btn-success dropdown-toggle shadow" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-success dropdown-toggle shadow" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
             <i class="fa fa-file-alt me-2"></i> Generate Reports
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -52,6 +53,12 @@
             <li>
                 <a class="dropdown-item" href="{{route('admin.students.soloparentdisplay')}}">
                     <i class="fa fa-female me-2"></i> Solo Parent Report
+                </a>
+            </li>
+
+            <li>
+                <a class="dropdown-item" href="{{route('admin.students.fourpsdisplay')}}">
+                    <i class="fa fa-female me-2"></i> 4p's Parent Report
                 </a>
             </li>
             <li>

@@ -78,6 +78,9 @@ class Student extends Model
         'semester_id',
         'school_year_id',
         'age',
+        'four_ps',
+        'scholarship',
+        'scholarship_remarks',
     ];
 
     public function setFirstNameAttribute($value)
@@ -177,6 +180,10 @@ class Student extends Model
     public function setIpsRemarksAttribute($value)
     {
         $this->attributes['ips_remarks'] = ucwords(strtolower($value));
+    }
+    public function setScholarshipRemarksAttribute($value)
+    {
+        $this->attributes['scholarship_remarks'] = ucwords(strtolower($value));
     }
 
 

@@ -142,7 +142,8 @@
                 <div class="mb-3">
                     <span>
                         <i class="fas fa-phone-alt me-2 text-warning"></i>
-                        <strong>Incase of Emergency Contact:</strong> {{ $student->incase_of_emergency_contact ?? 'N/A' }}
+                        <strong>Incase of Emergency Contact:</strong>
+                        {{ $student->incase_of_emergency_contact ?? 'N/A' }}
                     </span>
                 </div>
             </div>
@@ -187,6 +188,19 @@
                         <strong>School Year:</strong> {{ $student->school_year->school_year_name ?? 'N/A' }}
                     </span>
                 </div>
+                <div class="mb-3">
+                    <span>
+                        <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                        <strong>Scholarship:</strong> {{ $student->scholarship ?? 'N/A' }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <span>
+                        <i class="fas fa-comment-dots me-2 text-secondary"></i>
+                        <strong>Scholarship Remarks:</strong> {{ $student->scholarship_remarks ?? 'N/A' }}
+                    </span>
+                </div>
+
             </div>
         </div>
     </div>
@@ -203,6 +217,12 @@
                     <span>
                         <i class="fas fa-user-shield me-2 text-info"></i>
                         <strong>Solo Parent:</strong> {{ $student->solo_parent ?? 'N/A' }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <span>
+                        <i class="fas fa-users me-2 text-info"></i>
+                        <strong>4p's:</strong> {{ $student->four_ps ?? 'N/A' }}
                     </span>
                 </div>
                 <div class="mb-3">
@@ -278,7 +298,8 @@
                 <div class="mb-3">
                     <span>
                         <i class="fas fa-graduation-cap me-2 text-danger"></i>
-                        <strong>Highest Education Attainment:</strong> {{ $student->FathersHighestEducation->highest_education_level  ?? 'N/A' }}
+                        <strong>Highest Education Attainment:</strong>
+                        {{ $student->FathersHighestEducation->highest_education_level  ?? 'N/A' }}
                     </span>
                 </div>
                 <div class="mb-3">
@@ -348,7 +369,8 @@
                 <div class="mb-3">
                     <span>
                         <i class="fas fa-graduation-cap me-2 text-danger"></i>
-                        <strong>Highest Education Attainment:</strong> {{ $student->MothersHighestEducation->highest_education_level  ?? 'N/A' }}
+                        <strong>Highest Education Attainment:</strong>
+                        {{ $student->MothersHighestEducation->highest_education_level  ?? 'N/A' }}
                     </span>
                 </div>
                 <div class="mb-3">

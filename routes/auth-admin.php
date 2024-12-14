@@ -39,6 +39,8 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::post('/count-pwd', [StudentController::class, 'countPWDStudents'])->name('admin.students.countPWD');
     Route::post('/count-solo-parent', [StudentController::class, 'countSoloParentStudents'])->name('admin.students.countSoloParent');
     Route::post('/count-ips', [StudentController::class, 'countIpsStudents'])->name('admin.students.countIps');
+    Route::post('/count-4ps', [StudentController::class, 'countFourPsStudents'])->name('admin.students.countFourps');
+    Route::post('/count-scholar-students', [StudentController::class, 'countScholarStudents'])->name('admin.students.countScholar');
     Route::post('/count-active-students', [StudentController::class, 'countActiveStudents'])->name('admin.students.countActive');
 
     Route::get('/student-counts', [StudentController::class, 'getMunicipalStudentCount'])->name('admin.students.getMunicipalStudentCount');
@@ -84,6 +86,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
 
     Route::get('/students/ipsdisplay', [StudentController::class, 'ipsDisplay'])->name('admin.students.ipsdisplay');
     Route::get('/students/pwddisplay', [StudentController::class, 'pwdDisplay'])->name('admin.students.pwddisplay');
+    Route::get('/students/four-ps-display', [StudentController::class, 'fourpsDisplay'])->name('admin.students.fourpsdisplay');
     Route::get('/students/soloparentdisplay', [StudentController::class, 'soloparentDisplay'])->name('admin.students.soloparentdisplay');
 
     Route::post('/validate-current-password', [ProfileController::class, 'validateCurrentPassword'])->name('admin.validateCurrentPassword');
@@ -151,6 +154,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
 
     Route::get('/export-pdf-Ips', [StudentController::class, 'exportIpsPdf'])->name('admin.export.IpsPdf');
     Route::get('/export-pdf-Pwd', [StudentController::class, 'exportPwdPdf'])->name('admin.export.Pwdpdf');
+    Route::get('/export-pdf-4ps', [StudentController::class, 'exportFourPsPdf'])->name('admin.export.Fourpspdf');
     Route::get('/export-pdf-Soloparent', [StudentController::class, 'exportSoloparentPdf'])->name('admin.export.soloparentpdf');
 
     Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('admin.municipalities');
@@ -159,6 +163,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/students/{id}', [StudentController::class, 'show'])->name('admin.students.show');
     Route::get('/ips/print', [StudentController::class, 'ipsPrint'])->name('admin.ips-student.print');
     Route::get('/pwd/print', [StudentController::class, 'pwdPrint'])->name('admin.pwd-student.print');
+    Route::get('/4ps/print', [StudentController::class, 'fourpsPrint'])->name('admin.fourps-student.print');
     Route::get('/solo-parent/print', [StudentController::class, 'soloParentPrint'])->name('admin.solo-parent-student.print');
     Route::get('/below-10K/print', [StudentController::class, 'tenKPrint'])->name('admin.below10k.print');
     Route::get('/between10K-20k/print', [StudentController::class, 'tenKandtweentyKPrint'])->name('admin.between10k-20k.print');

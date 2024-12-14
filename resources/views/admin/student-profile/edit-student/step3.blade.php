@@ -3,8 +3,8 @@
     <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="id_no" class="form-label" style="font-weight: bold;">ID No</label>
-            <input type="text" class="form-control @error('id_no') is-invalid @enderror"
-                id="id_no" name="id_no" value="{{ old('id_no', $students->id_no) }}" id="id_no" required>
+            <input type="text" class="form-control @error('id_no') is-invalid @enderror" id="id_no" name="id_no"
+                value="{{ old('id_no', $students->id_no) }}" id="id_no" required>
             <small id="idNoError" style="color: red;"></small>
             @error('id_no')
             <div class="invalid-feedback">{{ $message }}</div>
@@ -16,11 +16,12 @@
     <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="school_year_id" class="form-label" style="font-weight: bold;">School Year</label>
-            <select class="form-control @error('school_year_id') is-invalid @enderror"
-                name="school_year_id" value="{{ old('school_year_id') }}" required>
+            <select class="form-control @error('school_year_id') is-invalid @enderror" name="school_year_id"
+                value="{{ old('school_year_id') }}" required>
                 <option value="" disabled selected>Select School Year</option>
                 @foreach ($school_years as $school_year)
-                <option value="{{$school_year->id}}" {{$students->school_year_id == $school_year->id ? 'selected' : ''}}>
+                <option value="{{$school_year->id}}"
+                    {{$students->school_year_id == $school_year->id ? 'selected' : ''}}>
                     {{$school_year->school_year_name}}
                 </option>
                 @endforeach
@@ -31,8 +32,8 @@
     <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="semester_id" class="form-label" style="font-weight: bold;">Semester</label>
-            <select class="form-control @error('semester_id') is-invalid @enderror"
-                name="semester_id" value="{{ old('semester_id') }}" required>
+            <select class="form-control @error('semester_id') is-invalid @enderror" name="semester_id"
+                value="{{ old('semester_id') }}" required>
                 <option value="" disabled selected>Select Semester</option>
                 @foreach ($semesters as $semester)
                 <option value="{{$semester->id}}" {{$students->semester_id == $semester->id ? 'selected' : ''}}>
@@ -44,11 +45,11 @@
         </div>
     </div>
     <hr style="border: 1px solid;stroke: black;" />
-    <div class="col-xl-6 col-md-6">
+    <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="course_id" class="form-label" style="font-weight: bold;">Course</label>
-            <select class="form-control @error('course_id') is-invalid @enderror"
-                name="course_id" value="{{ old('course_id') }}" required>
+            <select class="form-control @error('course_id') is-invalid @enderror" name="course_id"
+                value="{{ old('course_id') }}" required>
                 <option value="" disabled selected>Select Course</option>
                 @foreach ($courses as $course)
                 <option value="{{$course->id}}" {{$students->course_id == $course->id ? 'selected' : ''}}>
@@ -59,11 +60,11 @@
             <small class="error-message text-danger"></small>
         </div>
     </div>
-    <div class="col-xl-6 col-md-6">
+    <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="year_id" class="form-label" style="font-weight: bold;">Year Level</label>
-            <select class="form-control @error('year_id') is-invalid @enderror"
-                name="year_id" value="{{ old('year_id') }}" required>
+            <select class="form-control @error('year_id') is-invalid @enderror" name="year_id"
+                value="{{ old('year_id') }}" required>
                 <option value="" disabled selected>Select Year</option>
                 @foreach ($years as $year)
                 <option value="{{$year->id}}" {{$students->year_id == $year->id ? 'selected' : ''}}>
@@ -71,6 +72,27 @@
                 </option>
                 @endforeach
             </select>
+            <small class="error-message text-danger"></small>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-4">
+        <div class="mb-4">
+            <label for="scholarship" class="form-label" style="font-weight: bold;">Are you part of Scholarship?</label>
+            <select class="form-control @error('scholarship') is-invalid @enderror" id="pscholarship" name="scholarship"
+                onchange="toggleRemarks('scholarship_remarks', this.value)" required>
+                <option value="" disabled selected>Select</option>
+                <option value="No" {{old('scholarship', $students->scholarship) == "No" ? 'selected' : ''}}>No</option>
+                <option value="Yes" {{old('scholarship', $students->scholarship) == "Yes" ? 'selected' : ''}}>Yes
+                </option>
+            </select>
+            <small class="error-message text-danger"></small>
+        </div>
+
+        <div class="mb-4" id="scholarship_remarks" style="display: none;">
+            <label for="scholarship_remarksInput" class="form-label">Remarks:</label>
+            <input type="text" class="form-control @error('scholarship_remarks') is-invalid @enderror"
+                value="{{old('scholarship_remarks', $students->scholarship_remarks)}}" required
+                id="scholarship_remarksInput" name="scholarship_remarks">
             <small class="error-message text-danger"></small>
         </div>
     </div>

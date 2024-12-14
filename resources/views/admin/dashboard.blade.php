@@ -11,7 +11,7 @@
 </ol>
 <div class="row">
 
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="card bg-primary text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between">
                 <div>
@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="card bg-warning text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between">
                 <div>
@@ -35,13 +35,14 @@
                 <span id="ips-count" style="font-size: 20px;">0</span>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="{{route('admin.students.ipsdisplay')}}">View Details</a>
+                <a class="small text-white stretched-link" href="{{route('admin.students.ipsdisplay')}}">View
+                    Details</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="card bg-success text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
@@ -50,14 +51,15 @@
                 <span id="pwd-count" style="font-size: 20px;">0</span>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="{{route('admin.students.pwddisplay')}}">View Details</a>
+                <a class="small text-white stretched-link" href="{{route('admin.students.pwddisplay')}}">View
+                    Details</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
     </div>
 
 
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="card bg-secondary text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
@@ -66,7 +68,40 @@
                 <span id="solo-parent-count" style="font-size: 20px;">0</span>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="{{route('admin.students.soloparentdisplay')}}">View Details</a>
+                <a class="small text-white stretched-link" href="{{route('admin.students.soloparentdisplay')}}">View
+                    Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card bg-secondary text-white mb-4 shadow">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-user-friends"></i> Total of 4p's student
+                </div>
+                <span id="four-ps-count" style="font-size: 20px;">0</span>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{route('admin.students.fourpsdisplay')}}">View
+                    Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card bg-secondary text-white mb-4 shadow">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-user-friends"></i> Total of Scholar student
+                </div>
+                <span id="scholar-count" style="font-size: 20px;">0</span>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{route('admin.students.soloparentdisplay')}}">View
+                    Details</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -114,6 +149,8 @@
     const countPWDUrl = "{{ route('admin.students.countPWD') }}";
     const countSoloParentUrl = "{{ route('admin.students.countSoloParent') }}";
     const countIpsUrl = "{{ route('admin.students.countIps') }}";
+    const countFourpsUrl = "{{ route('admin.students.countFourps') }}";
+    const countScholarUrl = "{{ route('admin.students.countScholar') }}";
     const countTotalStudents = "{{ route('admin.students.countActive') }}";
     const violationsDataUrl = "{{ route('admin.violations.chart-data') }}";
     const totalStudentsDataUrl = "{{ route('admin.totalStudents.chart-data') }}";

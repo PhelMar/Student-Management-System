@@ -47,6 +47,37 @@ $(document).ready(function () {
             }
         });
     }
+    function countFourPsStudents() {
+        $.ajax({
+            url: countFourpsUrl,
+            method: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $('#four-ps-count').text(response.count)
+            },
+            error: function (xhr) {
+                console.error("AJAX error:", xhr);
+            }
+        });
+    }
+
+    function countScholarStudents() {
+        $.ajax({
+            url: countScholarUrl,
+            method: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $('#scholar-count').text(response.count)
+            },
+            error: function (xhr) {
+                console.error("AJAX error:", xhr);
+            }
+        });
+    }
 
     function fetchMunicipalityStudentCounts() {
         const columnColors = ['bg-primary', 'bg-warning', 'bg-success', 'bg-secondary']; // Colors for each column
@@ -94,6 +125,8 @@ $(document).ready(function () {
     countIpsStudents();
     countActiveStudents();
     fetchMunicipalityStudentCounts();
+    countFourPsStudents();
+    countScholarStudents();
 });
 
 function countActiveStudents() {

@@ -77,6 +77,19 @@ class StudentController extends Controller
         return response()->json(['count' => $ipsCount]);
     }
 
+    public function countFourPsStudents()
+    {
+
+        $fourps = Student::where('four_ps', 'Yes')->count();
+        return response()->json(['count' => $fourps]);
+    }
+    public function countScholarStudents()
+    {
+
+        $scholar = Student::where('scholarship', 'Yes')->count();
+        return response()->json(['count' => $scholar]);
+    }
+
     public function countActiveStudents()
     {
         $activeCount = Student::where('status', 'active')->count();
@@ -348,6 +361,9 @@ class StudentController extends Controller
             'ips' => 'required|in:No,Yes',
             'ips_remarks' => 'nullable|max:50',
             'solo_parent' => 'required|in:No,Yes',
+            'four_ps' => 'required|in:No,Yes',
+            'scholarship' => 'required|in:No,Yes',
+            'scholarship_remarks' => 'nullable|max:100',
             'course_id' => 'required|exists:courses,id',
             'year_id' => 'required|exists:years,id',
             'semester_id' => 'required|exists:semesters,id',
@@ -534,6 +550,9 @@ class StudentController extends Controller
                 'ips' => 'required|in:No,Yes',
                 'ips_remarks' => 'nullable|max:50',
                 'solo_parent' => 'required|in:No,Yes',
+                'four_ps' => 'required|in:No,Yes',
+                'scholarship' => 'required|in:No,Yes',
+                'scholarship_remarks' => 'nullable|max:100',
                 'course_id' => 'required|exists:courses,id',
                 'year_id' => 'required|exists:years,id',
                 'semester_id' => 'required|exists:semesters,id',
@@ -621,6 +640,9 @@ class StudentController extends Controller
             $student->ips = $request->input('ips');
             $student->ips_remarks = $request->input('ips_remarks');
             $student->solo_parent = $request->input('solo_parent');
+            $student->four_ps = $request->input('four_ps');
+            $student->scholarship = $request->input('scholarship');
+            $student->scholarship_remarks = $request->input('scholarship_remarks');
             $student->course_id = $request->input('course_id');
             $student->year_id = $request->input('year_id');
             $student->semester_id = $request->input('semester_id');
@@ -824,6 +846,67 @@ class StudentController extends Controller
 
         $school_years = SchoolYear::all();
         return view('admin.pwd-student.display', compact('school_years'));
+    }
+
+    public function fourpsDisplay(Request $request)
+    {
+
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+
+            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'pwd_remarks')
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                ])
+                ->where('status', 'active')
+                ->where('four_ps', 'Yes')
+                ->orderBy('last_name', 'asc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('last_name', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'last_name' => $row->last_name,
+                        'first_name' => $row->first_name,
+                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
+                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
+                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
+                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                    ];
+                }),
+            ]);
+        }
+
+        $school_years = SchoolYear::all();
+        return view('admin.four-ps-student.display', compact('school_years'));
     }
 
     public function soloparentDisplay(Request $request)
@@ -1067,7 +1150,7 @@ class StudentController extends Controller
             'length' => 'integer|min:1|max:100',
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
-        
+
         if ($request->ajax()) {
             $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
                 ->whereHas('income', function ($q) {
@@ -1139,6 +1222,18 @@ class StudentController extends Controller
         return $pdf->download('pwd_students.pdf');
     }
 
+    public function exportFourPsPdf(Request $request)
+    {
+        $fourpsData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('four_ps', 'Yes')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.four_ps_pdf', compact('fourpsData'));
+
+        return $pdf->download('4ps_students.pdf');
+    }
+
     public function exportSoloparentPdf(Request $request)
     {
         $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
@@ -1187,6 +1282,19 @@ class StudentController extends Controller
             ->get();
 
         return view('admin.pwd-student.print', compact('pwdData'));
+    }
+
+    public function fourpsPrint()
+    {
+
+        $fourpsData = Student::with('course', 'year', 'semester', 'school_year')
+            ->where('status', 'active')
+            ->where('four_ps', 'Yes')
+            ->orderBy('course_id', 'asc')
+            ->orderBy('last_name', 'asc')
+            ->get();
+
+        return view('admin.four-ps-student.print', compact('fourpsData'));
     }
     public function soloParentPrint()
     {
