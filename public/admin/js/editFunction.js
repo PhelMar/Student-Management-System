@@ -15,6 +15,7 @@ function toggleRemarks(remarksId, value) {
 document.addEventListener('DOMContentLoaded', function () {
     toggleRemarks('pwd_remarks', document.getElementById('pwd').value);
     toggleRemarks('ips_remarks', document.getElementById('ips').value);
+    toggleRemarks('scholarship_remarks', document.getElementById('scholarship').value);
 });
 
 

@@ -78,7 +78,7 @@
     <div class="col-xl-4 col-md-4">
         <div class="mb-4">
             <label for="scholarship" class="form-label" style="font-weight: bold;">Are you part of Scholarship?</label>
-            <select class="form-control @error('scholarship') is-invalid @enderror" id="pscholarship" name="scholarship"
+            <select class="form-control @error('scholarship') is-invalid @enderror" id="scholarship" name="scholarship"
                 onchange="toggleRemarks('scholarship_remarks', this.value)" required>
                 <option value="" disabled selected>Select</option>
                 <option value="No" {{old('scholarship', $students->scholarship) == "No" ? 'selected' : ''}}>No</option>

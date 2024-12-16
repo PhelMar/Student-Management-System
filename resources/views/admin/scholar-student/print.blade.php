@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print 4p's Students</title>
+    <title>Print Scholar Students</title>
     <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.min.css') }}">
     <style>
         body {
@@ -61,7 +61,7 @@
             <h2>Legacy College of Compostela, Inc.</h2>
             <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
             <p>Quality Education Within Reach</p>
-            <p>4p's Students List</p>
+            <p>Scholar Students List</p>
         </div>
     </div>
     <table border="1">
@@ -74,23 +74,25 @@
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
                 <th>SCHOOL YEAR</th>
+                <th>REMARKS</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($fourpsData as $fourpsdata)
+            @foreach ($scholarData as $scholardata)
             <tr>
                 <td>{{$loop->iteration}}</td>
-                <td>{{$fourpsdata->last_name}}</td>
-                <td>{{$fourpsdata->first_name}}</td>
-                <td>{{$fourpsdata->course->course_name}}</td>
-                <td>{{$fourpsdata->year->year_name}}</td>
-                <td>{{$fourpsdata->semester->semester_name}}</td>
-                <td>{{$fourpsdata->school_year->school_year_name}}</td>
+                <td>{{$scholardata->last_name}}</td>
+                <td>{{$scholardata->first_name}}</td>
+                <td>{{$scholardata->course->course_name}}</td>
+                <td>{{$scholardata->year->year_name}}</td>
+                <td>{{$scholardata->semester->semester_name}}</td>
+                <td>{{$scholardata->school_year->school_year_name}}</td>
+                <td>{{$scholardata->scholarship_remarks}}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="6" class="total">Total 4p's Students</td>
-                <td class="total">{{ $fourpsData->count() }}</td>
+                <td colspan="7" class="total">Total Scholar Students</td>
+                <td class="total">{{ $scholarData->count() }}</td>
             </tr>
         </tbody>
     </table>

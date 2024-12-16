@@ -45,7 +45,7 @@
             <!-- IP's Report -->
             <li>
                 <a class="dropdown-item" href="{{route('admin.students.ipsdisplay')}}">
-                    <i class="fa fa-admins me-2"></i> IP's Report
+                    <i class="fa fa-users me-2"></i> IP's Report
                 </a>
             </li>
 
@@ -58,12 +58,17 @@
 
             <li>
                 <a class="dropdown-item" href="{{route('admin.students.fourpsdisplay')}}">
-                    <i class="fa fa-female me-2"></i> 4p's Parent Report
+                    <i class="fa fa-users"></i> 4p's Student Report
                 </a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{route('admin.students.dropView')}}">
-                    <i class="fa fa-admin-times me-2"></i> Dropped Student
+                <a class="dropdown-item" href="{{route('admin.students.scholardisplay')}}">
+                    <i class="fas fa-user-graduate"></i> Scholar Student Report
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item text-danger" href="{{route('admin.students.dropView')}}">
+                    <i class="fa fa-user-times me-2" style="color: red;"></i> Dropped Student
                 </a>
             </li>
         </ul>

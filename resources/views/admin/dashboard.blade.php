@@ -76,10 +76,10 @@
     </div>
 
     <div class="col-xl-4 col-md-6">
-        <div class="card bg-secondary text-white mb-4 shadow">
+        <div class="card bg-warning text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <i class="fas fa-user-friends"></i> Total of 4p's student
+                    <i class="fas fa-users"></i> Total of 4p's student
                 </div>
                 <span id="four-ps-count" style="font-size: 20px;">0</span>
             </div>
@@ -92,15 +92,15 @@
     </div>
 
     <div class="col-xl-4 col-md-6">
-        <div class="card bg-secondary text-white mb-4 shadow">
+        <div class="card bg-success text-white mb-4 shadow">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <i class="fas fa-user-friends"></i> Total of Scholar student
+                    <i class="fas fa-user-graduate"></i> Total Number of Scholar Students
                 </div>
                 <span id="scholar-count" style="font-size: 20px;">0</span>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="{{route('admin.students.soloparentdisplay')}}">View
+                <a class="small text-white stretched-link" href="{{route('admin.students.scholardisplay')}}">View
                     Details</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
