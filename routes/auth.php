@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -7,14 +8,25 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
+
+    Route::get('create', [StudentController::class, 'createStudent'])->name('admin.students.createStudent');
+
+    Route::post('/students/store', [StudentController::class, 'storeStudent'])->name('admin.students.storeStudent');
+
+    Route::get('/get-municipalities/{province_id}', [LocationController::class, 'getMunicipalities'])->name('admin.municipalitiesStudent');
+    Route::get('/get-barangays/{municipality_id}', [LocationController::class, 'getBarangays'])->name('admin.barangaysStudent');
+
+    Route::post('/check-idno', [StudentController::class, 'checkIDNo'])->name('admin.students.checkIDNoStudent');
+
+    Route::post('/check-email', [StudentController::class, 'checkEmail'])->name('admin.students.checkEmailStudent');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
@@ -42,7 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
-        
+
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');
 
