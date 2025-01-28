@@ -207,9 +207,38 @@ class StudentController extends Controller
                 }),
             ]);
         }
-
-        return view('admin.student-profile.display');
+        $courses = Course::all();
+        $years = Year::all();
+        return view('admin.student-profile.display', compact(
+            'courses',
+            'years',
+        ));
     }
+
+    public function printStudents(Request $request)
+    {
+        $courseId = $request->query('course');
+        $yearId = $request->query('year');
+
+        $request->validate([
+            'course' => 'required|exists:courses,id',
+            'year' => 'required|exists:years,id',
+        ]);
+
+        $students = Student::with(['course', 'year', 'semester', 'school_year'])
+            ->where('course_id', $courseId)
+            ->where('year_id', $yearId)
+            ->where('status', 'active') // Filter only active students
+            ->get();
+
+        return view('admin.printStudents.print', [
+            'studentsData' => $students,
+            'courseName' => Course::find($courseId)->course_name,
+            'yearName' => Year::find($yearId)->year_name,
+        ]);
+    }
+
+
 
 
     public function dropStudentDisplay(Request $request)

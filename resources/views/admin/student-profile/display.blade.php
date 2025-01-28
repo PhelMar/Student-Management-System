@@ -9,19 +9,22 @@
 
 @if (session('success'))
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        Swal.fire({
-            title: 'Success!',
-            text: "{{ session('success') }}",
-            icon: 'success',
-            confirmButtonText: 'OK',
-            timer: 1200
-        });
+document.addEventListener("DOMContentLoaded", function() {
+    Swal.fire({
+        title: 'Success!',
+        text: "{{ session('success') }}",
+        icon: 'success',
+        confirmButtonText: 'OK',
+        timer: 1200
     });
+});
 </script>
 @endif
 
 <div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-primary shadow me-3" data-bs-toggle="modal" data-bs-target="#printModal">
+        <i class="fas fa-print me-2"></i> Print
+    </a>
     <div class="dropdown me-2">
         <button class="btn btn-success dropdown-toggle shadow" type="button" data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -78,6 +81,45 @@
         <i class="fas fa-user-plus me-2"></i> Add Students
     </a>
 </div>
+
+<!--Modal-->
+<div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="printModalLabel">Print Student Records</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="printForm">
+                    <div class="mb-3">
+                        <label for="course" class="form-label">Course</label>
+                        <select class="form-select" id="course" name="course" required>
+                            <option value="" selected disabled>Select Course</option>
+                            @foreach ($courses as $course)
+                            <option value="{{$course->id}}">{{$course->course_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Year Level</label>
+                        <select class="form-select" id="year" name="year" required>
+                            <option value="" selected disabled>Select Year Level</option>
+                            @foreach ($years as $year)
+                            <option value="{{$year->id}}">{{$year->year_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="printBtn">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card card-mb-4 shadow">
     <div class="card-header text-white" style="background-color: #0A7075">
         <i class="fas fa-table me-1"></i>
@@ -114,55 +156,55 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+$(document).ready(function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 
-        const table = $('#dataTables').DataTable({
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            scrollX: true,
-            ajax: {
-                url: "{{ route('admin.students.display') }}",
-                type: "GET",
+    const table = $('#dataTables').DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        scrollX: true,
+        ajax: {
+            url: "{{ route('admin.students.display') }}",
+            type: "GET",
+        },
+        columns: [{
+                data: 'DT_RowIndex',
+                orderable: false,
+                searchable: false
             },
-            columns: [{
-                    data: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'id_no',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'name',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'course_name',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'year_name',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'semester_name',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'school_year_name',
-                    defaultContent: 'N/A'
-                },
-                {
-                    data: 'hashed_id',
-                    render: function(data, type, row) {
-                        return `
+            {
+                data: 'id_no',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'name',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'course_name',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'year_name',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'semester_name',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'school_year_name',
+                defaultContent: 'N/A'
+            },
+            {
+                data: 'hashed_id',
+                render: function(data, type, row) {
+                    return `
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton${data}" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa fa-cogs"></i> Actions
@@ -186,43 +228,57 @@
             </ul>
         </div>
     `;
-                    }
-
                 }
-            ],
-            dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
-            pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
-            order: [
-                [0, 'desc']
-            ],
-            language: {
-                search: "_INPUT_",
-                searchPlaceholder: "Search students..."
+
             }
-        });
-        $('#sidebarToggle').on('click', function() {
-            setTimeout(function() {
-                table.columns.adjust().draw();
-            }, 300);
-        });
+        ],
+        dom: '<"d-flex justify-content-between"lf>rt<"d-flex justify-content-between"ip>',
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [
+            [0, 'desc']
+        ],
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search students..."
+        }
     });
+    $('#sidebarToggle').on('click', function() {
+        setTimeout(function() {
+            table.columns.adjust().draw();
+        }, 300);
+    });
+});
 
 
-    function confirmDrop(studentId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, drop student!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "{{ url('admin/students/drop') }}/" + studentId;
-            }
-        });
+function confirmDrop(studentId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, drop student!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{{ url('admin/students/drop') }}/" + studentId;
+        }
+    });
+}
+
+document.getElementById('printBtn').addEventListener('click', function() {
+    const courseId = document.getElementById('course').value;
+    const yearId = document.getElementById('year').value;
+
+    if (!courseId || !yearId) {
+        alert('Please select both Course and Year Level.');
+        return;
     }
+
+    const url = `{{ route('admin.students.print') }}?course=${courseId}&year=${yearId}`;
+    window.open(url, '_blank');
+
+});
 </script>
 @endsection

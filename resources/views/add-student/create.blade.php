@@ -18,16 +18,15 @@
         });
     });
 </script>
-@elseif (session('error'))
+@endif
+@if (session('error'))
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        Swal.fire({
-            title: 'Error!',
-            text: "{{session('error')}}",
-            icon: 'error',
-            confirmButtonText: 'OK',
-            timer: 1200
-        });
+    Swal.fire({
+        title: 'Error!',
+        text: "{{ session('error') }}",
+        icon: 'error',
+        confirmButtonText: 'OK',
+        timer: 1200
     });
 </script>
 @endif

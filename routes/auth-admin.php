@@ -183,6 +183,9 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/bscrim/print', [Clearances::class, 'bscrimClearedPrint'])->name('admin.bscrim.print');
     Route::get('/beed/print', [Clearances::class, 'beedClearedPrint'])->name('admin.beed.print');
 
+    Route::get('/print-students', [StudentController::class, 'printStudents'])->name('admin.students.print');
+
+
 
     Route::get('/clearance/BSITclearedStudentDisplay', [Clearances::class, 'BSITcleared'])->name('admin.BSITcleared.display');
     Route::get('/clearance/BSTMclearedStudentDisplay', [Clearances::class, 'BSTMcleared'])->name('admin.BSTMcleared.display');
