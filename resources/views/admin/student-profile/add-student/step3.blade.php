@@ -18,10 +18,11 @@
             <label for="school_year_id" class="form-label" style="font-weight: bold;">School Year</label>
             <select class="form-control @error('school_year_id') is-invalid @enderror" name="school_year_id"
                 value="{{ old('school_year_id') }}" required>
-                <option value="" disabled selected></option>
-                @foreach ($school_years as $school_year)
-                <option value="{{$school_year->id}}">{{$school_year->school_year_name}}</option>
-                @endforeach
+                @if( $latest_school_year )
+                    <option value="{{ $latest_school_year->id }}">
+                        {{ $latest_school_year->school_year_name}}
+                    </option>
+                @endif
             </select>
             <small class="error-message text-danger"></small>
         </div>

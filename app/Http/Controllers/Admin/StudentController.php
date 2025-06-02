@@ -24,6 +24,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Vinkla\Hashids\Facades\Hashids;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -42,6 +43,10 @@ class StudentController extends Controller
         $parents_status = ParentStatuses::all();
         $provinces = Province::orderBy('prov_desc', 'asc')->get();
 
+        $latest_school_year = DB::table('school_years')
+        ->orderBy('school_year_name', 'desc')
+        ->first();
+
 
         return view('admin.student-profile.add-student.create', compact(
             'stays',
@@ -55,7 +60,8 @@ class StudentController extends Controller
             'highest_educations',
             'incomes',
             'parents_status',
-            'provinces'
+            'provinces',
+            'latest_school_year'
         ));
     }
 
@@ -74,6 +80,10 @@ class StudentController extends Controller
         $parents_status = ParentStatuses::all();
         $provinces = Province::orderBy('prov_desc', 'asc')->get();
 
+        $latest_school_year = DB::table('school_years')
+        ->orderBy('school_year_name', 'desc')
+        ->first();
+
 
         return view('add-student.create', compact(
             'stays',
@@ -87,7 +97,8 @@ class StudentController extends Controller
             'highest_educations',
             'incomes',
             'parents_status',
-            'provinces'
+            'provinces',
+            'latest_school_year'
         ));
     }
 
@@ -207,11 +218,15 @@ class StudentController extends Controller
                 }),
             ]);
         }
+        $school_year = DB::table('school_years')->pluck('school_year_name', 'id');
+        $semester = DB::table('semesters')->pluck('semester_name', 'id');
         $courses = Course::all();
         $years = Year::all();
         return view('admin.student-profile.display', compact(
             'courses',
             'years',
+            'semester',
+            'school_year',
         ));
     }
 
@@ -380,6 +395,14 @@ class StudentController extends Controller
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
+            'single_mom' => [
+        'nullable',
+        Rule::in(['No', 'Yes']),
+        Rule::requiredIf(function () use ($request) {
+            $gender = Gender::find($request->gender_id);
+            return $gender && strtolower($gender->gender_name) === 'female';
+        }),
+    ],
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
@@ -469,6 +492,14 @@ class StudentController extends Controller
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
+            'single_mom' => [
+        'nullable',
+        Rule::in(['No', 'Yes']),
+        Rule::requiredIf(function () use ($request) {
+            $gender = Gender::find($request->gender_id);
+            return $gender && strtolower($gender->gender_name) === 'female';
+        }),
+    ],
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
@@ -651,7 +682,7 @@ class StudentController extends Controller
     {
         try {
             $id = Hashids::decode($hashId)[0] ?? null;
-            $validatedData = $request->validate([
+            $rules = [
                 'id_no' => 'required|digits:10|unique:tbl_students,id_no,' . $id,
                 'first_name' => 'required|max:40',
                 'middle_name' => 'nullable|max:40',
@@ -723,7 +754,19 @@ class StudentController extends Controller
                 'mothers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
                 'mothers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
                 'mothers_purok' => 'nullable|string|max:100',
-            ]);
+            ];
+
+            if ($request->gender_id) {
+                $gender = Gender::find($request->gender_id);
+                if ($gender && strtolower($gender->gender_name) === 'female') {
+                    $rules['single_mom'] = ['required', Rule::in(['Yes', 'No'])];
+                } else {
+                    $rules['single_mom'] = ['nullable', Rule::in(['Yes', 'No'])];
+                }
+            }
+
+            $validatedData = $request->validate($rules);
+
 
             $student = Student::findOrFail($id);
 
@@ -733,6 +776,7 @@ class StudentController extends Controller
             $student->last_name = $request->input('last_name');
             $student->nick_name = $request->input('nick_name');
             $student->gender_id = $request->input('gender_id');
+            $student->single_mom = $request->input('single_mom');
             $student->birthdate = $request->input('birthdate');
             $student->place_of_birth = $request->input('place_of_birth');
             $student->permanent_province_id = $request->input('permanent_province_id');
@@ -1411,11 +1455,19 @@ class StudentController extends Controller
 
     public function exportIpsPdf(Request $request)
     {
-        // Fetch IPs data for the selected school year
-        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
+        $schoolYearId = $request->input('school_year_id');
+
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('ips', 'Yes')
-            ->get();
+            ->where('ips', 'Yes');
+
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $ipsData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name')->get();
 
         $pdf = Pdf::loadView('admin.pdf.ips_pdf', compact('ipsData'));
 
@@ -1424,10 +1476,19 @@ class StudentController extends Controller
 
     public function exportPwdPdf(Request $request)
     {
-        $pwdData = Student::with('course', 'year', 'semester', 'school_year')
+        $schoolYearId = $request->input('school_year_id');
+
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('pwd', 'Yes')
-            ->get();
+            ->where('pwd', 'Yes');
+
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $pwdData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name')->get();
 
         $pdf = Pdf::loadView('admin.pdf.pwd_pdf', compact('pwdData'));
 
@@ -1436,10 +1497,19 @@ class StudentController extends Controller
 
     public function exportFourPsPdf(Request $request)
     {
-        $fourpsData = Student::with('course', 'year', 'semester', 'school_year')
+        $schoolYearId = $request->input('school_year_id');
+
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('four_ps', 'Yes')
-            ->get();
+            ->where('four_ps', 'Yes');
+
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $fourpsData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name')->get();
 
         $pdf = Pdf::loadView('admin.pdf.four_ps_pdf', compact('fourpsData'));
 
@@ -1448,10 +1518,19 @@ class StudentController extends Controller
 
     public function exportScholarPdf(Request $request)
     {
-        $scholarData = Student::with('course', 'year', 'semester', 'school_year')
+        $schoolYearId = $request->input('school_year_id');
+
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('scholarship', 'Yes')
-            ->get();
+            ->where('scholarship', 'Yes');
+        
+            if ($schoolYearId){
+                $query->where('school_year_id', $schoolYearId);
+            }
+
+        $scholarData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name')->get();
 
         $pdf = Pdf::loadView('admin.pdf.scholar_student_pdf', compact('scholarData'));
 
@@ -1459,16 +1538,26 @@ class StudentController extends Controller
     }
 
     public function exportSoloparentPdf(Request $request)
-    {
-        $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('status', 'active')
-            ->where('solo_parent', 'Yes')
-            ->get();
+{
+    $schoolYearId = $request->input('school_year_id');
 
-        $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', compact('soloparentData'));
+    $query = Student::with('course', 'year', 'semester', 'school_year')
+        ->where('status', 'active')
+        ->where('solo_parent', 'Yes');
 
-        return $pdf->download('soloparent_students.pdf');
+    if ($schoolYearId) {
+        $query->where('school_year_id', $schoolYearId);
     }
+
+    $soloparentData = $query
+    ->orderBy('course_id', 'asc')
+    ->orderBy('last_name')->get();
+
+    $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', compact('soloparentData'));
+
+    return $pdf->download('soloparent_students.pdf');
+}
+
 
     public function getActiveStudentsStats()
     {
@@ -1482,12 +1571,70 @@ class StudentController extends Controller
         return response()->json($activeStudents);
     }
 
-    public function ipsPrint()
-    {
 
-        $ipsData = Student::with('course', 'year', 'semester', 'school_year')
+    public function generateStudentsReport(Request $request){
+
+        $schoolYearId = $request->school_year_id;
+        $semesterId = $request->semester_id;
+
+        $rawData = Student::selectRaw('courses.course_name as course, years.year_name as year_level, COUNT(*) as total')
+        ->join('courses', 'tbl_students.course_id', '=', 'courses.id')
+        ->join('years', 'tbl_students.year_id', '=', 'years.id')
+        ->where('tbl_students.status', 'active')
+        ->where('tbl_students.school_year_id', $schoolYearId)
+        ->where('tbl_students.semester_id', $semesterId)
+        ->groupBy('courses.course_name', 'years.year_name')
+        ->orderBy('courses.course_name')
+        ->get();
+
+    $report = [];
+    $overallTotal = 0;
+
+    foreach ($rawData as $row) {
+        $course = $row->course;
+        $year = $row->year_level;
+        $count = $row->total;
+
+        if (!isset($report[$course])) {
+            $report[$course] = [
+                '1st Year' => 0,
+                '2nd Year' => 0,
+                '3rd Year' => 0,
+                '4th Year' => 0,
+                'total' => 0
+            ];
+        }
+
+        $report[$course][$year] = $count;
+        $report[$course]['total'] += $count;
+        $overallTotal += $count;
+    }
+
+    // Handle view or PDF/Print
+    $action = $request->input('action');
+
+    if ($action === 'pdf') {
+        $pdf = PDF::loadView('admin.total_students_report.pdf', compact('report', 'overallTotal'));
+        return $pdf->stream('Student_Report.pdf');
+    } elseif ($action === 'print') {
+        return view('admin.total_students_report.print', compact('report', 'overallTotal'));
+    }
+
+    return view('admin.reportResult', compact('report', 'overallTotal'));
+    }
+
+    public function ipsPrint(Request $request)
+    {
+        $schoolYearId = $request->input('school_year_id');
+
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('ips', 'Yes')
+            ->where('ips', 'Yes');
+            
+        if($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+        $ipsData = $query
             ->orderBy('course_id', 'asc')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1495,12 +1642,19 @@ class StudentController extends Controller
         return view('admin.ips-student.print', compact('ipsData'));
     }
 
-    public function pwdPrint()
+    public function pwdPrint(Request $request)
     {
+        $schoolYearId = $request->input('school_year_id');
 
-        $pwdData = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('pwd', 'Yes')
+            ->where('pwd', 'Yes');
+
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $pwdData = $query
             ->orderBy('course_id', 'asc')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1508,12 +1662,20 @@ class StudentController extends Controller
         return view('admin.pwd-student.print', compact('pwdData'));
     }
 
-    public function fourpsPrint()
+    public function fourpsPrint(Request $request)
     {
+        $schoolYearId = $request->input('school_year_id');
 
-        $fourpsData = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('four_ps', 'Yes')
+            ->where('four_ps', 'Yes');
+            
+        
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $fourpsData = $query
             ->orderBy('course_id', 'asc')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1521,30 +1683,44 @@ class StudentController extends Controller
         return view('admin.four-ps-student.print', compact('fourpsData'));
     }
 
-    public function scholarPrint()
+    public function scholarPrint(Request $request)
     {
+        $schoolYearId = $request->input('school_year_id');
 
-        $scholarData = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with('course', 'year', 'semester', 'school_year')
             ->where('status', 'active')
-            ->where('scholarship', 'Yes')
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            ->where('scholarship', 'Yes');
+        
+        if ($schoolYearId) {
+            $query->where('school_year_id', $schoolYearId);
+        }
+
+        $scholarData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name', 'asc')
+        ->get();
 
         return view('admin.scholar-student.print', compact('scholarData'));
     }
-    public function soloParentPrint()
-    {
+    public function soloParentPrint(Request $request)
+{
+    $schoolYearId = $request->input('school_year_id');
 
-        $soloparentData = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('status', 'active')
-            ->where('solo_parent', 'Yes')
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+    $query = Student::with('course', 'year', 'semester', 'school_year')
+        ->where('status', 'active')
+        ->where('solo_parent', 'Yes');
 
-        return view('admin.solo-parent-student.print', compact('soloparentData'));
+    if ($schoolYearId) {
+        $query->where('school_year_id', $schoolYearId);
     }
+
+    $soloparentData = $query
+        ->orderBy('course_id', 'asc')
+        ->orderBy('last_name', 'asc')
+        ->get();
+
+    return view('admin.solo-parent-student.print', compact('soloparentData'));
+}
 
     public function tenKPrint()
     {

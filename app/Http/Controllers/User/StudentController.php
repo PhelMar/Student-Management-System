@@ -24,6 +24,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Vinkla\Hashids\Facades\Hashids;
 
 class StudentController extends Controller
@@ -43,6 +44,11 @@ class StudentController extends Controller
         $parents_status = ParentStatuses::all();
         $provinces = Province::orderBy('prov_desc', 'asc')->get();
 
+        $latest_school_year = DB::table('school_years')
+        ->orderBy('school_year_name', 'desc')
+        ->first();
+
+
         return view('users.student-profile.add-student.create', compact(
             'stays',
             'genders',
@@ -55,7 +61,9 @@ class StudentController extends Controller
             'highest_educations',
             'incomes',
             'parents_status',
-            'provinces'
+            'provinces',
+            'latest_school_year'
+
         ));
     }
 
@@ -283,6 +291,14 @@ class StudentController extends Controller
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
+            'single_mom' => [
+        'nullable',
+        Rule::in(['No', 'Yes']),
+        Rule::requiredIf(function () use ($request) {
+            $gender = Gender::find($request->gender_id);
+            return $gender && strtolower($gender->gender_name) === 'female';
+        }),
+    ],
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
@@ -462,7 +478,7 @@ class StudentController extends Controller
     {
         try {
             $id = Hashids::decode($hashId)[0] ?? null;
-            $validatedData = $request->validate([
+            $rules = [
                 'id_no' => 'required|digits:10|unique:tbl_students,id_no,' . $id,
                 'first_name' => 'required|max:40',
                 'middle_name' => 'nullable|max:40',
@@ -511,6 +527,9 @@ class StudentController extends Controller
                 'ips' => 'required|in:No,Yes',
                 'ips_remarks' => 'nullable|max:50',
                 'solo_parent' => 'required|in:No,Yes',
+                'four_ps' => 'required|in:No,Yes',
+                'scholarship' => 'required|in:No,Yes',
+                'scholarship_remarks' => 'nullable|max:100',
                 'course_id' => 'required|exists:courses,id',
                 'year_id' => 'required|exists:years,id',
                 'semester_id' => 'required|exists:semesters,id',
@@ -531,7 +550,18 @@ class StudentController extends Controller
                 'mothers_municipality_id' => 'nullable|exists:municipalities,citymun_code',
                 'mothers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
                 'mothers_purok' => 'nullable|string|max:100',
-            ]);
+            ];
+
+            if ($request->gender_id) {
+                $gender = Gender::find($request->gender_id);
+                if ($gender && strtolower($gender->gender_name) === 'female') {
+                    $rules['single_mom'] = ['required', Rule::in(['Yes', 'No'])];
+                } else {
+                    $rules['single_mom'] = ['nullable', Rule::in(['Yes', 'No'])];
+                }
+            }
+
+            $validatedData = $request->validate($rules);
 
             $student = Student::findOrFail($id);
 
@@ -541,6 +571,7 @@ class StudentController extends Controller
             $student->last_name = $request->input('last_name');
             $student->nick_name = $request->input('nick_name');
             $student->gender_id = $request->input('gender_id');
+            $student->single_mom = $request->input('single_mom');
             $student->birthdate = $request->input('birthdate');
             $student->place_of_birth = $request->input('place_of_birth');
             $student->permanent_province_id = $request->input('permanent_province_id');
