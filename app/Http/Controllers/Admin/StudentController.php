@@ -1571,58 +1571,6 @@ class StudentController extends Controller
         return response()->json($activeStudents);
     }
 
-
-    public function generateStudentsReport(Request $request){
-
-        $schoolYearId = $request->school_year_id;
-        $semesterId = $request->semester_id;
-
-        $rawData = Student::selectRaw('courses.course_name as course, years.year_name as year_level, COUNT(*) as total')
-        ->join('courses', 'tbl_students.course_id', '=', 'courses.id')
-        ->join('years', 'tbl_students.year_id', '=', 'years.id')
-        ->where('tbl_students.status', 'active')
-        ->where('tbl_students.school_year_id', $schoolYearId)
-        ->where('tbl_students.semester_id', $semesterId)
-        ->groupBy('courses.course_name', 'years.year_name')
-        ->orderBy('courses.course_name')
-        ->get();
-
-    $report = [];
-    $overallTotal = 0;
-
-    foreach ($rawData as $row) {
-        $course = $row->course;
-        $year = $row->year_level;
-        $count = $row->total;
-
-        if (!isset($report[$course])) {
-            $report[$course] = [
-                '1st Year' => 0,
-                '2nd Year' => 0,
-                '3rd Year' => 0,
-                '4th Year' => 0,
-                'total' => 0
-            ];
-        }
-
-        $report[$course][$year] = $count;
-        $report[$course]['total'] += $count;
-        $overallTotal += $count;
-    }
-
-    // Handle view or PDF/Print
-    $action = $request->input('action');
-
-    if ($action === 'pdf') {
-        $pdf = PDF::loadView('admin.total_students_report.pdf', compact('report', 'overallTotal'));
-        return $pdf->stream('Student_Report.pdf');
-    } elseif ($action === 'print') {
-        return view('admin.total_students_report.print', compact('report', 'overallTotal'));
-    }
-
-    return view('admin.reportResult', compact('report', 'overallTotal'));
-    }
-
     public function ipsPrint(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
@@ -1769,4 +1717,54 @@ class StudentController extends Controller
 
         return view('admin.income-base-report.print4', compact('above30k'));
     }
+    public function generateReport(Request $request)
+{
+    $schoolYearId = $request->school_year_id;
+    $semesterId = $request->semester_id;
+
+    $rawData = Student::selectRaw('courses.course_name as course, years.year_name as year_level, COUNT(*) as total')
+        ->join('courses', 'tbl_students.course_id', '=', 'courses.id')
+        ->join('years', 'tbl_students.year_id', '=', 'years.id')
+        ->where('tbl_students.status', 'active')
+        ->where('tbl_students.school_year_id', $schoolYearId)
+        ->where('tbl_students.semester_id', $semesterId)
+        ->groupBy('courses.course_name', 'years.year_name')
+        ->orderBy('courses.course_name')
+        ->get();
+
+    $report = [];
+    $overallTotal = 0;
+
+    foreach ($rawData as $row) {
+        $course = $row->course;
+        $year = $row->year_level;
+        $count = $row->total;
+
+        if (!isset($report[$course])) {
+            $report[$course] = [
+                '1st Year' => 0,
+                '2nd Year' => 0,
+                '3rd Year' => 0,
+                '4th Year' => 0,
+                'total' => 0
+            ];
+        }
+
+        $report[$course][$year] = $count;
+        $report[$course]['total'] += $count;
+        $overallTotal += $count;
+    }
+
+    $action = $request->input('action');
+
+        if ($action === 'pdf') {
+            $pdf = Pdf::loadView('admin.total_students_report.pdf', compact('report', 'overallTotal'));
+            return $pdf->stream('Student_Report.pdf');
+        }
+        elseif ($action === 'print') {
+            return view('admin.total_students_report.print', compact('report', 'overallTotal'));
+}
+
+    return view('admin.reportResult', compact('report', 'overallTotal'));
+}
 }

@@ -8,6 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 0;
             padding: 20px;
         }
@@ -104,6 +105,10 @@
                 <td>{{ $pwddata->pwd_remarks }}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="7" class="total">Total Pwd Students</td>
+                <td class="total">{{ $pwdData->count() }}</td>
+            </tr>
         </tbody>
     </table>
 </body>

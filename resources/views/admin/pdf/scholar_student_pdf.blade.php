@@ -8,6 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 0;
             padding: 20px;
         }
@@ -101,8 +102,13 @@
                 <td>{{ $scholardata->year->year_name }}</td>
                 <td>{{ $scholardata->semester->semester_name }}</td>
                 <td>{{ $scholardata->school_year->school_year_name }}</td>
+                <td>{{$scholardata->scholarship_remarks}}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="7" class="total">Total Scholar Students</td>
+                <td class="total">{{ $scholarData->count() }}</td>
+            </tr>
         </tbody>
     </table>
 </body>

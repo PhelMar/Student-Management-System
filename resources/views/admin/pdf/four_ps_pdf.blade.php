@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4'ps Students List</title>
+    <title>Print 4P's Students</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 0;
             padding: 20px;
         }
@@ -70,7 +70,7 @@
 
 <body>
     <div class="header">
-        <img src="{{ public_path('images/lccLogo.png') }}" alt="School Logo"> <!-- School logo -->
+    <img src="{{ public_path('images/lccLogo.png') }}" alt="School Logo">
         <div>
             <h2>Legacy College of Compostela, Inc.</h2>
             <p>Purok 2 Dagohoy St. Poblacion Compostela</p>
@@ -78,6 +78,7 @@
             <p>4p's Students List</p>
         </div>
     </div>
+
     <table>
         <thead>
             <tr>
@@ -102,8 +103,11 @@
                 <td>{{ $fourpsdata->school_year->school_year_name }}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="6" class="total">Total 4P's Students</td>
+                <td class="total">{{ $fourpsData->count() }}</td>
+            </tr>
         </tbody>
     </table>
 </body>
-
 </html>

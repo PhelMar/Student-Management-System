@@ -196,4 +196,6 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/clearance/BSED-ENGLISHclearedStudentDisplay', [Clearances::class, 'BSEDENGLISHcleared'])->name('admin.BSEDENGLISHcleared.display');
     Route::get('/clearance/BSED-VALUESclearedStudentDisplay', [Clearances::class, 'BSEDVALUEScleared'])->name('admin.BSEDVALUEScleared.display');
     Route::get('/clearance/BSCRIMclearedStudentDisplay', [Clearances::class, 'BSCRIMcleared'])->name('admin.BSCRIMcleared.display');
+
+    Route::get('/admin/report', [StudentController::class, 'generateReport'])->name('admin.generateReport');
 });

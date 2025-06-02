@@ -8,6 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 0;
             padding: 20px;
         }
@@ -102,6 +103,10 @@
                 <td>{{ $soloparentdata->school_year->school_year_name }}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="6" class="total">Total Solo Parent Students</td>
+                <td class="total">{{ $soloparentData->count() }}</td>
+            </tr>
         </tbody>
     </table>
 </body>
