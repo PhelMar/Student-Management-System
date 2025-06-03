@@ -57,7 +57,7 @@
         <div class="mb-4" id="pwd_remarks" style="display: none;">
             <label for="pwd_remarksInput" class="form-label">Remarks:</label>
             <input type="text" class="form-control @error('pwd_remarks') is-invalid @enderror" id="pwd_remarksInput"
-                name="pwd_remarks" required>
+                name="pwd_remarks">
             <small class="error-message text-danger"></small>
         </div>
         <div class="mb-4">

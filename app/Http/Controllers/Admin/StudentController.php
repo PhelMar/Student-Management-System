@@ -395,14 +395,6 @@ class StudentController extends Controller
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
-            'single_mom' => [
-        'nullable',
-        Rule::in(['No', 'Yes']),
-        Rule::requiredIf(function () use ($request) {
-            $gender = Gender::find($request->gender_id);
-            return $gender && strtolower($gender->gender_name) === 'female';
-        }),
-    ],
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
@@ -492,14 +484,6 @@ class StudentController extends Controller
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
-            'single_mom' => [
-        'nullable',
-        Rule::in(['No', 'Yes']),
-        Rule::requiredIf(function () use ($request) {
-            $gender = Gender::find($request->gender_id);
-            return $gender && strtolower($gender->gender_name) === 'female';
-        }),
-    ],
             'birthdate' => 'required|date',
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',

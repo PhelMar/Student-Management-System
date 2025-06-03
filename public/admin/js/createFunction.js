@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    const successAlert = $('#success-alert');
+    const successAlert = $("#success-alert");
     if (successAlert.length) {
         setTimeout(function () {
             successAlert.fadeOut();
-            $('#addStudentForm')[0].reset();
+            $("#addStudentForm")[0].reset();
         }, 3000);
     }
 });
@@ -22,198 +22,217 @@ function toggleRemarks(remarksId, value) {
     }
 }
 
-
 $(document).ready(function () {
-    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const csrfToken = $('meta[name="csrf-token"]').attr("content");
 
     function checkEmail() {
-        const email = $('#email_address').val();
-        const emailAddressErrorElement = $('#email_address_error');
-        const emailErrorElement = $('#email_error');
+        const email = $("#email_address").val();
+        const emailAddressErrorElement = $("#email_address_error");
+        const emailErrorElement = $("#email_error");
 
-        emailAddressErrorElement.text('');
+        emailAddressErrorElement.text("");
         emailErrorElement.hide();
-        $('#email_address').removeClass('is-invalid');
+        $("#email_address").removeClass("is-invalid");
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            emailAddressErrorElement.text('Please enter a valid email address');
-            $('#email_address').addClass('is-invalid');
+            emailAddressErrorElement.text("Please enter a valid email address");
+            $("#email_address").addClass("is-invalid");
             return;
         }
 
         if (email && email.length > 0) {
             $.ajax({
                 url: checkEmailUrl,
-                method: 'POST',
+                method: "POST",
                 data: {
                     email: email,
-                    _token: csrfToken
+                    _token: csrfToken,
                 },
                 success: function (response) {
                     if (response.exists) {
-                        $('#email_address').addClass('is-invalid');
+                        $("#email_address").addClass("is-invalid");
                         emailErrorElement.show();
                     } else {
                         emailErrorElement.hide();
                     }
                 },
                 error: function (xhr, status, error) {
-                    $('#email_address').addClass('is-invalid');
-                    emailErrorElement.text('An error occurred while checking the email. Please try again.').show();
-                }
+                    $("#email_address").addClass("is-invalid");
+                    emailErrorElement
+                        .text(
+                            "An error occurred while checking the email. Please try again."
+                        )
+                        .show();
+                },
             });
         }
     }
-    $('#email_address').on('input', checkEmail);
+    $("#email_address").on("input", checkEmail);
 });
 
-
 $(document).ready(function () {
-    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const csrfToken = $('meta[name="csrf-token"]').attr("content");
 
-    $('#id_no').on('change', function () {
+    $("#id_no").on("change", function () {
         var idNo = $(this).val();
-        var studentId = '{{ $student->id }}';
+        var studentId = "{{ $student->id }}";
 
         if (!/^[a-zA-Z0-9]+$/.test(idNo)) {
-            $('#idNoError').text('Invalid ID format.').show();
-            $('#id_no').addClass('is-invalid');
+            $("#idNoError").text("Invalid ID format.").show();
+            $("#id_no").addClass("is-invalid");
             return;
         }
 
         $.ajax({
             url: checkIDNoUrl,
-            type: 'POST',
+            type: "POST",
             data: {
                 id_no: idNo,
                 student_id: studentId,
-                _token: csrfToken
+                _token: csrfToken,
             },
             success: function (response) {
                 if (response.exists) {
-                    $('#idNoError').text('This ID number is already taken.').show();
-                    $('#id_no').addClass('is-invalid');
+                    $("#idNoError")
+                        .text("This ID number is already taken.")
+                        .show();
+                    $("#id_no").addClass("is-invalid");
                 } else {
-                    $('#idNoError').hide();
-                    $('#id_no').removeClass('is-invalid');
+                    $("#idNoError").hide();
+                    $("#id_no").removeClass("is-invalid");
                 }
             },
             error: function (xhr, status, error) {
-                $('#idNoError').text('An error occurred while checking the ID number. Please try again.').show();
-                $('#id_no').addClass('is-invalid');
-            }
+                $("#idNoError")
+                    .text(
+                        "An error occurred while checking the ID number. Please try again."
+                    )
+                    .show();
+                $("#id_no").addClass("is-invalid");
+            },
         });
     });
 });
 
-
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
-    $('#contact_no').on('input', function () {
+    $("#contact_no").on("input", function () {
         const contactNoInput = $(this).val();
-        const contact_no_errorElement = $('#contactNoError');
+        const contact_no_errorElement = $("#contactNoError");
 
-        contact_no_errorElement.text('');
-        $(this).removeClass('is-invalid');
+        contact_no_errorElement.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^0\d{10}$/.test(contactNoInput)) {
-            contact_no_errorElement.text('Contact No. must be 11 digits with start 0');
-            $(this).addClass('is-invalid');
+            contact_no_errorElement.text(
+                "Contact No. must be 11 digits with start 0"
+            );
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#incase_of_emergency_contact').on('input', function () {
+    $("#incase_of_emergency_contact").on("input", function () {
         const emergencyContactInput = $(this).val();
-        const emergencyContactError = $('#incase_of_emergency_contact_Error');
+        const emergencyContactError = $("#incase_of_emergency_contact_Error");
 
-        emergencyContactError.text('');
-        $(this).removeClass('is-invalid');
+        emergencyContactError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^0\d{10}$/.test(emergencyContactInput)) {
-            emergencyContactError.text('Contact no. must be 11 digits and start 0');
-            $(this).addClass('is-invalid');
+            emergencyContactError.text(
+                "Contact no. must be 11 digits and start 0"
+            );
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#fathers_contact_no').on('input', function () {
+    $("#fathers_contact_no").on("input", function () {
         const fathersContactInput = $(this).val();
-        const fathersContactError = $('#fathers_contactNoError');
+        const fathersContactError = $("#fathers_contactNoError");
 
-        fathersContactError.text('');
-        $(this).removeClass('is-invalid');
+        fathersContactError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^0\d{10}$/.test(fathersContactInput)) {
-            fathersContactError.text('Contact no. must be 11 digits and start 0');
-            $(this).addClass('is-invalid');
+            fathersContactError.text(
+                "Contact no. must be 11 digits and start 0"
+            );
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#mothers_contact_no').on('input', function () {
+    $("#mothers_contact_no").on("input", function () {
         const mothersContactInput = $(this).val();
-        const mothersContactError = $('#mothers_contactNoError');
+        const mothersContactError = $("#mothers_contactNoError");
 
-        mothersContactError.text('');
-        $(this).removeClass('is-invalid');
+        mothersContactError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^0\d{10}$/.test(mothersContactInput)) {
-            mothersContactError.text('Contact no. must be 11 digits and start 0');
-            $(this).addClass('is-invalid');
+            mothersContactError.text(
+                "Contact no. must be 11 digits and start 0"
+            );
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#birth_order_among_sibling').on('input', function () {
+    $("#birth_order_among_sibling").on("input", function () {
         const birthOrderInput = $(this).val();
-        const birthOrderError = $('#birth_order_Error');
+        const birthOrderError = $("#birth_order_Error");
 
-        birthOrderError.text('');
-        $(this).removeClass('is-invalid');
+        birthOrderError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^[0-9]+$/.test(birthOrderInput)) {
-            birthOrderError.text('Enter digits only');
-            $(this).addClass('is-invalid');
+            birthOrderError.text("Enter digits only");
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#id_no').on('input', function () {
+    $("#id_no").on("input", function () {
         const idNoInput = $(this).val();
-        const idNoError = $('#idNoError');
+        const idNoError = $("#idNoError");
 
-        idNoError.text('');
-        $(this).removeClass('is-invalid');
+        idNoError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^202\d{7}$/.test(idNoInput)) {
-            idNoError.text('Invalid input ID type!');
-            $(this).addClass('is-invalid');
+            idNoError.text("Invalid input ID type!");
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#number_of_fathers_sibling').on('input', function () {
+    $("#number_of_fathers_sibling").on("input", function () {
         const numberOfFathersSiblingInput = $(this).val();
-        const numberOfFathersSiblingError = $('#number_of_fathers_sibling_Error');
+        const numberOfFathersSiblingError = $(
+            "#number_of_fathers_sibling_Error"
+        );
 
-        numberOfFathersSiblingError.text('');
-        $(this).removeClass('is-invalid');
+        numberOfFathersSiblingError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^[0-9]+$/.test(numberOfFathersSiblingInput)) {
-            numberOfFathersSiblingError.text('Enter digits only!');
-            $(this).addClass('is-invalid');
+            numberOfFathersSiblingError.text("Enter digits only!");
+            $(this).addClass("is-invalid");
         }
     });
 
-    $('#number_of_mothers_sibling').on('input', function () {
+    $("#number_of_mothers_sibling").on("input", function () {
         const numberOfMothersSiblingInput = $(this).val();
-        const numberOfMothersSiblingError = $('#number_of_mothers_sibling_Error');
+        const numberOfMothersSiblingError = $(
+            "#number_of_mothers_sibling_Error"
+        );
 
-        numberOfMothersSiblingError.text('');
-        $(this).removeClass('is-invalid');
+        numberOfMothersSiblingError.text("");
+        $(this).removeClass("is-invalid");
 
         if (!/^[0-9]+$/.test(numberOfMothersSiblingInput)) {
-            numberOfMothersSiblingError.text('Enter digits only!');
-            $(this).addClass('is-invalid');
+            numberOfMothersSiblingError.text("Enter digits only!");
+            $(this).addClass("is-invalid");
         }
     });
 
@@ -257,7 +276,9 @@ $(document).ready(function () {
 
             if (!value) {
                 isValid = false;
-                errorMessage.text(`${field.attr("name").replace("_", " ")} is required.`);
+                errorMessage.text(
+                    `${field.attr("name").replace("_", " ")} is required.`
+                );
             } else {
                 errorMessage.text("");
             }
@@ -267,7 +288,10 @@ $(document).ready(function () {
     }
 
     $(document).keydown(function (e) {
-        if ((e.key === "Enter" || e.keyCode === 13) && $(".next:visible").length > 0) {
+        if (
+            (e.key === "Enter" || e.keyCode === 13) &&
+            $(".next:visible").length > 0
+        ) {
             e.preventDefault();
 
             const valid = validateStep(currentStep);
@@ -295,48 +319,60 @@ $(document).ready(function () {
     }
     showStep(currentStep);
     toggleButtons();
-
 });
 
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
-    $('#permanent_province').change(function () {
+    $("#permanent_province").change(function () {
         let provinceId = $(this).val();
-        $('#permanent_municipality').html('<option value="">Loading...</option>');
-        $('#permanent_barangay').html('<option value="">Select Barangay</option>');
+        $("#permanent_municipality").html(
+            '<option value="">Loading...</option>'
+        );
+        $("#permanent_barangay").html(
+            '<option value="">Select Barangay</option>'
+        );
         if (provinceId) {
-            const url = muncipalitiesUrl.replace(':province_id', provinceId);
+            const url = muncipalitiesUrl.replace(":province_id", provinceId);
             $.get(url, function (data) {
                 let options = '<option value="">Select Municipality</option>';
                 data.forEach(function (municipality) {
                     options += `<option value="${municipality.citymun_code}">${municipality.citymun_desc}</option>`;
                 });
-                $('#permanent_municipality').html(options);
+                $("#permanent_municipality").html(options);
             });
         } else {
-            $('#permanent_municipality').html('<option value="">Select Municipality</option>');
-            $('#permanent_barangay').html('<option value="">Select Barangay</option>');
+            $("#permanent_municipality").html(
+                '<option value="">Select Municipality</option>'
+            );
+            $("#permanent_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 
-    $('#permanent_municipality').change(function () {
+    $("#permanent_municipality").change(function () {
         let municipalityId = $(this).val();
-        $('#permanent_barangay').html('<option value="">Loading...</option>');
+        $("#permanent_barangay").html('<option value="">Loading...</option>');
         if (municipalityId) {
-            const url = barangaysUrl.replace(':municipality_id', municipalityId);
+            const url = barangaysUrl.replace(
+                ":municipality_id",
+                municipalityId
+            );
             $.get(url, function (data) {
                 let options = '<option value="">Select Barangay</option>';
                 data.forEach(function (barangay) {
                     options += `<option value="${barangay.brgy_code}">${barangay.brgy_desc}</option>`;
                 });
-                $('#permanent_barangay').html(options);
+                $("#permanent_barangay").html(options);
             });
         } else {
-            $('#permanent_barangay').html('<option value="">Select Barangay</option>');
+            $("#permanent_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 });
@@ -344,42 +380,53 @@ $(document).ready(function () {
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
-    $('#current_province').change(function () {
+    $("#current_province").change(function () {
         let provinceId = $(this).val();
-        $('#current_municipality').html('<option value="">Loading...</option>');
-        $('#current_barangay').html('<option value="">Select Barangay</option>');
+        $("#current_municipality").html('<option value="">Loading...</option>');
+        $("#current_barangay").html(
+            '<option value="">Select Barangay</option>'
+        );
         if (provinceId) {
-            const url = muncipalitiesUrl.replace(':province_id', provinceId);
+            const url = muncipalitiesUrl.replace(":province_id", provinceId);
             $.get(url, function (data) {
                 let options = '<option value="">Select Municipality</option>';
                 data.forEach(function (municipality) {
                     options += `<option value="${municipality.citymun_code}">${municipality.citymun_desc}</option>`;
                 });
-                $('#current_municipality').html(options);
+                $("#current_municipality").html(options);
             });
         } else {
-            $('#current_municipality').html('<option value="">Select Municipality</option>');
-            $('#current_barangay').html('<option value="">Select Barangay</option>');
+            $("#current_municipality").html(
+                '<option value="">Select Municipality</option>'
+            );
+            $("#current_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 
-    $('#current_municipality').change(function () {
+    $("#current_municipality").change(function () {
         let municipalityId = $(this).val();
-        $('#current_barangay').html('<option value="">Loading...</option>');
+        $("#current_barangay").html('<option value="">Loading...</option>');
         if (municipalityId) {
-            const url = barangaysUrl.replace(':municipality_id', municipalityId);
+            const url = barangaysUrl.replace(
+                ":municipality_id",
+                municipalityId
+            );
             $.get(url, function (data) {
                 let options = '<option value="">Select Barangay</option>';
                 data.forEach(function (barangay) {
                     options += `<option value="${barangay.brgy_code}">${barangay.brgy_desc}</option>`;
                 });
-                $('#current_barangay').html(options);
+                $("#current_barangay").html(options);
             });
         } else {
-            $('#current_barangay').html('<option value="">Select Barangay</option>');
+            $("#current_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 });
@@ -387,52 +434,63 @@ $(document).ready(function () {
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
-    $('#fathers_province').change(function () {
+    $("#fathers_province").change(function () {
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
         });
         let provinceId = $(this).val();
-        $('#fathers_municipality').html('<option value="">Loading...</option>');
-        $('#fathers_barangay').html('<option value="">Select Barangay</option>');
+        $("#fathers_municipality").html('<option value="">Loading...</option>');
+        $("#fathers_barangay").html(
+            '<option value="">Select Barangay</option>'
+        );
         if (provinceId) {
-            const url = muncipalitiesUrl.replace(':province_id', provinceId);
+            const url = muncipalitiesUrl.replace(":province_id", provinceId);
             $.get(url, function (data) {
                 let options = '<option value="">Select Municipality</option>';
                 data.forEach(function (municipality) {
                     options += `<option value="${municipality.citymun_code}">${municipality.citymun_desc}</option>`;
                 });
-                $('#fathers_municipality').html(options);
+                $("#fathers_municipality").html(options);
             });
         } else {
-            $('#fathers_municipality').html('<option value="">Select Municipality</option>');
-            $('#fathers_barangay').html('<option value="">Select Barangay</option>');
+            $("#fathers_municipality").html(
+                '<option value="">Select Municipality</option>'
+            );
+            $("#fathers_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 
-    $('#fathers_municipality').change(function () {
+    $("#fathers_municipality").change(function () {
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
         });
         let municipalityId = $(this).val();
-        $('#fathers_barangay').html('<option value="">Loading...</option>');
+        $("#fathers_barangay").html('<option value="">Loading...</option>');
         if (municipalityId) {
-            const url = barangaysUrl.replace(':municipality_id', municipalityId);
+            const url = barangaysUrl.replace(
+                ":municipality_id",
+                municipalityId
+            );
             $.get(url, function (data) {
                 let options = '<option value="">Select Barangay</option>';
                 data.forEach(function (barangay) {
                     options += `<option value="${barangay.brgy_code}">${barangay.brgy_desc}</option>`;
                 });
-                $('#fathers_barangay').html(options);
+                $("#fathers_barangay").html(options);
             });
         } else {
-            $('#fathers_barangay').html('<option value="">Select Barangay</option>');
+            $("#fathers_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 });
@@ -440,42 +498,53 @@ $(document).ready(function () {
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
-    $('#mothers_province').change(function () {
+    $("#mothers_province").change(function () {
         let provinceId = $(this).val();
-        $('#mothers_municipality').html('<option value="">Loading...</option>');
-        $('#mothers_barangay').html('<option value="">Select Barangay</option>');
+        $("#mothers_municipality").html('<option value="">Loading...</option>');
+        $("#mothers_barangay").html(
+            '<option value="">Select Barangay</option>'
+        );
         if (provinceId) {
-            const url = muncipalitiesUrl.replace(':province_id', provinceId);
+            const url = muncipalitiesUrl.replace(":province_id", provinceId);
             $.get(url, function (data) {
                 let options = '<option value="">Select Municipality</option>';
                 data.forEach(function (municipality) {
                     options += `<option value="${municipality.citymun_code}">${municipality.citymun_desc}</option>`;
                 });
-                $('#mothers_municipality').html(options);
+                $("#mothers_municipality").html(options);
             });
         } else {
-            $('#mothers_municipality').html('<option value="">Select Municipality</option>');
-            $('#mothers_barangay').html('<option value="">Select Barangay</option>');
+            $("#mothers_municipality").html(
+                '<option value="">Select Municipality</option>'
+            );
+            $("#mothers_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 
-    $('#mothers_municipality').change(function () {
+    $("#mothers_municipality").change(function () {
         let municipalityId = $(this).val();
-        $('#mothers_barangay').html('<option value="">Loading...</option>');
+        $("#mothers_barangay").html('<option value="">Loading...</option>');
         if (municipalityId) {
-            const url = barangaysUrl.replace(':municipality_id', municipalityId);
+            const url = barangaysUrl.replace(
+                ":municipality_id",
+                municipalityId
+            );
             $.get(url, function (data) {
                 let options = '<option value="">Select Barangay</option>';
                 data.forEach(function (barangay) {
                     options += `<option value="${barangay.brgy_code}">${barangay.brgy_desc}</option>`;
                 });
-                $('#mothers_barangay').html(options);
+                $("#mothers_barangay").html(options);
             });
         } else {
-            $('#mothers_barangay').html('<option value="">Select Barangay</option>');
+            $("#mothers_barangay").html(
+                '<option value="">Select Barangay</option>'
+            );
         }
     });
 });
