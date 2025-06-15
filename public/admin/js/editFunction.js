@@ -1,22 +1,51 @@
 
-function toggleRemarks(remarksId, value) {
+function toggleRemarks(remarksId, triggerValue) {
     const remarksDiv = document.getElementById(remarksId);
-    const remarksInput = remarksDiv.querySelector("input");
 
-    if (value === "Yes") {
+    if (!remarksDiv) return;
+
+    const input = remarksDiv.querySelector("input, select");
+    if (triggerValue === "Yes") {
         remarksDiv.style.display = "block";
-        remarksInput.setAttribute("required", "required");
+        if (input) {
+            input.setAttribute("required", "required");
+        }
     } else {
         remarksDiv.style.display = "none";
-        remarksInput.removeAttribute("required");
-        remarksInput.value = "";
+        if (input) {
+            input.removeAttribute("required");
+            input.value = ""; // clear old value
+        }
     }
 }
+
 document.addEventListener('DOMContentLoaded', function () {
-    toggleRemarks('pwd_remarks', document.getElementById('pwd').value);
-    toggleRemarks('ips_remarks', document.getElementById('ips').value);
-    toggleRemarks('scholarship_remarks', document.getElementById('scholarship').value);
+    const pwdSelect = document.getElementById('pwd');
+    const ipsSelect = document.getElementById('ips');
+    const scholarshipSelect = document.getElementById('scholarship');
+
+    if (pwdSelect) {
+        toggleRemarks('pwd_remarks', pwdSelect.value);
+        pwdSelect.addEventListener('change', function () {
+            toggleRemarks('pwd_remarks', this.value);
+        });
+    }
+
+    if (ipsSelect) {
+        toggleRemarks('ips_remarks', ipsSelect.value);
+        ipsSelect.addEventListener('change', function () {
+            toggleRemarks('ips_remarks', this.value);
+        });
+    }
+
+    if (scholarshipSelect) {
+        toggleRemarks('scholarship_remarks', scholarshipSelect.value);
+        scholarshipSelect.addEventListener('change', function () {
+            toggleRemarks('scholarship_remarks', this.value);
+        });
+    }
 });
+
 
 
 $(document).ready(function () {

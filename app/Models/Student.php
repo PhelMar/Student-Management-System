@@ -69,7 +69,7 @@ class Student extends Model
         'senior_high',
         'senior_high_year_attended',
         'pwd',
-        'pwd_remarks',
+        'pwd_remarks_id',
         'ips',
         'ips_remarks',
         'solo_parent',
@@ -82,7 +82,7 @@ class Student extends Model
         'scholarship',
         'scholarship_remarks',
     ];
-
+    
     public function setFirstNameAttribute($value)
     {
         $this->attributes['first_name'] = ucwords(strtolower($value));
@@ -172,11 +172,7 @@ class Student extends Model
     public function setSeniorHighAttribute($value)
     {
         $this->attributes['senior_high'] = ucwords(strtolower($value));
-    }
-    public function setPwdRemarksAttribute($value)
-    {
-        $this->attributes['pwd_remarks'] = ucwords(strtolower($value));
-    }
+    } 
     public function setIpsRemarksAttribute($value)
     {
         $this->attributes['ips_remarks'] = ucwords(strtolower($value));
@@ -232,6 +228,11 @@ class Student extends Model
     {
         return $this->belongsTo(Year::class, 'year_id');
     }
+
+    public function pwdRemarks(){
+        return $this->belongsTo(PwdRemarks::class, 'pwd_remarks_id');
+    }
+    
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');

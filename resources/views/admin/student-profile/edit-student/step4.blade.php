@@ -92,7 +92,7 @@
         <div class="mb-4">
             <label for="fathers_occupation" class="form-label" style="font-weight: bold;">Occupation</label>
             <input type="text" class="form-control @error('fathers_occupation') is-invalid @enderror"
-                placeholder="Farmer" name="fathers_occupation" value="{{ old('fathers_occupation', $students->fathers_occupation) }}">
+                 name="fathers_occupation" value="{{ old('fathers_occupation', $students->fathers_occupation) }}">
         </div>
     </div>
     <div class="col-xl-4 col-md-4">

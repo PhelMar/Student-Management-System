@@ -46,7 +46,7 @@
         <div class="mb-4">
             <label for="pwd" class="form-label" style="font-weight: bold;">Are you PWD?</label>
             <select class="form-control @error('pwd') is-invalid @enderror" id="pwd" name="pwd"
-                onchange="toggleRemarks('pwd_remarks', this.value)" required>
+                onchange="toggleRemarks('pwd_remarks', this.value)">
                 <option value="" disabled selected>Select</option>
                 <option value="No" {{old('pwd', $students->pwd) == "No" ? 'selected' : ''}}>No</option>
                 <option value="Yes" {{old('pwd', $students->pwd) == "Yes" ? 'selected' : ''}}>Yes</option>
@@ -55,12 +55,20 @@
         </div>
 
         <div class="mb-4" id="pwd_remarks" style="display: none;">
-            <label for="pwd_remarksInput" class="form-label">Remarks:</label>
-            <input type="text" class="form-control @error('pwd_remarks') is-invalid @enderror"
-                value="{{old('pwd_remarks', $students->pwd_remarks)}}" required id="pwd_remarksInput"
-                name="pwd_remarks">
-            <small class="error-message text-danger"></small>
-        </div>
+    <label for="pwd_remarks_id" class="form-label">Remarks:</label>
+    <select class="form-control @error('pwd_remarks_id') is-invalid @enderror"
+        name="pwd_remarks_id" id="pwd_remarks_id" value="{{ old('pwd_remarks_id') }}">
+        <option value="" >Select remark</option>
+        @foreach($pwd_remarks as $remark)
+            <option value="{{ $remark->id }}"
+                {{ $students->pwd_remarks_id == $remark->id ? 'selected' : '' }}>
+                {{ $remark->pwd_name }}
+            </option>
+        @endforeach
+    </select>
+    <small class="error-message text-danger"></small>
+</div>
+
         <div class="mb-4">
             <label for="solo_parent" class="form-label" style="font-weight: bold;">Are you a Solo Parent?</label>
             <select class="form-control @error('solo_parent') is-invalid @enderror" required id="solo_parent"
@@ -117,7 +125,8 @@
         </div>
         <div class="mb-4">
             <label for="stay_id" class="form-label" style="font-weight: bold;">Who are you staying?</label>
-            <select class="form-control @error('stay_id') is-invalid @enderror" name="stay_id"
+            <select class="form-control @error('stay_id') is-invalid @enderror" 
+                name="stay_id"
                 value="{{ old('stay_id') }}" required>
                 <option value="" disabled selected>Please Select</option>
                 @foreach ($stays as $stay)

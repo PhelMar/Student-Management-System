@@ -55,9 +55,13 @@
         </div>
 
         <div class="mb-4" id="pwd_remarks" style="display: none;">
-            <label for="pwd_remarksInput" class="form-label">Remarks:</label>
-            <input type="text" class="form-control @error('pwd_remarks') is-invalid @enderror" id="pwd_remarksInput"
-                name="pwd_remarks">
+            <select class="form-control @error('pwd') is-invalid @enderror" name="pwd_remarks_id" id="pwd_remarks">
+                <option value="">Select remark</option>
+                    @foreach($pwdRemarks as $remark)
+                <option value="{{ $remark->id }}">{{ $remark->pwd_name }}</option>
+                    @endforeach
+            </select>
+
             <small class="error-message text-danger"></small>
         </div>
         <div class="mb-4">

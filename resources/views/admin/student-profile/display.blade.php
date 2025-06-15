@@ -22,9 +22,15 @@ document.addEventListener("DOMContentLoaded", function() {
 @endif
 
 <div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary shadow me-3" data-bs-toggle="modal" data-bs-target="#printModal">
-        <i class="fas fa-print me-2"></i> Print
-    </a>
+        <div class="mx-2">
+            <a href="#" 
+            class="btn btn-primary openStudentReportModal" 
+            data-route="{{ route('admin.students.print') }}"
+            data-bs-toggle="modal" 
+            data-bs-target="#reportStudentModal">
+            <i class="fas fa-file-alt me-2"></i>Print
+        </a>
+        </div>
     <div class="dropdown me-2">
         <button class="btn btn-success dropdown-toggle shadow" type="button" data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -88,19 +94,19 @@ document.addEventListener("DOMContentLoaded", function() {
     </a>
 </div>
 
-<!--Modal-->
-<div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
+<!--Print Student Modal-->
+<div class="modal fade" id="reportStudentModal" tabindex="-1" aria-labelledby="reportStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
+        <form id="reportStudentForm" method="GET" target="_self">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="printModalLabel">Print Student Records</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="printForm">
                     <div class="mb-3">
                         <label for="course" class="form-label">Course</label>
-                        <select class="form-select" id="course" name="course" required>
+                        <select class="form-control" id="course" name="course" required>
                             <option value="" selected disabled>Select Course</option>
                             @foreach ($courses as $course)
                             <option value="{{$course->id}}">{{$course->course_name}}</option>
@@ -109,24 +115,43 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                     <div class="mb-3">
                         <label for="year" class="form-label">Year Level</label>
-                        <select class="form-select" id="year" name="year" required>
+                        <select class="form-control" id="year" name="year" required>
                             <option value="" selected disabled>Select Year Level</option>
                             @foreach ($years as $year)
                             <option value="{{$year->id}}">{{$year->year_name}}</option>
                             @endforeach
                         </select>
                     </div>
-                </form>
-            </div>
+                    <div class="form-group mb-3">
+                        <label for="school_year_id">School Year:</label>
+                        <select name="school_year_id" id="school_year_id" class="form-control" required>
+                            <option value="" selected>Select School Year</option>
+                        @foreach ($school_year as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="semester">Semester:</label>
+                        <select name="semester_id" id="semester_id" class="form-control" required>
+                        <option value="">-- Select --</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                        </select>
+                    </div>
+        </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="printBtn">Print</button>
+                <button type="submit" name="action" value="print" class="btn btn-success" onclick="openInNewTab(event)">
+                    <i class="fas fa-print"></i> Print
+                </button>
             </div>
         </div>
+        </form>
     </div>
 </div>
 
-<!-- Report Modal -->
+<!-- Generate Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
   <div class="modal-dialog">
   <form id="reportForm" action="{{ route('admin.generateReport') }}" method="GET" target="_self">
@@ -322,18 +347,22 @@ function confirmDrop(studentId) {
     });
 }
 
-document.getElementById('printBtn').addEventListener('click', function() {
-    const courseId = document.getElementById('course').value;
-    const yearId = document.getElementById('year').value;
+document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.openStudentReportModal');
+        const form = document.getElementById('reportStudentForm');
 
-    if (!courseId || !yearId) {
-        alert('Please select both Course and Year Level.');
-        return;
-    }
+        buttons.forEach(button => {
+            button.addEventListener('click', function () {
+                const route = this.getAttribute('data-route');
+                form.setAttribute('action', route);
+                form.setAttribute('target', '_self');
+            });
+        });
 
-    const url = `{{ route('admin.students.print') }}?course=${courseId}&year=${yearId}`;
-    window.open(url, '_blank');
-
-});
+        window.openInNewTab = function (e) {
+            const form = document.getElementById('reportStudentForm');
+            form.setAttribute('target', '_blank');
+        };
+    });
 </script>
 @endsection

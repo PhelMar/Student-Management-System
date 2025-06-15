@@ -76,7 +76,9 @@
             <select id="current_province" name="current_province_id" class="form-control @error('current_province_id') is-invalid @enderror" required>
                 <option value="">Select Province</option>
                 @foreach($provinces as $province)
-                <option value="{{ $province->prov_code }}">{{ $province->prov_desc }}</option>
+                <option value="{{ $province->prov_code }}" >
+                    {{ $province->prov_desc }}
+                </option>
                 @endforeach
             </select>
             @error('current_province_id')
@@ -89,7 +91,8 @@
         <div class="mb-4">
             <label for="" class="form-label" style="font-weight: bold;">Municipality</label>
             <select id="current_municipality" name="current_municipality_id" class="form-control @error('current_municipality_id') is-invalid @enderror" required>
-                <option value="">Select Municipality</option>
+                <option value=""
+                >Select Municipality</option>
             </select>
             @error('current_municipality_id')
             <span class="text-danger">{{ $message }}</span>

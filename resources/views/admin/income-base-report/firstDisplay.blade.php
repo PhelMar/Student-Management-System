@@ -37,28 +37,85 @@
         <!-- 10k Below Tab -->
         <div class="tab-pane fade show active" id="below_10k" role="tabpanel" aria-labelledby="below_10k-tab">
             @include('admin.income-base-report.table')
-            <a href="{{ route('admin.below10k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
+                <button type="button"
+                    class="btn btn-primary mt-3 openReportModal"
+                    data-route="{{ route('admin.below10k.print') }}">
+                    <i class="fa fa-file-alt me-2"></i> Generate Report
+                </button>
         </div>
 
         <!-- Between 10k-20k Tab -->
         <div class="tab-pane fade" id="tenk_to_twenty" role="tabpanel" aria-labelledby="tenk_to_twenty-tab">
             @include('admin.income-base-report.table2')
-            <a href="{{ route('admin.between10k-20k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
+                <button type="button"
+                    class="btn btn-primary mt-3 openReportModal"
+                    data-route="{{ route('admin.between10k-20k.print') }}">
+                    <i class="fa fa-file-alt me-2"></i> Generate Report
+                </button>
         </div>
 
         <!-- Between 20k-30k Tab -->
         <div class="tab-pane fade" id="twentyk_to_thirty" role="tabpanel" aria-labelledby="twentyk_to_thirty-tab">
             @include('admin.income-base-report.table3')
-            <a href="{{ route('admin.between20k-30k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
+                <button type="button"
+                    class="btn btn-primary mt-3 openReportModal"
+                    data-route="{{ route('admin.between20k-30k.print') }}">
+                    <i class="fa fa-file-alt me-2"></i> Generate Report
+                </button>
         </div>
 
         <!-- Above 30k Tab -->
         <div class="tab-pane fade" id="above_30k" role="tabpanel" aria-labelledby="above_30k-tab">
             @include('admin.income-base-report.table4')
-            <a href="{{ route('admin.above-30k.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
+                <button type="button"
+                    class="btn btn-primary mt-3 openReportModal"
+                    data-route="{{ route('admin.above-30k.print') }}">
+                    <i class="fa fa-file-alt me-2"></i> Generate Report
+                </button>
         </div>
     </div>
 </div>
+
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+  <form id="reportForm" method="GET" target="_self">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reportModalLabel">Generate Student Report</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group mb-3">
+            <label for="school_year_id">School Year:</label>
+            <select name="school_year_id" id="school_year_id" class="form-control" required>
+              <option value="" selected>Select School Year</option>
+              @foreach ($school_year as $id => $name)
+                <option value="{{ $id }}">{{ $name }}</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="semester">Semester:</label>
+            <select name="semester_id" id="semester_id" class="form-control" required>
+              <option value="">-- Select --</option>
+              <option value="1st Semester">1st Semester</option>
+              <option value="2nd Semester">2nd Semester</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" name="action" value="print" class="btn btn-success" onclick="openInNewTab(event)">
+            <i class="fas fa-print"></i> Print
+        </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
     const below10Thousand = "{{ route('admin.belowTenK.display') }}";
     const between10to20Thousand = "{{ route('admin.betweenTenToTwentyThousand.display') }}";
@@ -70,6 +127,27 @@
 
         document.querySelector('#below_10k').classList.add('show', 'active');
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.openReportModal');
+        const form = document.getElementById('reportForm');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function () {
+                const route = this.getAttribute('data-route');
+                form.setAttribute('action', route);
+                form.setAttribute('target', '_self'); // Default to same tab
+                const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+                modal.show();
+            });
+        });
+
+        window.openInNewTab = function (e) {
+            const form = document.getElementById('reportForm');
+            form.setAttribute('target', '_blank');
+        };
+    });
+    
 </script>
 <script src="{{asset('admin/js/belowTenThousand.js')}}"></script>
 <script src="{{asset('admin/js/betweenTenToTwentyThousand.js')}}"></script>

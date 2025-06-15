@@ -67,7 +67,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th>#/th>
+                <th>#</th>
                 <th>Student Name</th>
                 <th>Course</th>
                 <th>Year</th>

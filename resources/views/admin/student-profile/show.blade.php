@@ -234,7 +234,7 @@
                 <div class="mb-3">
                     <span>
                         <i class="fas fa-notes-medical me-2 text-secondary"></i>
-                        <strong>PWD Remarks:</strong> {{ $student->pwd_remarks ?? 'N/A' }}
+                        <strong>PWD Remarks:</strong> {{ $student->pwdRemarks->pwd_name ?? 'N/A' }}
                     </span>
                 </div>
                 <div class="mb-3">

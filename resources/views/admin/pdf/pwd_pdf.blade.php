@@ -102,7 +102,7 @@
                 <td>{{ $pwddata->year->year_name }}</td>
                 <td>{{ $pwddata->semester->semester_name }}</td>
                 <td>{{ $pwddata->school_year->school_year_name }}</td>
-                <td>{{ $pwddata->pwd_remarks }}</td>
+                <td>{{ $pwddata->pwdRemarks->pwd_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
