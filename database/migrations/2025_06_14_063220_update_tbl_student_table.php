@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tbl_students', function (Blueprint $table){
-            $table->dropColumn('pwd_remarks_id');
+        Schema::table('tbl_students', function (Blueprint $table) {
 
             $table->unsignedBigInteger('pwd_remarks_id')->nullable()->after('pwd');
 
             $table->foreign('pwd_remarks_id')
-            ->references('id')
-            ->on('pwd_remarks')
-            ->onDelete('set null');
+                ->references('id')
+                ->on('pwd_remarks')
+                ->onDelete('set null');
         });
     }
 
@@ -29,12 +28,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tbl_students', function (Blueprint $table) {
-        // Rollback: remove foreign key and column
-        $table->dropForeign(['pwd_remarks_id']);
-        $table->dropColumn('pwd_remarks_id');
+            // Rollback: remove foreign key and column
+            $table->dropForeign(['pwd_remarks_id']);
+            $table->dropColumn('pwd_remarks_id');
 
-        // Re-add the old column
-        $table->string('pwd_remarks')->nullable();
-    });
+            // Re-add the old column
+            $table->string('pwd_remarks')->nullable();
+        });
     }
 };
