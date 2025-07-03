@@ -12,17 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('violations', function (Blueprint $table) {
+
             $table->unsignedBigInteger('student_id')->change();
+
 
             $table->foreign('student_id')->references('id')->on('tbl_students')->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('violations', function (Blueprint $table) {
+
             $table->dropForeign(['student_id']);
+
             $table->bigInteger('student_id')->change();
+
         });
     }
 };
