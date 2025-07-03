@@ -948,13 +948,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'ips_remarks')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                ])
+            $query = Student::with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
                 ->where('status', 'active')
                 ->where('ips', 'Yes')
                 ->orderBy('last_name', 'asc');
@@ -984,10 +983,10 @@ class StudentController extends Controller
                         'DT_RowIndex' => $start + $index + 1,
                         'last_name' => $row->last_name,
                         'first_name' => $row->first_name,
-                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
-                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
-                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
-                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
+                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                         'ips_remarks' => $row->ips_remarks ?? 'N/A',
                     ];
                 }),
@@ -1016,14 +1015,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'pwd_remarks_id')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                    'pwdRemarks:id,pwd_name',
-                ])
+            $query = Student::with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
                 ->where('status', 'active')
                 ->where('pwd', 'Yes')
                 ->orderBy('last_name', 'asc');
@@ -1053,10 +1050,10 @@ class StudentController extends Controller
                         'DT_RowIndex' => $start + $index + 1,
                         'last_name' => $row->last_name,
                         'first_name' => $row->first_name,
-                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
-                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
-                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
-                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
+                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                         'pwd_name' => $row->pwdRemarks ? $row->pwdRemarks->pwd_name : 'N/A',
                     ];
                 }),
@@ -1084,13 +1081,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                ])
+            $query = Student::with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
                 ->where('status', 'active')
                 ->where('four_ps', 'Yes')
                 ->orderBy('last_name', 'asc');
@@ -1120,10 +1116,10 @@ class StudentController extends Controller
                         'DT_RowIndex' => $start + $index + 1,
                         'last_name' => $row->last_name,
                         'first_name' => $row->first_name,
-                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
-                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
-                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
-                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
+                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1150,13 +1146,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'scholarship_remarks')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                ])
+            $query = Student::with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
                 ->where('status', 'active')
                 ->where('scholarship', 'Yes')
                 ->orderBy('last_name', 'asc');
@@ -1186,10 +1181,10 @@ class StudentController extends Controller
                         'DT_RowIndex' => $start + $index + 1,
                         'last_name' => $row->last_name,
                         'first_name' => $row->first_name,
-                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
-                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
-                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
-                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
+                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                         'scholarship_remarks' => $row->scholarship_remarks,
                     ];
                 }),
@@ -1217,13 +1212,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id', 'ips_remarks')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                ])
+            $query = Student::with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
                 ->where('status', 'active')
                 ->where('solo_parent', 'Yes')
                 ->orderBy('last_name', 'asc');
@@ -1253,10 +1247,10 @@ class StudentController extends Controller
                         'DT_RowIndex' => $start + $index + 1,
                         'last_name' => $row->last_name,
                         'first_name' => $row->first_name,
-                        'course_name' => $row->course ? $row->course->course_name : 'N/A',
-                        'year_name' => $row->year ? $row->year->year_name : 'N/A',
-                        'semester_name' => $row->semester ? $row->semester->semester_name : 'N/A',
-                        'school_year_name' => $row->school_year ? $row->school_year->school_year_name : 'N/A',
+                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
+                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
