@@ -1500,39 +1500,57 @@ class StudentController extends Controller
     public function exportIpsPdf(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('ips', 'Yes');
+            ->where('ips', 'Yes') // filters from tbl_students
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        if ($schoolYearId) {
-            $query->where('school_year_id', $schoolYearId);
-        }
+        $ipsData = $query->orderBy('last_name', 'asc')->get();
 
-        $ipsData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name')->get();
 
         $pdf = Pdf::loadView('admin.pdf.ips_pdf', compact('ipsData'));
 
         return $pdf->download('ips_students.pdf');
     }
 
+
     public function exportPwdPdf(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year', 'pwdRemarks')
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('pwd', 'Yes');
+            ->where('pwd', 'Yes') // filters from tbl_students
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        if ($schoolYearId) {
-            $query->where('school_year_id', $schoolYearId);
-        }
-
-        $pwdData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name')->get();
+        $pwdData = $query->orderBy('last_name', 'asc')->get();
 
         $pdf = Pdf::loadView('admin.pdf.pwd_pdf', compact('pwdData'));
 
@@ -1542,18 +1560,26 @@ class StudentController extends Controller
     public function exportFourPsPdf(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('four_ps', 'Yes');
+            ->where('four_ps', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        if ($schoolYearId) {
-            $query->where('school_year_id', $schoolYearId);
-        }
-
-        $fourpsData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name')->get();
+        $fourpsData = $query->orderBy('last_name', 'asc')->get();
 
         $pdf = Pdf::loadView('admin.pdf.four_ps_pdf', compact('fourpsData'));
 
@@ -1563,18 +1589,26 @@ class StudentController extends Controller
     public function exportScholarPdf(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('scholarship', 'Yes');
+            ->where('scholarship', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        if ($schoolYearId) {
-            $query->where('school_year_id', $schoolYearId);
-        }
-
-        $scholarData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name')->get();
+        $scholarData = $query->orderBy('last_name', 'asc')->get();
 
         $pdf = Pdf::loadView('admin.pdf.scholar_student_pdf', compact('scholarData'));
 
@@ -1584,18 +1618,26 @@ class StudentController extends Controller
     public function exportSoloparentPdf(Request $request)
     {
         $schoolYearId = $request->input('school_year_id');
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('solo_parent', 'Yes');
+            ->where('solo_parent', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        if ($schoolYearId) {
-            $query->where('school_year_id', $schoolYearId);
-        }
-
-        $soloparentData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name')->get();
+        $soloparentData = $query->orderBy('last_name', 'asc')->get();
 
         $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', compact('soloparentData'));
 
@@ -1626,16 +1668,24 @@ class StudentController extends Controller
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('ips', 'Yes');
+            ->where('ips', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        $ipsData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        $ipsData = $query->orderBy('last_name', 'asc')->get();
 
         $action = $request->input('action');
 
@@ -1657,16 +1707,24 @@ class StudentController extends Controller
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('pwd', 'Yes');
+            ->where('pwd', 'Yes') // filters from tbl_students
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        $pwdData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        $pwdData = $query->orderBy('last_name', 'asc')->get();
 
         $action = $request->input('action');
 
@@ -1688,16 +1746,24 @@ class StudentController extends Controller
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('four_ps', 'Yes');
+            ->where('four_ps', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        $fourpsData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        $fourpsData = $query->orderBy('last_name', 'asc')->get();
 
 
         $action = $request->input('action');
@@ -1718,18 +1784,26 @@ class StudentController extends Controller
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $validated['semester_id'];
+        $semesterId = $request->input('semester_id');
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('scholarship', 'Yes');
+            ->where('scholarship', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        $scholarData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        $scholarData = $query->orderBy('last_name', 'asc')->get();
 
         $action = $request->input('action');
 
@@ -1750,16 +1824,24 @@ class StudentController extends Controller
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with('course', 'year', 'semester', 'school_year')
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+        $query = Student::with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
             ->where('status', 'active')
-            ->where('solo_parent', 'Yes');
+            ->where('solo_parent', 'Yes')
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            });
 
-        $soloparentData = $query
-            ->orderBy('course_id', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->get();
+        $soloparentData = $query->orderBy('last_name', 'asc')->get();
 
         $action = $request->input('action');
 

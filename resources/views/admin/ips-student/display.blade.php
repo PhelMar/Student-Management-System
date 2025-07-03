@@ -8,11 +8,8 @@
 </ol>
 <div class="row justify-content-end align-items-center mb-3">
     <div class="col-sm-auto">
-        <a href="#" 
-            class="btn btn-primary openReportModal" 
-            data-route="{{ route('admin.ips-student.print') }}"
-            data-bs-toggle="modal" 
-            data-bs-target="#reportModal">
+        <a href="#" class="btn btn-primary openReportModal" data-route="{{ route('admin.ips-student.print') }}"
+            data-bs-toggle="modal" data-bs-target="#reportModal">
             <i class="fas fa-file-alt me-2"></i>Generate IP's Report
         </a>
     </div>
@@ -60,44 +57,46 @@
 
 <!-- Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-  <form id="reportForm" method="GET" target="_self">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="reportModalLabel">Generate IP's Report</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group mb-3">
-            <label for="school_year_id">School Year:</label>
-            <select name="school_year_id" id="school_year_id" class="form-control" required>
-              <option value="" selected>Select School Year</option>
-              @foreach ($school_year as $id => $name)
-                <option value="{{ $id }}">{{ $name }}</option>
-              @endforeach
-            </select>
-          </div>
+    <div class="modal-dialog">
+        <form id="reportForm" method="GET" target="_self">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportModalLabel">Generate IP's Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="school_year_id">School Year:</label>
+                        <select name="school_year_id" id="school_year_id" class="form-control" required>
+                            <option value="" selected>Select School Year</option>
+                            @foreach ($school_year as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
 
-          <div class="form-group mb-3">
-            <label for="semester">Semester:</label>
-            <select name="semester_id" id="semester_id" class="form-control" required>
-              <option value="">-- Select --</option>
-              <option value="1st Semester">1st Semester</option>
-              <option value="2nd Semester">2nd Semester</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" name="action" value="pdf" class="btn btn-danger">
-            <i class="fas fa-file-pdf"></i> View PDF
-          </button>
-          <button type="submit" name="action" value="print" class="btn btn-success" onclick="openInNewTab(event)">
-            <i class="fas fa-print"></i> Print
-        </button>
-        </div>
-      </div>
-    </form>
-  </div>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="semester">Semester:</label>
+                        <select name="semester_id" id="semester_id" class="form-control" required>
+                            <option value="">-- Select --</option>
+                            <option value="1st Semester">1st Semester</option>
+                            <option value="2nd Semester">2nd Semester</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="action" value="pdf" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> View PDF
+                    </button>
+                    <button type="submit" name="action" value="print" class="btn btn-success"
+                        onclick="openInNewTab(event)">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -167,19 +166,19 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.openReportModal');
         const form = document.getElementById('reportForm');
 
         buttons.forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 const route = this.getAttribute('data-route');
                 form.setAttribute('action', route);
                 form.setAttribute('target', '_self');
             });
         });
 
-        window.openInNewTab = function (e) {
+        window.openInNewTab = function(e) {
             const form = document.getElementById('reportForm');
             form.setAttribute('target', '_blank');
         };

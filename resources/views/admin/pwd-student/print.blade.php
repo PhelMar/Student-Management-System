@@ -68,8 +68,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
+                <th>STUDENT'S NAME</th>
                 <th>COURSE</th>
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
@@ -78,20 +77,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($pwdData as $pwddata)
+            @foreach($pwdData as $pwddata)
             <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>{{$pwddata->last_name}}</td>
-                <td>{{$pwddata->first_name}}</td>
-                <td>{{$pwddata->course->course_name}}</td>
-                <td>{{$pwddata->year->year_name}}</td>
-                <td>{{$pwddata->semester->semester_name}}</td>
-                <td>{{$pwddata->school_year->school_year_name}}</td>
-                <td>{{$pwddata->pwdRemarks->pwd_name ?? 'N/A'}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $pwddata->last_name }}, {{ $pwddata->first_name }}</td>
+                <td>{{ $pwddata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
+                <td>{{ $pwddata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
+                <td>{{ $pwddata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
+                <td>{{ $pwddata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
+                <td>{{ $pwddata->pwdRemarks->pwd_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="7" class="total">Total Pwd Students</td>
+                <td colspan="6" class="total">Total Pwd Students</td>
                 <td class="total">{{ $pwdData->count() }}</td>
             </tr>
         </tbody>

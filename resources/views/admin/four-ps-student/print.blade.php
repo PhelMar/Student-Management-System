@@ -68,8 +68,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
+                <th>STUDENT'S NAME</th>
                 <th>COURSE</th>
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
@@ -79,17 +78,16 @@
         <tbody>
             @foreach ($fourpsData as $fourpsdata)
             <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>{{$fourpsdata->last_name}}</td>
-                <td>{{$fourpsdata->first_name}}</td>
-                <td>{{$fourpsdata->course->course_name}}</td>
-                <td>{{$fourpsdata->year->year_name}}</td>
-                <td>{{$fourpsdata->semester->semester_name}}</td>
-                <td>{{$fourpsdata->school_year->school_year_name}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $fourpsdata->last_name }}, {{ $fourpsdata->first_name }}</td>
+                <td>{{ $fourpsdata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
+                <td>{{ $fourpsdata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
+                <td>{{ $fourpsdata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
+                <td>{{ $fourpsdata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="6" class="total">Total 4p's Students</td>
+                <td colspan="5" class="total">Total 4p's Students</td>
                 <td class="total">{{ $fourpsData->count() }}</td>
             </tr>
         </tbody>

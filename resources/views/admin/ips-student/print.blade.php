@@ -68,8 +68,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
+                <th>STUDENT'S NAME</th>
                 <th>COURSE</th>
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
@@ -81,17 +80,16 @@
             @foreach ($ipsData as $ipsdata)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $ipsdata->last_name }}</td>
-                <td>{{ $ipsdata->first_name }}</td>
-                <td>{{ $ipsdata->course->course_name }}</td>
-                <td>{{ $ipsdata->year->year_name }}</td>
-                <td>{{ $ipsdata->semester->semester_name }}</td>
-                <td>{{ $ipsdata->school_year->school_year_name }}</td>
-                <td>{{ $ipsdata->ips_remarks }}</td>
+                <td>{{ $ipsdata->last_name }}, {{ $ipsdata->first_name }}</td>
+                <td>{{ $ipsdata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
+                <td>{{ $ipsdata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
+                <td>{{ $ipsdata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
+                <td>{{ $ipsdata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
+                <td>{{ $ipsdata->ips_remarks ?? 'N/A' }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="7" class="total">Total IPS Students</td>
+                <td colspan="6" class="total">Total IPS Students</td>
                 <td class="total">{{ $ipsData->count() }}</td>
             </tr>
         </tbody>

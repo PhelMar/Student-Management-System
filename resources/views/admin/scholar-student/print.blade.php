@@ -68,8 +68,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
+                <th>STUDENT'S NAME</th>
                 <th>COURSE</th>
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
@@ -78,20 +77,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($scholarData as $scholardata)
+            @foreach($scholarData as $scholardata)
             <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>{{$scholardata->last_name}}</td>
-                <td>{{$scholardata->first_name}}</td>
-                <td>{{$scholardata->course->course_name}}</td>
-                <td>{{$scholardata->year->year_name}}</td>
-                <td>{{$scholardata->semester->semester_name}}</td>
-                <td>{{$scholardata->school_year->school_year_name}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $scholardata->last_name }}, {{ $scholardata->first_name }}</td>
+                <td>{{ $scholardata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
+                <td>{{ $scholardata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
+                <td>{{ $scholardata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
+                <td>{{ $scholardata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
                 <td>{{$scholardata->scholarship_remarks}}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="7" class="total">Total Scholar Students</td>
+                <td colspan="6" class="total">Total Scholar Students</td>
                 <td class="total">{{ $scholarData->count() }}</td>
             </tr>
         </tbody>
