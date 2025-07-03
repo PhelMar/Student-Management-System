@@ -7,50 +7,50 @@
     <title>Print 4p's Students</title>
     <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.min.css') }}">
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
 
-    .header {
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        .header {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .header img {
-        height: 115px;
-        margin-right: 15px;
-    }
+        .header img {
+            height: 115px;
+            margin-right: 15px;
+        }
 
-    h2,
-    p {
-        margin: 5px 0;
-    }
+        h2,
+        p {
+            margin: 5px 0;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-    th,
-    td {
-        border: 1px solid #000;
-        padding: 8px;
-        text-align: left;
-    }
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
 
-    th {
-        background-color: #f2f2f2;
-    }
+        th {
+            background-color: #f2f2f2;
+        }
 
-    .total {
-        font-weight: bold;
-        text-align: right;
-    }
+        .total {
+            font-weight: bold;
+            text-align: right;
+        }
     </style>
 </head>
 
@@ -68,7 +68,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>STUDENTS NAME</th>
+                <th>STUDENT'S NAME</th>
                 <th>COURSE</th>
                 <th>YEAR LEVEL</th>
                 <th>SEMESTER</th>
@@ -76,14 +76,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($studentsData as $student)
+            @foreach ($studentsData as $record)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $student->last_name }}, {{ $student->first_name }}</td>
-                <td>{{ $student->course->course_name }}</td>
-                <td>{{ $student->year->year_name }}</td>
-                <td>{{ $student->semester->semester_name }}</td>
-                <td>{{ $student->school_year->school_year_name }}</td>
+                <td>{{ $record->student->last_name }}, {{ $record->student->first_name }}</td>
+                <td>{{ $record->course->course_name }}</td>
+                <td>{{ $record->year->year_name }}</td>
+                <td>{{ $record->semester->semester_name }}</td>
+                <td>{{ $record->schoolYear->school_year_name }}</td>
             </tr>
             @endforeach
             <tr>
@@ -92,13 +92,14 @@
             </tr>
         </tbody>
     </table>
+
     <script>
-    window.onload = function() {
-        window.print();
-        window.onafterprint = function() {
-            window.close();
+        window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+                window.close();
+            };
         };
-    };
     </script>
 </body>
 

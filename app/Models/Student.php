@@ -73,16 +73,12 @@ class Student extends Model
         'ips',
         'ips_remarks',
         'solo_parent',
-        'course_id',
-        'year_id',
-        'semester_id',
-        'school_year_id',
         'age',
         'four_ps',
         'scholarship',
         'scholarship_remarks',
     ];
-    
+
     public function setFirstNameAttribute($value)
     {
         $this->attributes['first_name'] = ucwords(strtolower($value));
@@ -172,7 +168,7 @@ class Student extends Model
     public function setSeniorHighAttribute($value)
     {
         $this->attributes['senior_high'] = ucwords(strtolower($value));
-    } 
+    }
     public function setIpsRemarksAttribute($value)
     {
         $this->attributes['ips_remarks'] = ucwords(strtolower($value));
@@ -183,6 +179,15 @@ class Student extends Model
     }
 
 
+    public function records()
+    {
+        return $this->hasMany(StudentRecord::class, 'student_id');
+    }
+
+    public function latestRecord()
+    {
+        return $this->hasOne(StudentRecord::class)->latestOfMany();
+    }
 
     public function dialect()
     {
@@ -229,10 +234,11 @@ class Student extends Model
         return $this->belongsTo(Year::class, 'year_id');
     }
 
-    public function pwdRemarks(){
+    public function pwdRemarks()
+    {
         return $this->belongsTo(PwdRemarks::class, 'pwd_remarks_id');
     }
-    
+
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
