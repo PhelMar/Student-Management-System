@@ -186,7 +186,7 @@ class Student extends Model
 
     public function latestRecord()
     {
-        return $this->hasOne(StudentRecord::class)->latestOfMany();
+        return $this->hasOne(StudentRecord::class, 'student_id')->latestOfMany();
     }
 
     public function dialect()

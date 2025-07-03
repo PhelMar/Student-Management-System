@@ -38,39 +38,50 @@ class ViolationController extends Controller
 
     public function store(Request $request)
     {
-        $validateData = $request->validate([
-            'student_id' => 'required|exists:tbl_students,id_no',
+        $request->validate([
+            'id_no' => 'required|exists:tbl_students,id_no',
             'violations_type_id' => 'required|exists:violations_type,id',
             'violations_date' => 'required|date',
-            'remarks' => 'required',
-            'course_id' => 'required|exists:courses,id',
-            'year_id' => 'required|exists:years,id',
-            'semester_id' => 'required|exists:semesters,id',
-            'school_year_id' => 'required|exists:school_years,id'
+            'remarks' => 'required|string|max:255',
         ]);
 
-        $lastViolation = Violation::where('student_id', $request->student_id)
+        $student = Student::where('id_no', $request->id_no)->first();
+
+        if (!$student) {
+            return redirect()->back()->withErrors(['id_no' => 'Student not found.']);
+        }
+
+        $latestRecord = $student->latestRecord;
+
+        if (!$latestRecord) {
+            return redirect()->back()->withErrors(['id_no' => 'No student record found for this student.']);
+        }
+
+        $lastViolation = Violation::where('student_id', $student->id)
+            ->where('semester_id', $latestRecord->semester_id)
+            ->where('school_year_id', $latestRecord->school_year_id)
             ->latest('created_at')
             ->first();
 
-        $violationsLevel = 1;
 
-        if ($lastViolation) {
-            if ($lastViolation->semester_id == $request->semester_id && $lastViolation->school_year_id == $request->school_year_id) {
+        $violationsLevel = $lastViolation ? ($lastViolation->violations_level + 1) : 1;
 
-                $violationsLevel = $lastViolation->violations_level + 1;
-            }
-        }
 
-        $violations = Violation::create(array_merge($validateData, [
+        Violation::create([
+            'student_id' => $student->id,
+            'violations_type_id' => $request->violations_type_id,
+            'violations_date' => $request->violations_date,
+            'remarks' => $request->remarks,
+            'course_id' => $latestRecord->course_id,
+            'year_id' => $latestRecord->year_id,
+            'semester_id' => $latestRecord->semester_id,
+            'school_year_id' => $latestRecord->school_year_id,
             'violations_level' => $violationsLevel,
-        ]));
+        ]);
 
-        if ($violations) {
-            return redirect()->route('admin.violations.display')
-                ->with('success', 'Violation recorded successfully.');
-        }
+        return redirect()->route('admin.violations.display')->with('success', 'Violation recorded successfully.');
     }
+
 
 
 
@@ -78,20 +89,43 @@ class ViolationController extends Controller
     {
         $student = Student::where('id_no', $request->id_no)
             ->whereNotIn('status', ['dropped', 'graduated'])
-            ->with('course', 'year', 'semester', 'school_year')
+            ->with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
             ->first();
 
-        if ($student) {
-            return response()->json([
-                'student' => $student,
-                'course' => $student->course->id,
-                'year' => $student->year->id,
-                'semester' => $student->semester->id,
-                'school_year' => $student->school_year->id,
-            ]);
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
         }
-        return response()->json(['message' => 'Student not found'], 404);
+
+        $record = $student->latestRecord;
+
+        if (!$record) {
+            return response()->json(['message' => 'No student record found'], 404);
+        }
+
+        return response()->json([
+            'student' => [
+                'first_name' => $student->first_name,
+                'last_name' => $student->last_name,
+                'course' => ['course_name' => $record->course?->course_name ?? 'N/A'],
+                'year' => ['year_name' => $record->year?->year_name ?? 'N/A'],
+                'semester' => ['semester_name' => $record->semester?->semester_name ?? 'N/A'],
+                'school_year' => ['school_year_name' => $record->schoolYear?->school_year_name ?? 'N/A'],
+                'course_id' => $record->course_id ?? null,
+                'year_id' => $record->year_id ?? null,
+                'semester_id' => $record->semester_id ?? null,
+                'school_year_id' => $record->school_year_id ?? null,
+            ]
+        ]);
     }
+
+
+
+
     public function display(Request $request)
     {
         $request->validate([

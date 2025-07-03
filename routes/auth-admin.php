@@ -57,7 +57,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
 
     Route::get('/violations/create', [ViolationController::class, 'create'])->name('admin.violations.create');
     Route::post('/violations/store', [ViolationController::class, 'store'])->name('admin.violations.store');
-    Route::get('/get-student', [ViolationController::class, 'getStudent'])->name('admin.violations.getStudent');
+    Route::get('/admin/get-student', [ViolationController::class, 'getStudent'])->name('admin.violations.getStudent');
 
     Route::get('/violations-data', [ViolationController::class, 'getViolationsData'])->name('admin.violations.chart-data');
     Route::get('/violations/data', [ViolationController::class, 'getBarViolationsData'])->name('admin.violations.bar-data');
