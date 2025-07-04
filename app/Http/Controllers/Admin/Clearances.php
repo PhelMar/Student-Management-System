@@ -58,20 +58,38 @@ class Clearances extends Controller
     {
         $student = Student::where('id_no', $request->id_no)
             ->whereNotIn('status', ['dropped', 'graduated'])
-            ->with('course', 'year', 'semester', 'school_year')
+            ->with([
+                'latestRecord.course:id,course_name',
+                'latestRecord.year:id,year_name',
+                'latestRecord.semester:id,semester_name',
+                'latestRecord.schoolYear:id,school_year_name',
+            ])
             ->first();
 
-        if ($student) {
-            return response()->json([
-                'student' => $student,
-                'course' => $student->course->id,
-                'year' => $student->year->id,
-                'semester' => $student->semester->id,
-                'school_year' => $student->school_year->id,
-            ]);
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
         }
 
-        return response()->json(['message' => 'Student not Found'], 404);
+        $record = $student->latestRecord;
+
+        if (!$record) {
+            return response()->json(['message' => 'No student record found'], 404);
+        }
+
+        return response()->json([
+            'student' => [
+                'first_name' => $student->first_name,
+                'last_name' => $student->last_name,
+                'course' => ['course_name' => $record->course?->course_name ?? 'N/A'],
+                'year' => ['year_name' => $record->year?->year_name ?? 'N/A'],
+                'semester' => ['semester_name' => $record->semester?->semester_name ?? 'N/A'],
+                'school_year' => ['school_year_name' => $record->schoolYear?->school_year_name ?? 'N/A'],
+                'course_id' => $record->course_id ?? null,
+                'year_id' => $record->year_id ?? null,
+                'semester_id' => $record->semester_id ?? null,
+                'school_year_id' => $record->school_year_id ?? null,
+            ]
+        ]);
     }
 
     public function display(Request $request)
@@ -638,7 +656,7 @@ class Clearances extends Controller
             'length' => 'integer|min:1|max:100',
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
-        
+
         if ($request->ajax()) {
 
             $query = Clearance::whereHas('course', function ($q) {

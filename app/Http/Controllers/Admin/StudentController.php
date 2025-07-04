@@ -276,15 +276,15 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
-                ->with([
-                    'course:id,course_name',
-                    'year:id,year_name',
-                    'semester:id,semester_name',
-                    'school_year:id,school_year_name',
-                ])
-                ->where('status', 'dropped') // Filter by dropped students
-                ->orderBy('created_at', 'desc');
+            $query = StudentRecord::with([
+                'student:id,id_no,first_name,last_name',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])->whereHas('student', function ($q) {
+                $q->where('status', 'dropped'); // Only active students
+            })->orderBy('created_at', 'desc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {

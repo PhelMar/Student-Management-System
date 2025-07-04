@@ -16,20 +16,25 @@ class Clearance extends Model
         'school_year_id',
         'control_no',
     ];
-    public function student(){
+    public function student()
+    {
         return $this->belongsTo(Student::class, 'student_id', 'id_no');
     }
 
-    public function course(){
-        return $this->belongsTo(Course::class,'course_id', 'id');
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id', 'id');
     }
-    public function year(){
-        return $this->belongsTo(Year::class,'year_id', 'id');
+    public function year()
+    {
+        return $this->belongsTo(Year::class, 'year_id', 'id');
     }
-    public function semester(){
-        return $this->belongsTo(Semester::class,'semester_id', 'id');
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id', 'id');
     }
-    public function school_year(){
-        return $this->belongsTo(SchoolYear::class,'school_year_id', 'id');
+    public function school_year()
+    {
+        return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
     }
 }
