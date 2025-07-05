@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\OrganizationController;
 use App\Http\Controllers\Admin\OrganizationTypeController;
 use App\Http\Controllers\Admin\ParentStatusController;
 use App\Http\Controllers\Admin\PositionsController;
+use App\Http\Controllers\Admin\PwdRemarksController;
 use App\Http\Controllers\Admin\ReligionController;
 use App\Http\Controllers\Admin\SchoolYearController;
 use App\Http\Controllers\Admin\StayController;
@@ -132,6 +133,11 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::post('/religion/store', [ReligionController::class, 'store'])->name('admin.religion.store');
     Route::put('/religion/update/{id}', [ReligionController::class, 'update'])->name('admin.religion.update');
     Route::delete('/religion/delete/{id}', [ReligionController::class, 'delete'])->name('admin.religion.delete');
+
+    Route::get('/pwd-remarks/display', [PwdRemarksController::class, 'display'])->name('admin.pwd-remarks.display');
+    Route::post('/pwd-remarks/store', [PwdRemarksController::class, 'store'])->name('admin.pwd-remarks.store');
+    Route::put('/pwd-remarks/update/{id}', [PwdRemarksController::class, 'update'])->name('admin.pwd-remarks.update');
+    Route::delete('/pwd-remarks/delete/{id}', [PwdRemarksController::class, 'delete'])->name('admin.pwd-remarks.delete');
 
     Route::get('/school_year/display', [SchoolYearController::class, 'display'])->name('admin.school_year.display');
     Route::post('/school_year/store', [SchoolYearController::class, 'store'])->name('admin.school_year.store');

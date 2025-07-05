@@ -1297,7 +1297,10 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $query = Student::whereHas('income', function ($q) {
                 $q->where('income_base', 'Below ₱10,000');
-            })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+            }) ->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.schoolYear:id,school_year_name',])
                 ->where('status', 'active')
                 ->orderBy('last_name', 'asc');
 
@@ -1327,10 +1330,10 @@ class StudentController extends Controller
                 'data' => $data->map(function ($student, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'student_name' => "{$student->last_name}, {$student->first_name}",
-                        'course_name' => $student->course->course_name ?? 'N/A',
-                        'year_name' => $student->year->year_name ?? 'N/A',
-                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    'student_name' => "{$student->last_name}, {$student->first_name}",
+                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
+                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
+                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1349,7 +1352,10 @@ class StudentController extends Controller
         if ($request->ajax()) {
             $query = Student::whereHas('income', function ($q) {
                 $q->where('income_base', '₱10,000-₱20,000');
-            })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+            })->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.schoolYear:id,school_year_name',])
                 ->where('status', 'active')
                 ->orderBy('last_name', 'asc');
 
@@ -1379,10 +1385,10 @@ class StudentController extends Controller
                 'data' => $data->map(function ($student, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'student_name' => "{$student->last_name}, {$student->first_name}",
-                        'course_name' => $student->course->course_name ?? 'N/A',
-                        'year_name' => $student->year->year_name ?? 'N/A',
-                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    'student_name' => "{$student->last_name}, {$student->first_name}",
+                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
+                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
+                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1400,10 +1406,12 @@ class StudentController extends Controller
         ]);
 
         if ($request->ajax()) {
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
-                ->whereHas('income', function ($q) {
+           $query = Student::whereHas('income', function ($q) {
                     $q->where('income_base', '₱20,000-₱30,000');
-                })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                })->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.schoolYear:id,school_year_name',])
                 ->where('status', 'active')
                 ->orderBy('last_name', 'asc');
 
@@ -1433,10 +1441,10 @@ class StudentController extends Controller
                 'data' => $data->map(function ($student, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'student_name' => "{$student->last_name}, {$student->first_name}",
-                        'course_name' => $student->course->course_name ?? 'N/A',
-                        'year_name' => $student->year->year_name ?? 'N/A',
-                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    'student_name' => "{$student->last_name}, {$student->first_name}",
+                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
+                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
+                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1453,10 +1461,12 @@ class StudentController extends Controller
         ]);
 
         if ($request->ajax()) {
-            $query = Student::select('id', 'id_no', 'first_name', 'last_name', 'course_id', 'year_id', 'semester_id', 'school_year_id')
-                ->whereHas('income', function ($q) {
+            $query = Student::whereHas('income', function ($q) {
                     $q->where('income_base', 'Above ₱30,000');
-                })->with(['course:id,course_name', 'year:id,year_name', 'school_year:id,school_year_name'])
+                })->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.schoolYear:id,school_year_name',])
                 ->where('status', 'active')
                 ->orderBy('last_name', 'asc');
 
@@ -1486,10 +1496,10 @@ class StudentController extends Controller
                 'data' => $data->map(function ($student, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'student_name' => "{$student->last_name}, {$student->first_name}",
-                        'course_name' => $student->course->course_name ?? 'N/A',
-                        'year_name' => $student->year->year_name ?? 'N/A',
-                        'school_year_name' => $student->school_year->school_year_name ?? 'N/A',
+                    'student_name' => "{$student->last_name}, {$student->first_name}",
+                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
+                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
+                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1867,9 +1877,20 @@ class StudentController extends Controller
         $belowTenK = Student::whereHas('income', function ($query) {
             $query->where('income_base', 'Below ₱10,000');
         })
-            ->with(['course', 'year', 'school_year'])
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+            ->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            })
             ->where('status', 'active')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1890,9 +1911,20 @@ class StudentController extends Controller
         $tenkToTwentyk = Student::whereHas('income', function ($query) {
             $query->where('income_base', '₱10,000-₱20,000');
         })
-            ->with(['course', 'year', 'school_year'])
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+            ->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            })
             ->where('status', 'active')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1912,9 +1944,20 @@ class StudentController extends Controller
         $twentykToThirtyk = Student::whereHas('income', function ($query) {
             $query->where('income_base', '₱20,000-₱30,000');
         })
-            ->with(['course', 'year', 'school_year'])
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+            ->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            })
             ->where('status', 'active')
             ->orderBy('last_name', 'asc')
             ->get();
@@ -1934,9 +1977,20 @@ class StudentController extends Controller
         $above30k = Student::whereHas('income', function ($query) {
             $query->where('income_base', 'Above ₱30,000');
         })
-            ->with(['course', 'year', 'school_year'])
-            ->where('school_year_id', $schoolYearId)
-            ->where('semester_id', $semesterId)
+            ->with([
+            'latestRecord.course:id,course_name',
+            'latestRecord.year:id,year_name',
+            'latestRecord.semester:id,semester_name',
+            'latestRecord.schoolYear:id,school_year_name',
+        ])
+            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
+                if ($schoolYearId) {
+                    $q->where('school_year_id', $schoolYearId);
+                }
+                if ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                }
+            })
             ->where('status', 'active')
             ->orderBy('last_name', 'asc')
             ->get();

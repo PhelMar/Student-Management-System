@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class PwdRemarks extends Model
 {
+    protected $fillable = ['pwd_name'];
+    
     public function students()
 {
     return $this->hasMany(Student::class, 'pwd_remarks_id');

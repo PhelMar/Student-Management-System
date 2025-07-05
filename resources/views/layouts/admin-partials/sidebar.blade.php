@@ -78,6 +78,7 @@
                     <a class="nav-link" href="{{route('admin.dialect.display')}}">Dialogue Type</a>
                     <a class="nav-link" href="{{route('admin.stay.display')}}">Living Type</a>
                     <a class="nav-link" href="{{route('admin.position.display')}}">Position Type</a>
+                    <a class="nav-link" href="{{route('admin.pwd-remarks.display')}}">Pwd Remarks</a>
                 </nav>
             </div>
         </div>

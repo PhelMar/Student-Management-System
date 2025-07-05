@@ -79,9 +79,9 @@
             <tr>
                 <td>{{$loop->iteration}}</td>
                 <td>{{$student->first_name}} {{$student->last_name}}</td>
-                <td>{{$student->course->course_name}}</td>
-                <td>{{$student->year->year_name}}</td>
-                <td>{{$student->school_year->school_year_name}}</td>
+                <td>{{$student->latestRecord?->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$student->latestRecord?->year->year_name ?? 'N/A'}}</td>
+                <td>{{$student->latestRecord?->schoolYear->school_year_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
