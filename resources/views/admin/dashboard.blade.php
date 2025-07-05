@@ -109,6 +109,17 @@
 
 </div>
 <div class="row">
+    <div class="row d-flex align-items-center justify-content-center">
+    <div class="col-xl-9">
+        <div class="card mb-4 shadow">
+            <div class="card-header text-white" style="background-color: #0A7075">
+                <i class="fas fa-chart-bar me-1"></i>
+                Total of Students
+            </div>
+            <div class="card-body"><canvas id="myAreaChartStudents" width="100%" height="40"></canvas></div>
+        </div>
+    </div>
+</div>
     <div class="col-xl-6">
         <div class="card mb-4 shadow">
             <div class="card-header text-white" style="background-color: #0A7075">
@@ -128,17 +139,7 @@
         </div>
     </div>
 </div>
-<div class="row d-flex align-items-center justify-content-center">
-    <div class="col-xl-9">
-        <div class="card mb-4 shadow">
-            <div class="card-header text-white" style="background-color: #0A7075">
-                <i class="fas fa-chart-bar me-1"></i>
-                Total of Students
-            </div>
-            <div class="card-body"><canvas id="myAreaChartStudents" width="100%" height="40"></canvas></div>
-        </div>
-    </div>
-</div>
+
 <div id="municipality-cards-container">
     <div class="row">
 

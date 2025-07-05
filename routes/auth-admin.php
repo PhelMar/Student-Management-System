@@ -45,6 +45,11 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::post('/count-active-students', [StudentController::class, 'countActiveStudents'])->name('admin.students.countActive');
 
     Route::get('/student-counts', [StudentController::class, 'getMunicipalStudentCount'])->name('admin.students.getMunicipalStudentCount');
+    Route::get('/students/municipality/list/data', [StudentController::class, 'municipalStudentsList'])->name('admin.students.municipalStudentsList');
+    Route::get('/students/municipality/{municipality_id}', [StudentController::class, 'showByMunicipality'])->name('admin.students.byMunicipality');
+    Route::get('/students/municipal-barangay-counts', [StudentController::class, 'municipalBarangayCounts'])->name('admin.students.municipalBarangayCounts');
+
+
 
     Route::get('/edit/{id}', [StudentController::class, 'edit'])->name('admin.students.edit');
     Route::put('/edit/{id}', [StudentController::class, 'update'])->name('admin.students.update');

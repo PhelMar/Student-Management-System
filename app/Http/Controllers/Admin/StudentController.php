@@ -159,11 +159,104 @@ class StudentController extends Controller
             $municipalityStudentCounts[] = [
                 'municipality' => $municipality ? $municipality->citymun_desc : 'Unknown',
                 'count' => $count->count,
+                'id' => $count->current_municipality_id,
             ];
         }
+        
 
         return response()->json($municipalityStudentCounts);
     }
+
+    public function municipalStudentsList(Request $request)
+{
+    $request->validate([
+        'start' => 'integer|min:0',
+        'length' => 'integer|min:1|max:100',
+        'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        'municipality_id' => 'nullable|string|max:20',
+    ]);
+
+    if ($request->ajax()) {
+        $search = $request->input('search.value', '');
+        $municipalityId = $request->input('municipality_id', null);
+
+        $query = StudentRecord::with([
+            'student:id,current_municipality_id,id_no,first_name,last_name,permanent_barangay_id',
+            'student.permanentBarangay:id,brgy_code,brgy_desc',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+        ->whereHas('student', function ($q) use ($municipalityId) {
+            $q->where('status', 'active');
+            if ($municipalityId) {
+                $q->where('current_municipality_id', $municipalityId);
+            }
+        })
+        ->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->whereHas('student', function ($q) use ($search) {
+                $q->whereRaw("CAST(id_no AS CHAR) LIKE ?", ["%{$search}%"])
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('first_name', 'like', "%{$search}%");
+            });
+        }
+
+        $totalData = $query->count();
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+
+        $data = $query->skip($start)->take($length)->get();
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => $totalData,
+            'recordsFiltered' => $totalData,
+            'data' => $data->map(function ($row, $index) use ($start) {
+                return [
+                    'DT_RowIndex' => $start + $index + 1,
+                    'students_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                    'course_name' => $row->course->course_name ?? 'N/A',
+                    'year_name' => $row->year->year_name ?? 'N/A',
+                    'semester_name' => $row->semester->semester_name ?? 'N/A',
+                    'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
+                    'barangay_name' => $row->student->permanentBarangay?->brgy_desc ?? 'N/A',
+                    'hashed_id' => Hashids::encode($row->student->id),
+                ];
+            }),
+        ]);
+    }
+
+    return response()->json(['error' => 'Invalid request'], 400);
+}
+
+public function showByMunicipality($municipality_id)
+{
+    $municipality = Municipality::where('citymun_code', trim($municipality_id))->firstOrFail();
+    return view('admin.students.by_municipality', compact('municipality'));
+}
+
+public function municipalBarangayCounts(Request $request)
+{
+    $municipalityId = $request->input('municipality_id', null);
+
+    $studentsQuery = \App\Models\Student::query()
+        ->where('status', 'active')
+        ->where('current_municipality_id', $municipalityId)
+        ->with('permanentBarangay:id,brgy_code,brgy_desc');
+
+    $students = $studentsQuery->get();
+
+    $counts = $students->groupBy('permanentBarangay.brgy_desc')
+        ->map(function ($group) {
+            return count($group);
+        });
+
+    // Reformat to array of [barangay_name => count]
+    return response()->json($counts);
+}
 
 
 

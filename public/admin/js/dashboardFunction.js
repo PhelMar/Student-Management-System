@@ -94,19 +94,20 @@ $(document).ready(function () {
                         const colorClass = columnColors[index % columnColors.length];
 
                         let card = `
-                            <div class="col-xl-3 col-md-6 mb-4"> <!-- Grid column -->
-                                <div class="card ${colorClass} text-white shadow">
-                                    <div class="card-body">
-                                        <h5">FROM MUNICIPALITY OF ${municipality.municipality}</h5>
-                                        <p class="card-text">Total Students: ${municipality.count}</p>
-                                    </div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card ${colorClass} text-white shadow">
+            <div class="card-body">
+                <h5">FROM MUNICIPALITY OF ${municipality.municipality}</h5>
+                <p class="card-text">Total Students: ${municipality.count}</p>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/admin/students/municipality/${municipality.id}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+`;
+
 
                         $('#municipality-cards-container .row').append(card);
                     }
@@ -128,6 +129,7 @@ $(document).ready(function () {
     countFourPsStudents();
     countScholarStudents();
 });
+
 
 function countActiveStudents() {
     $.ajax({
