@@ -71,22 +71,24 @@
                 <th>Student Name</th>
                 <th>Course</th>
                 <th>Year</th>
+                <th>Semester</th>
                 <th>School Year</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($twentykToThirtyk as $student)
+             @foreach ($query as $row)
             <tr>
                 <td>{{$loop->iteration}}</td>
-                <td>{{$student->first_name}} {{$student->last_name}}</td>
-                <td>{{$student->latestRecord?->course?->course_name ?? 'N/A'}}</td>
-                <td>{{$student->latestRecord?->year->year_name ?? 'N/A'}}</td>
-                <td>{{$student->latestRecord?->schoolYear->school_year_name ?? 'N/A'}}</td>
+                <td>{{$row->student->first_name}} {{$row->student->last_name}}</td>
+                <td>{{$row->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$row->year->year_name ?? 'N/A'}}</td>
+                <td>{{$row->semester->semester_name ?? 'N/A'}}</td>
+                <td>{{$row->schoolYear->school_year_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="4" class="total">Total Income between 20k-30k </td>
-                <td class="total">{{ $twentykToThirtyk->count() }}</td>
+                <td colspan="5" class="total">Total Income between 20k-30k </td>
+                <td class="total">{{ $totalData }}</td>
             </tr>
         </tbody>
     </table>

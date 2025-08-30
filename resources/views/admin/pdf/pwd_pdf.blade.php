@@ -92,20 +92,20 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($pwdData as $pwddata)
+            @foreach ($query as $row)
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $pwddata->last_name }}, {{ $pwddata->first_name }}</td>
-                <td>{{ $pwddata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
-                <td>{{ $pwddata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
-                <td>{{ $pwddata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
-                <td>{{ $pwddata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
-                <td>{{ $pwddata->pwdRemarks->pwd_name ?? 'N/A'}}</td>
+                <td>{{$loop->iteration}}</td>
+                <td>{{$row->student->first_name}} {{$row->student->last_name}}</td>
+                <td>{{$row->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$row->year->year_name ?? 'N/A'}}</td>
+                <td>{{$row->semester->semester_name ?? 'N/A'}}</td>
+                <td>{{$row->schoolYear->school_year_name ?? 'N/A'}}</td>
+                <td>{{$row->student->pwdRemarks->pwd_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="6" class="total">Total Pwd Students</td>
-                <td class="total">{{ $pwdData->count() }}</td>
+                <td colspan="6" class="total">Total IPS Students</td>
+                <td class="total">{{ $totalData }}</td>
             </tr>
         </tbody>
     </table>

@@ -34,8 +34,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>LAST NAME</th>
-                    <th>FIRST NAME</th>
+                    <th>FULL NAME</th>
                     <th>COURSE</th>
                     <th>YEAR LEVEL</th>
                     <th>SEMESTER</th>
@@ -45,8 +44,7 @@
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>LAST NAME</th>
-                    <th>FIRST NAME</th>
+                    <th>FULL NAME</th>
                     <th>COURSE</th>
                     <th>YEAR LEVEL</th>
                     <th>SEMESTER</th>
@@ -125,10 +123,7 @@
                     searchable: false
                 },
                 {
-                    data: 'last_name'
-                },
-                {
-                    data: 'first_name'
+                    data: 'name'
                 },
                 {
                     data: 'course_name',

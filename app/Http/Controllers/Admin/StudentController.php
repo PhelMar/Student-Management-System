@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\SchoolHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Baranggay;
 use App\Models\Course;
@@ -110,44 +111,119 @@ class StudentController extends Controller
 
     public function countPWDStudents()
     {
-        $pwdCount = Student::where('pwd', 'Yes')->count();
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('pwd', 'Yes');
+        });
+
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $pwdCount = $query->count();
         return response()->json(['count' => $pwdCount]);
     }
     public function countSoloParentStudents()
     {
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('solo_parent', 'Yes');
+        });
 
-        $soloParentCount = Student::where('solo_parent', 'Yes')->count();
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $soloParentCount = $query->count();
         return response()->json(['count' => $soloParentCount]);
     }
     public function countIpsStudents()
     {
 
-        $ipsCount = Student::where('ips', 'Yes')->count();
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('ips', 'Yes');
+        });
+
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $ipsCount = $query->count();
+
         return response()->json(['count' => $ipsCount]);
     }
 
     public function countFourPsStudents()
     {
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('four_ps', 'Yes');
+        });
 
-        $fourps = Student::where('four_ps', 'Yes')->count();
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $fourps = $query->count();
         return response()->json(['count' => $fourps]);
     }
     public function countScholarStudents()
     {
 
-        $scholar = Student::where('scholarship', 'Yes')->count();
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('scholarship', 'Yes');
+        });
+
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $scholar = $query->count();
         return response()->json(['count' => $scholar]);
     }
 
     public function countActiveStudents()
     {
-        $activeCount = Student::where('status', 'active')->count();
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active');
+        });
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+        $activeCount = $query->count();
         return response()->json(['count' => $activeCount]);
     }
+
     public function getMunicipalStudentCount()
     {
-        $municipalityCounts = Student::select('current_municipality_id', DB::raw('count(*) as count'))
-            ->groupBy('current_municipality_id')
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+        $query = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active');
+        });
+
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
+        }
+
+        $municipalityCounts = $query
+            ->join('tbl_students', 'student_records.student_id', '=', 'tbl_students.id')
+            ->select('tbl_students.current_municipality_id', DB::raw('count(*) as count'))
+            ->groupBy('tbl_students.current_municipality_id')
             ->get();
 
         // Prepare an array to hold the municipality name and its student count
@@ -162,101 +238,129 @@ class StudentController extends Controller
                 'id' => $count->current_municipality_id,
             ];
         }
-        
+
 
         return response()->json($municipalityStudentCounts);
     }
 
     public function municipalStudentsList(Request $request)
-{
-    $request->validate([
-        'start' => 'integer|min:0',
-        'length' => 'integer|min:1|max:100',
-        'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
-        'municipality_id' => 'nullable|string|max:20',
-    ]);
+    {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+            'municipality_id' => 'nullable|string|max:20',
+        ]);
 
-    if ($request->ajax()) {
-        $search = $request->input('search.value', '');
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
+        if ($request->ajax()) {
+            $search = $request->input('search.value', '');
+            $municipalityId = $request->input('municipality_id', null);
+
+            $query = StudentRecord::with([
+                'student:id,current_municipality_id,id_no,first_name,last_name,permanent_barangay_id',
+                'student.permanentBarangay:id,brgy_code,brgy_desc',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])
+                ->whereHas('student', function ($q) use ($municipalityId) {
+                    $q->where('status', 'active');
+                    if ($municipalityId) {
+                        $q->where('current_municipality_id', $municipalityId);
+                    }
+                });
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $totalData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'students_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'semester_name' => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
+                        'barangay_name' => $row->student->permanentBarangay?->brgy_desc ?? 'N/A',
+                        'hashed_id' => Hashids::encode($row->student->id),
+                    ];
+                }),
+            ]);
+        }
+
+        return response()->json(['error' => 'Invalid request'], 400);
+    }
+
+    public function showByMunicipality($municipality_id)
+    {
+        $municipality = Municipality::where('citymun_code', trim($municipality_id))->firstOrFail();
+        return view('admin.students.by_municipality', compact('municipality'));
+    }
+
+    public function municipalBarangayCounts(Request $request)
+    {
         $municipalityId = $request->input('municipality_id', null);
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
 
-        $query = StudentRecord::with([
-            'student:id,current_municipality_id,id_no,first_name,last_name,permanent_barangay_id',
-            'student.permanentBarangay:id,brgy_code,brgy_desc',
-            'course:id,course_name',
-            'year:id,year_name',
-            'semester:id,semester_name',
-            'schoolYear:id,school_year_name',
-        ])
-        ->whereHas('student', function ($q) use ($municipalityId) {
+        // Start from StudentRecord because semester/school_year are there
+        $query = StudentRecord::whereHas('student', function ($q) use ($municipalityId) {
             $q->where('status', 'active');
             if ($municipalityId) {
                 $q->where('current_municipality_id', $municipalityId);
             }
-        })
-        ->orderBy('created_at', 'desc');
+        });
 
-        if ($search) {
-            $query->whereHas('student', function ($q) use ($search) {
-                $q->whereRaw("CAST(id_no AS CHAR) LIKE ?", ["%{$search}%"])
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('first_name', 'like', "%{$search}%");
-            });
+        if ($current['semester'] && $current['school_year']) {
+            $query->where('semester_id', $current['semester']->id)
+                ->where('school_year_id', $current['school_year']->id);
         }
 
-        $totalData = $query->count();
-        $start = $request->input('start', 0);
-        $length = $request->input('length', 10);
+        // Join to students to get barangay info
+        $records = $query->with('student.permanentBarangay:id,brgy_code,brgy_desc')->get();
 
-        $data = $query->skip($start)->take($length)->get();
-
-        return response()->json([
-            'draw' => intval($request->input('draw')),
-            'recordsTotal' => $totalData,
-            'recordsFiltered' => $totalData,
-            'data' => $data->map(function ($row, $index) use ($start) {
-                return [
-                    'DT_RowIndex' => $start + $index + 1,
-                    'students_name' => $row->student->last_name . ', ' . $row->student->first_name,
-                    'course_name' => $row->course->course_name ?? 'N/A',
-                    'year_name' => $row->year->year_name ?? 'N/A',
-                    'semester_name' => $row->semester->semester_name ?? 'N/A',
-                    'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
-                    'barangay_name' => $row->student->permanentBarangay?->brgy_desc ?? 'N/A',
-                    'hashed_id' => Hashids::encode($row->student->id),
-                ];
-            }),
-        ]);
-    }
-
-    return response()->json(['error' => 'Invalid request'], 400);
-}
-
-public function showByMunicipality($municipality_id)
-{
-    $municipality = Municipality::where('citymun_code', trim($municipality_id))->firstOrFail();
-    return view('admin.students.by_municipality', compact('municipality'));
-}
-
-public function municipalBarangayCounts(Request $request)
-{
-    $municipalityId = $request->input('municipality_id', null);
-
-    $studentsQuery = \App\Models\Student::query()
-        ->where('status', 'active')
-        ->where('current_municipality_id', $municipalityId)
-        ->with('permanentBarangay:id,brgy_code,brgy_desc');
-
-    $students = $studentsQuery->get();
-
-    $counts = $students->groupBy('permanentBarangay.brgy_desc')
-        ->map(function ($group) {
+        // Group by barangay
+        $counts = $records->groupBy(function ($record) {
+            return $record->student->permanentBarangay->brgy_desc ?? 'Unknown';
+        })->map(function ($group) {
             return count($group);
         });
 
-    // Reformat to array of [barangay_name => count]
-    return response()->json($counts);
-}
+        return response()->json($counts);
+    }
+
+
 
 
 
@@ -346,7 +450,7 @@ public function municipalBarangayCounts(Request $request)
             ->whereHas('student', function ($query) {
                 $query->where('status', 'active');
             })
-            ->get();
+            ->cursor();
 
         return view('admin.printStudents.print', [
             'studentsData' => $students,
@@ -540,6 +644,7 @@ public function municipalBarangayCounts(Request $request)
             'senior_high_year_attended' => 'nullable',
             'pwd' => 'required|in:No,Yes',
             'ips' => 'required|in:No,Yes',
+            'ips_remarks' => 'nullable|max:100',
             'pwd_remarks_id' => 'nullable|exists:pwd_remarks,id',
             'solo_parent' => 'required|in:No,Yes',
             'four_ps' => 'required|in:No,Yes',
@@ -940,23 +1045,14 @@ public function municipalBarangayCounts(Request $request)
 
             $student->update($validatedData);
 
-            $exists = StudentRecord::where([
+            StudentRecord::firstOrCreate([
                 'student_id'     => $student->id,
                 'course_id'      => $request->course_id,
                 'year_id'        => $request->year_id,
                 'semester_id'    => $request->semester_id,
                 'school_year_id' => $request->school_year_id,
-            ])->exists();
+            ]);
 
-            if (!$exists) {
-                StudentRecord::create([
-                    'student_id'     => $student->id,
-                    'course_id'      => $request->course_id,
-                    'year_id'        => $request->year_id,
-                    'semester_id'    => $request->semester_id,
-                    'school_year_id' => $request->school_year_id,
-                ]);
-            }
 
             if ($student) {
                 session()->flash('success', 'Updated Successfully');
@@ -1038,25 +1134,46 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        // ✅ Get latest school year + semester (via helper)
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
+        // 🔎 Debug: see what helper is returning
+        // dd($current);
+
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,ips_remarks,ips',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
             ])
-                ->where('status', 'active')
-                ->where('ips', 'Yes')
-                ->orderBy('last_name', 'asc');
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('ips', 'Yes');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('last_name', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
@@ -1073,27 +1190,30 @@ public function municipalBarangayCounts(Request $request)
                 'recordsFiltered' => $totalData,
                 'data' => $data->map(function ($row, $index) use ($start) {
                     return [
-                        'DT_RowIndex' => $start + $index + 1,
-                        'last_name' => $row->last_name,
-                        'first_name' => $row->first_name,
-                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
-                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
-                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
-                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
-                        'ips_remarks' => $row->ips_remarks ?? 'N/A',
+                        'DT_RowIndex'     => $start + $index + 1,
+                        'name'            => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name'     => $row->course->course_name ?? 'N/A',
+                        'year_name'       => $row->year->year_name ?? 'N/A',
+                        'semester_name'   => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
+                        'ips_remarks'     => $row->student?->ips_remarks ?? 'N/A',
                     ];
                 }),
             ]);
         }
 
         $school_year = DB::table('school_years')->pluck('school_year_name', 'id');
-        $semester = DB::table('semesters')->pluck('semester_name', 'id');
+        $semester    = DB::table('semesters')->pluck('semester_name', 'id');
 
         return view('admin.ips-student.display', compact(
             'semester',
             'school_year',
+            'current'
         ));
     }
+
+
+
 
 
     public function pwdDisplay(Request $request)
@@ -1105,25 +1225,39 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,pwd,pwd_remarks_id',
+                'student.pwdRemarks:id,pwd_name',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
             ])
-                ->where('status', 'active')
-                ->where('pwd', 'Yes')
-                ->orderBy('last_name', 'asc');
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('pwd', 'Yes');
+                });
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(Student::select('last_name')
+                ->whereColumn('tbl_students.id', 'student_records.student_id'), 'asc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('last_name', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q1) use ($search) {
+                        $q1->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q2) use ($search) {
+                            $q2->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
@@ -1141,13 +1275,12 @@ public function municipalBarangayCounts(Request $request)
                 'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'last_name' => $row->last_name,
-                        'first_name' => $row->first_name,
-                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
-                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
-                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
-                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
-                        'pwd_name' => $row->pwdRemarks ? $row->pwdRemarks->pwd_name : 'N/A',
+                        'name' => $row->student->last_name . ', ' . $row->student->first_name ?? 'N/A',
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'semester_name' => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
+                        'pwd_name' => $row->student?->pwdRemarks?->pwd_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1171,25 +1304,37 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,four_ps',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
             ])
-                ->where('status', 'active')
-                ->where('four_ps', 'Yes')
-                ->orderBy('last_name', 'asc');
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('four_ps', 'Yes');
+                });
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+            $query->orderBy(Student::select('last_name')
+                ->whereColumn('tbl_students.id', 'student_records.student_id'), 'asc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('last_name', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q1) use ($search) {
+                        $q1->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q2) use ($search) {
+                            $q2->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
@@ -1207,12 +1352,11 @@ public function municipalBarangayCounts(Request $request)
                 'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'last_name' => $row->last_name,
-                        'first_name' => $row->first_name,
-                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
-                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
-                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
-                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'name' => $row->student->last_name . ', ' . $row->student->first_name ?? 'N/A',
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'semester_name' => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1236,25 +1380,38 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,scholarship,scholarship_remarks',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
             ])
-                ->where('status', 'active')
-                ->where('scholarship', 'Yes')
-                ->orderBy('last_name', 'asc');
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('scholarship', 'Yes');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+            $query->orderBy(Student::select('last_name')
+                ->whereColumn('tbl_students.id', 'student_records.student_id'), 'asc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('last_name', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
@@ -1272,13 +1429,12 @@ public function municipalBarangayCounts(Request $request)
                 'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'last_name' => $row->last_name,
-                        'first_name' => $row->first_name,
-                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
-                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
-                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
-                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
-                        'scholarship_remarks' => $row->scholarship_remarks,
+                        'name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'semester_name' => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
+                        'scholarship_remarks' => $row->student->scholarship_remarks,
                     ];
                 }),
             ]);
@@ -1302,25 +1458,38 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
             $search = $request->input('search.value', '');
 
-            $query = Student::with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,solo_parent',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
             ])
-                ->where('status', 'active')
-                ->where('solo_parent', 'Yes')
-                ->orderBy('last_name', 'asc');
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('solo_parent', 'Yes');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+            $query->orderBy(Student::select('last_name')
+                ->whereColumn('tbl_students.id', 'student_records.student_id'), 'asc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('last_name', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q1) use ($search) {
+                        $q1->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q2) use ($search) {
+                            $q2->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
@@ -1338,12 +1507,11 @@ public function municipalBarangayCounts(Request $request)
                 'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                        'last_name' => $row->last_name,
-                        'first_name' => $row->first_name,
-                        'course_name' => $row->latestRecord?->course?->course_name ?? 'N/A',
-                        'year_name' => $row->latestRecord?->year?->year_name ?? 'N/A',
-                        'semester_name' => $row->latestRecord?->semester?->semester_name ?? 'N/A',
-                        'school_year_name' => $row->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name' => $row->course?->course_name ?? 'N/A',
+                        'year_name' => $row->year?->year_name ?? 'N/A',
+                        'semester_name' => $row->semester?->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear?->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1387,31 +1555,51 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
+
         if ($request->ajax()) {
-            $query = Student::whereHas('income', function ($q) {
-                $q->where('income_base', 'Below ₱10,000');
-            }) ->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.schoolYear:id,school_year_name',])
-                ->where('status', 'active')
-                ->orderBy('last_name', 'asc');
-
-            $totalData = $query->count();
-
-            $start = $request->input('start', 0);
-            $length = $request->input('length', 10);
             $search = $request->input('search.value', '');
 
-            if (!empty($search)) {
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,income_id',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('income_id', '1');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
+
+            if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+
 
             $filteredData = $query->count();
             $data = $query->skip($start)->take($length)->get();
@@ -1420,13 +1608,14 @@ public function municipalBarangayCounts(Request $request)
                 'draw' => intval($request->input('draw')),
                 'recordsTotal' => $totalData,
                 'recordsFiltered' => $filteredData,
-                'data' => $data->map(function ($student, $index) use ($start) {
+                'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                    'student_name' => "{$student->last_name}, {$student->first_name}",
-                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
-                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
-                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'student_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name'     => $row->course->course_name ?? 'N/A',
+                        'year_name'       => $row->year->year_name ?? 'N/A',
+                        'semester_name'   => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1442,31 +1631,49 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
-            $query = Student::whereHas('income', function ($q) {
-                $q->where('income_base', '₱10,000-₱20,000');
-            })->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.schoolYear:id,school_year_name',])
-                ->where('status', 'active')
-                ->orderBy('last_name', 'asc');
-
-            $totalData = $query->count();
-
-            $start = $request->input('start', 0);
-            $length = $request->input('length', 10);
             $search = $request->input('search.value', '');
 
-            if (!empty($search)) {
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,income_id',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('income_id', '2');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
+
+            if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
 
             $filteredData = $query->count();
             $data = $query->skip($start)->take($length)->get();
@@ -1475,13 +1682,14 @@ public function municipalBarangayCounts(Request $request)
                 'draw' => intval($request->input('draw')),
                 'recordsTotal' => $totalData,
                 'recordsFiltered' => $filteredData,
-                'data' => $data->map(function ($student, $index) use ($start) {
+                'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                    'student_name' => "{$student->last_name}, {$student->first_name}",
-                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
-                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
-                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'student_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name'     => $row->course->course_name ?? 'N/A',
+                        'year_name'       => $row->year->year_name ?? 'N/A',
+                        'semester_name'   => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1498,31 +1706,49 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
-           $query = Student::whereHas('income', function ($q) {
-                    $q->where('income_base', '₱20,000-₱30,000');
-                })->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.schoolYear:id,school_year_name',])
-                ->where('status', 'active')
-                ->orderBy('last_name', 'asc');
-
-            $totalData = $query->count();
-
-            $start = $request->input('start', 0);
-            $length = $request->input('length', 10);
             $search = $request->input('search.value', '');
 
-            if (!empty($search)) {
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,income_id',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('income_id', '3');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
+
+            if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
 
             $filteredData = $query->count();
             $data = $query->skip($start)->take($length)->get();
@@ -1531,13 +1757,14 @@ public function municipalBarangayCounts(Request $request)
                 'draw' => intval($request->input('draw')),
                 'recordsTotal' => $totalData,
                 'recordsFiltered' => $filteredData,
-                'data' => $data->map(function ($student, $index) use ($start) {
+                'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                    'student_name' => "{$student->last_name}, {$student->first_name}",
-                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
-                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
-                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'student_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name'     => $row->course->course_name ?? 'N/A',
+                        'year_name'       => $row->year->year_name ?? 'N/A',
+                        'semester_name'   => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1553,31 +1780,49 @@ public function municipalBarangayCounts(Request $request)
             'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
         ]);
 
+        $current = SchoolHelper::getCurrentSchoolYearAndSemester();
+
         if ($request->ajax()) {
-            $query = Student::whereHas('income', function ($q) {
-                    $q->where('income_base', 'Above ₱30,000');
-                })->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.schoolYear:id,school_year_name',])
-                ->where('status', 'active')
-                ->orderBy('last_name', 'asc');
-
-            $totalData = $query->count();
-
-            $start = $request->input('start', 0);
-            $length = $request->input('length', 10);
             $search = $request->input('search.value', '');
 
-            if (!empty($search)) {
+            $query = StudentRecord::with([
+                'student:id,first_name,last_name,income_id',
+                'course:id,course_name',
+                'year:id,year_name',
+                'semester:id,semester_name',
+                'schoolYear:id,school_year_name',
+            ])
+                ->whereHas('student', function ($q) {
+                    $q->where('status', 'active')
+                        ->where('income_id', '4');
+                });
+
+            if ($current['semester'] && $current['school_year']) {
+                $query->where('semester_id', $current['semester']->id)
+                    ->where('school_year_id', $current['school_year']->id);
+            }
+
+            $query->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            );
+
+            if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhereHas('course', function ($query) use ($search) {
-                            $query->where('course_name', 'like', "%{$search}%");
+                    $q->whereHas('student', function ($q2) use ($search) {
+                        $q2->where('last_name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('course', function ($q3) use ($search) {
+                            $q3->where('course_name', 'like', "%{$search}%");
                         });
                 });
             }
+
+            $totalData = $query->count();
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
 
             $filteredData = $query->count();
             $data = $query->skip($start)->take($length)->get();
@@ -1586,13 +1831,14 @@ public function municipalBarangayCounts(Request $request)
                 'draw' => intval($request->input('draw')),
                 'recordsTotal' => $totalData,
                 'recordsFiltered' => $filteredData,
-                'data' => $data->map(function ($student, $index) use ($start) {
+                'data' => $data->map(function ($row, $index) use ($start) {
                     return [
                         'DT_RowIndex' => $start + $index + 1,
-                    'student_name' => "{$student->last_name}, {$student->first_name}",
-                    'course_name' => $student->latestRecord?->course?->course_name ?? 'N/A',
-                    'year_name' => $student->latestRecord?->year?->year_name ?? 'N/A',
-                    'school_year_name' => $student->latestRecord?->schoolYear?->school_year_name ?? 'N/A',
+                        'student_name' => $row->student->last_name . ', ' . $row->student->first_name,
+                        'course_name'     => $row->course->course_name ?? 'N/A',
+                        'year_name'       => $row->year->year_name ?? 'N/A',
+                        'semester_name'   => $row->semester->semester_name ?? 'N/A',
+                        'school_year_name' => $row->schoolYear->school_year_name ?? 'N/A',
                     ];
                 }),
             ]);
@@ -1771,32 +2017,52 @@ public function municipalBarangayCounts(Request $request)
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->where('status', 'active')
-            ->where('ips', 'Yes')
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            });
 
-        $ipsData = $query->orderBy('last_name', 'asc')->get();
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('ips', 'Yes');
+        })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
+
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('ips', 'Yes');
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
 
         $action = $request->input('action');
 
         if ($action === 'pdf') {
-            $pdf = Pdf::loadView('admin.pdf.ips_pdf', compact('ipsData'));
+            $pdf = Pdf::loadView('admin.pdf.ips_pdf', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
             return $pdf->download('IP\'s_Student_Report.pdf');
         } elseif ($action === 'print') {
-            return view('admin.ips-student.print', compact('ipsData'));
+            return view('admin.ips-student.print', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
         }
     }
 
@@ -1810,32 +2076,52 @@ public function municipalBarangayCounts(Request $request)
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->where('status', 'active')
-            ->where('pwd', 'Yes') // filters from tbl_students
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            });
 
-        $pwdData = $query->orderBy('last_name', 'asc')->get();
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('pwd', 'Yes');
+        })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
+
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('pwd', 'Yes');
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
 
         $action = $request->input('action');
 
         if ($action === 'pdf') {
-            $pdf = Pdf::loadView('admin.pdf.pwd_pdf', compact('pwdData'));
+            $pdf = Pdf::loadView('admin.pdf.pwd_pdf', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
             return $pdf->download('PWD_Student_Report.pdf');
         } elseif ($action === 'print') {
-            return view('admin.pwd-student.print', compact('pwdData'));
+            return view('admin.pwd-student.print', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
         }
     }
 
@@ -1849,33 +2135,53 @@ public function municipalBarangayCounts(Request $request)
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->where('status', 'active')
-            ->where('four_ps', 'Yes')
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            });
 
-        $fourpsData = $query->orderBy('last_name', 'asc')->get();
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('four_ps', 'Yes');
+        })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
+
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('four_ps', 'Yes');
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
 
 
         $action = $request->input('action');
 
         if ($action === 'pdf') {
-            $pdf = Pdf::loadView('admin.pdf.four_ps_pdf', compact('fourpsData'));
+            $pdf = Pdf::loadView('admin.pdf.four_ps_pdf', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
             return $pdf->download('4p\'s_Report.pdf');
         } elseif ($action === 'print') {
-            return view('admin.four-ps-student.print', compact('fourpsData'));
+            return view('admin.four-ps-student.print', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
         }
     }
 
@@ -1887,34 +2193,54 @@ public function municipalBarangayCounts(Request $request)
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $request->input('semester_id');
+        $semesterId = $validated['semester_id'];
 
-        $query = Student::with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
+
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('scholarship', 'Yes');
+        })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
+
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
         ])
-            ->where('status', 'active')
-            ->where('scholarship', 'Yes')
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            });
-
-        $scholarData = $query->orderBy('last_name', 'asc')->get();
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('scholarship', 'Yes');
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
 
         $action = $request->input('action');
 
         if ($action === 'pdf') {
-            $pdf = Pdf::loadView('admin.pdf.scholar_student_pdf', compact('scholarData'));
+            $pdf = Pdf::loadView('admin.pdf.scholar_student_pdf', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
             return $pdf->download('Scholar_Student_Report.pdf');
         } elseif ($action === 'print') {
-            return view('admin.scholar-student.print', compact('scholarData'));
+            return view('admin.scholar-student.print', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
         }
     }
     public function soloParentPrint(Request $request)
@@ -1927,168 +2253,235 @@ public function municipalBarangayCounts(Request $request)
         $schoolYearId = $validated['school_year_id'];
         $semesterId = $validated['semester_id'];
 
-        $query = Student::with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->where('status', 'active')
-            ->where('solo_parent', 'Yes')
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            });
 
-        $soloparentData = $query->orderBy('last_name', 'asc')->get();
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('solo_parent', 'Yes');
+        })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
+
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('solo_parent', 'Yes');
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
 
         $action = $request->input('action');
 
         if ($action === 'pdf') {
-            $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', compact('soloparentData'));
+            $pdf = Pdf::loadView('admin.pdf.soloparent_pdf', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
             return $pdf->download('Solo_Parent_Report.pdf');
         } elseif ($action === 'print') {
-            return view('admin.solo-parent-student.print', compact('soloparentData'));
+            return view('admin.solo-parent-student.print', [
+                'query'       => $query,
+                'schoolYearId'    => $schoolYearId,
+                'semesterId'      => $semesterId,
+                'totalData'  => $totalData,
+            ]);
         }
     }
 
     public function tenKPrint(Request $request)
     {
-
         $validated = $request->validate([
             'school_year_id' => 'required|exists:school_years,id',
-            'semester_id'    => 'required|in:1st Semester,2nd Semester',
+            'semester_id'    => 'required|exists:semesters,id',
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $validated['semester_id'];
+        $semesterId   = $validated['semester_id'];
 
-        $belowTenK = Student::whereHas('income', function ($query) {
-            $query->where('income_base', 'Below ₱10,000');
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('income_id', 1);
         })
-            ->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            })
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
 
-        return view('admin.income-base-report.print1', compact('belowTenK', 'schoolYearId', 'semesterId'));
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('income_id', 1);
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
+
+        return view('admin.income-base-report.print1', [
+            'query'       => $query,
+            'schoolYearId'    => $schoolYearId,
+            'semesterId'      => $semesterId,
+            'totalData'  => $totalData,
+        ]);
     }
+
     public function tenKandtweentyKPrint(Request $request)
     {
-
         $validated = $request->validate([
             'school_year_id' => 'required|exists:school_years,id',
-            'semester_id'    => 'required|in:1st Semester,2nd Semester',
+            'semester_id'    => 'required|exists:semesters,id',
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $validated['semester_id'];
+        $semesterId   = $validated['semester_id'];
 
-        $tenkToTwentyk = Student::whereHas('income', function ($query) {
-            $query->where('income_base', '₱10,000-₱20,000');
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('income_id', 2);
         })
-            ->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            })
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
 
-        return view('admin.income-base-report.print2', compact('tenkToTwentyk', 'schoolYearId', 'semesterId'));
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('income_id', 2);
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
+
+        return view('admin.income-base-report.print2', [
+            'query'       => $query,
+            'schoolYearId'    => $schoolYearId,
+            'semesterId'      => $semesterId,
+            'totalData'  => $totalData,
+        ]);
     }
     public function tweentyKandThirtyKPrint(Request $request)
     {
         $validated = $request->validate([
             'school_year_id' => 'required|exists:school_years,id',
-            'semester_id'    => 'required|in:1st Semester,2nd Semester',
+            'semester_id'    => 'required|exists:semesters,id',
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $validated['semester_id'];
+        $semesterId   = $validated['semester_id'];
 
-        $twentykToThirtyk = Student::whereHas('income', function ($query) {
-            $query->where('income_base', '₱20,000-₱30,000');
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('income_id', 3);
         })
-            ->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            })
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
 
-        return view('admin.income-base-report.print3', compact('twentykToThirtyk', 'schoolYearId', 'semesterId'));
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('income_id', 3);
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
+
+        return view('admin.income-base-report.print3', [
+            'query'           => $query,
+            'schoolYearId'    => $schoolYearId,
+            'semesterId'      => $semesterId,
+            'totalData'       => $totalData,
+        ]);
     }
     public function aboveThirtyKPrint(Request $request)
     {
         $validated = $request->validate([
             'school_year_id' => 'required|exists:school_years,id',
-            'semester_id'    => 'required|in:1st Semester,2nd Semester',
+            'semester_id'    => 'required|exists:semesters,id',
         ]);
 
         $schoolYearId = $validated['school_year_id'];
-        $semesterId = $validated['semester_id'];
+        $semesterId   = $validated['semester_id'];
 
-        $above30k = Student::whereHas('income', function ($query) {
-            $query->where('income_base', 'Above ₱30,000');
+        $totalData = StudentRecord::whereHas('student', function ($q) {
+            $q->where('status', 'active')
+                ->where('income_id', 4);
         })
-            ->with([
-            'latestRecord.course:id,course_name',
-            'latestRecord.year:id,year_name',
-            'latestRecord.semester:id,semester_name',
-            'latestRecord.schoolYear:id,school_year_name',
-        ])
-            ->whereHas('latestRecord', function ($q) use ($schoolYearId, $semesterId) {
-                if ($schoolYearId) {
-                    $q->where('school_year_id', $schoolYearId);
-                }
-                if ($semesterId) {
-                    $q->where('semester_id', $semesterId);
-                }
-            })
-            ->where('status', 'active')
-            ->orderBy('last_name', 'asc')
-            ->get();
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->count();
 
-        return view('admin.income-base-report.print4', compact('above30k', 'schoolYearId', 'semesterId'));
+        $query = StudentRecord::with([
+            'student:id,first_name,last_name',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'active')
+                    ->where('income_id', 4);
+            })
+            ->where('school_year_id', $schoolYearId)
+            ->where('semester_id', $semesterId)
+            ->orderBy(
+                Student::select('last_name')
+                    ->whereColumn('tbl_students.id', 'student_records.student_id'),
+                'asc'
+            )
+            ->cursor();
+
+        return view('admin.income-base-report.print4', [
+            'query'       => $query,
+            'schoolYearId'    => $schoolYearId,
+            'semesterId'      => $semesterId,
+            'totalData'  => $totalData,
+        ]);
     }
     public function generateReport(Request $request)
     {

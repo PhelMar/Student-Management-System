@@ -1,17 +1,17 @@
-let below10ThousandTable;
+let BSBAHRMTABLES;
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
         },
     });
-    below10ThousandTable = $("#below10ThousandTable").DataTable({
+    BSBAHRMTABLES = $("#BSBAHRMTABLES").DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
         scrollX: true,
         ajax: {
-            url: below10Thousand,
+            url: BSBAHRMUrl,
             type: "GET",
         },
         columns: [
@@ -32,11 +32,11 @@ $(document).ready(function () {
                 defaultContent: "N/A",
             },
             {
-                data: "semester_name",
+                data: "school_year_name",
                 defaultContent: "N/A",
             },
             {
-                data: "school_year_name",
+                data: "status",
                 defaultContent: "N/A",
             },
         ],
@@ -51,12 +51,12 @@ $(document).ready(function () {
     });
     $("#sidebarToggle").on("click", function () {
         setTimeout(function () {
-            table.columns.adjust().draw();
+            BSBAHRMTABLES.columns.adjust().draw();
         }, 300);
     });
     $('a[data-bs-toggle="tab"]').on("shown.bs.tab", function () {
-        if ($("#below10ThousandTable").is(":visible")) {
-            below10ThousandTable.columns.adjust().draw();
+        if ($("#BSBAHRMTABLES").is(":visible")) {
+            BSBAHRMTABLES.columns.adjust().draw();
         }
     });
 });

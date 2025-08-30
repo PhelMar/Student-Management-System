@@ -277,6 +277,68 @@ class Clearances extends Controller
         return view('admin.student-clearance.clearedClearance');
     }
 
+    public function BSBAHRMcleared(Request $request)
+    {
+        $request->validate([
+            'start' => 'integer|min:0',
+            'length' => 'integer|min:1|max:100',
+            'search.value' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\s]*$/',
+        ]);
+
+        if ($request->ajax()) {
+
+            $query = Clearance::whereHas('course', function ($q) {
+                $q->where('course_name', 'BSBA HRM');
+            })
+                ->with([
+                    'course:id,course_name',
+                    'year:id,year_name',
+                    'semester:id,semester_name',
+                    'school_year:id,school_year_name',
+                    'student:id,id_no,last_name,first_name',
+                ])
+                ->where('status', 'cleared')
+                ->orderBy('created_at', 'desc');
+
+            $totalData = $query->count();
+
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $search = $request->input('search.value', '');
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereHas('course', function ($query) use ($search) {
+                            $query->where('course_name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $filteredData = $query->count();
+            $data = $query->skip($start)->take($length)->get();
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalData,
+                'recordsFiltered' => $filteredData,
+                'data' => $data->map(function ($row, $index) use ($start) {
+                    return [
+                        'DT_RowIndex' => $start + $index + 1,
+                        'student_name' => "{$row->student->last_name}, {$row->student->first_name}",
+                        'course_name' => $row->course->course_name ?? 'N/A',
+                        'year_name' => $row->year->year_name ?? 'N/A',
+                        'school_year_name' => $row->school_year->school_year_name ?? 'N/A',
+                        'status' => $row->status,
+                    ];
+                }),
+            ]);
+        }
+
+        return view('admin.student-clearance.clearedClearance');
+    }
+
     public function BSBAFMcleared(Request $request)
     {
         $request->validate([
@@ -748,6 +810,19 @@ class Clearances extends Controller
             ->get();
 
         return view('admin.student-clearance.bsba-mm-print', compact('BSBA_MM'));
+    }
+
+    public function bsbahrmClearedPrint()
+    {
+        $BSBA_MM = Clearance::whereHas('course', function ($query) {
+            $query->where('course_name', 'BSBA HRM');
+        })
+            ->with(['course', 'year', 'semester', 'school_year', 'student'])
+            ->where('status', 'cleared')
+            ->orderBy(Student::select('last_name')->whereColumn('tbl_students.id', 'tbl_clearances.student_id'), 'asc')
+            ->get();
+
+        return view('admin.student-clearance.bsba-hrm-print', compact('BSBA_HRM'));
     }
 
     public function bstmClearedPrint()

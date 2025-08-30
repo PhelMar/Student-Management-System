@@ -11,11 +11,22 @@
                     <th>Student Name</th>
                     <th>Course</th>
                     <th>Year</th>
+                    <th>Semester</th>
                     <th>School Year</th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
+            <tfoot>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Semester</th>
+                    <th>School Year</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>

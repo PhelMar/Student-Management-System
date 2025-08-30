@@ -92,19 +92,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($fourpsData as $fourpsdata)
+            @foreach ($query as $row)
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $fourpsdata->last_name }}, {{ $fourpsdata->first_name }}</td>
-                <td>{{ $fourpsdata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
-                <td>{{ $fourpsdata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
-                <td>{{ $fourpsdata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
-                <td>{{ $fourpsdata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
+                <td>{{$loop->iteration}}</td>
+                <td>{{$row->student->first_name}} {{$row->student->last_name}}</td>
+                <td>{{$row->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$row->year->year_name ?? 'N/A'}}</td>
+                <td>{{$row->semester->semester_name ?? 'N/A'}}</td>
+                <td>{{$row->schoolYear->school_year_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="5" class="total">Total 4P's Students</td>
-                <td class="total">{{ $fourpsData->count() }}</td>
+                <td class="total">{{ $totalData }}</td>
             </tr>
         </tbody>
     </table>

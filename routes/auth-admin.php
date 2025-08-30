@@ -187,6 +187,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/bsit/print', [Clearances::class, 'bsitClearedPrint'])->name('admin.bsit.print');
     Route::get('/bsbafm/print', [Clearances::class, 'bsbafmClearedPrint'])->name('admin.bsbafm.print');
     Route::get('/bsbamm/print', [Clearances::class, 'bsbammClearedPrint'])->name('admin.bsbamm.print');
+    Route::get('/bsbahrm/print', [Clearances::class, 'bsbahrmClearedPrint'])->name('admin.bsbahrm.print');
     Route::get('/bstm/print', [Clearances::class, 'bstmClearedPrint'])->name('admin.bstm.print');
     Route::get('/bsedenglish/print', [Clearances::class, 'bsedenglishClearedPrint'])->name('admin.bsedenglish.print');
     Route::get('/bsedvalues/print', [Clearances::class, 'bsedvaluesClearedPrint'])->name('admin.bsedvalues.print');
@@ -202,6 +203,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/clearance/BSTMclearedStudentDisplay', [Clearances::class, 'BSTMcleared'])->name('admin.BSTMcleared.display');
     Route::get('/clearance/BSBA-FMclearedStudentDisplay', [Clearances::class, 'BSBAFMcleared'])->name('admin.BSBAFMcleared.display');
     Route::get('/clearance/BSBA-MMclearedStudentDisplay', [Clearances::class, 'BSBAMMcleared'])->name('admin.BSBAMMcleared.display');
+    Route::get('/clearance/BSBA-HRMclearedStudentDisplay', [Clearances::class, 'BSBAHRMcleared'])->name('admin.BSBAHRMcleared.display');
     Route::get('/clearance/BEEDclearedStudentDisplay', [Clearances::class, 'BEEDcleared'])->name('admin.BEEDcleared.display');
     Route::get('/clearance/BSED-SOCIAL-STUDIESclearedStudentDisplay', [Clearances::class, 'BSEDSOCIALSTUDIEScleared'])->name('admin.BSEDSOCIALSTUDIEScleared.display');
     Route::get('/clearance/BSED-ENGLISHclearedStudentDisplay', [Clearances::class, 'BSEDENGLISHcleared'])->name('admin.BSEDENGLISHcleared.display');

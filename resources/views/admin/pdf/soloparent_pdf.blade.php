@@ -91,19 +91,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($soloparentData as $soloparentdata)
+            @foreach ($query as $row)
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $soloparentdata->last_name }}, {{ $soloparentdata->first_name }}</td>
-                <td>{{ $soloparentdata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
-                <td>{{ $soloparentdata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
-                <td>{{ $soloparentdata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
-                <td>{{ $soloparentdata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
+                <td>{{$loop->iteration}}</td>
+                <td>{{$row->student->first_name}} {{$row->student->last_name}}</td>
+                <td>{{$row->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$row->year->year_name ?? 'N/A'}}</td>
+                <td>{{$row->semester->semester_name ?? 'N/A'}}</td>
+                <td>{{$row->schoolYear->school_year_name ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="5" class="total">Total Solo Parent Students</td>
-                <td class="total">{{ $soloparentData->count() }}</td>
+                <td class="total">{{ $totalData }}</td>
             </tr>
         </tbody>
     </table>

@@ -40,6 +40,9 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="BSCRIM-tab" data-bs-toggle="tab" href="#BSCRIM" role="tab" aria-controls="BSCRIM" aria-selected="false">BSCRIM</a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="BSCRIM-tab" data-bs-toggle="tab" href="#BSBA_HRM" role="tab" aria-controls="BSBA_HRM" aria-selected="false">BSBA HRM</a>
+            </li>
         </ul>
     </div>
 
@@ -93,6 +96,11 @@
             @include('admin.student-clearance.bscrim-table9')
             <a href="{{ route('admin.bscrim.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
         </div>
+
+        <div class="tab-pane fade" id="BSBA_HRM" role="tabpanel" aria-labelledby="BSBA_HRM-tab">
+            @include('admin.student-clearance.bsba-hrm-table8')
+            <a href="{{ route('admin.bsbahrm.print') }}" target="_blank" class="btn btn-primary mt-2">Print</a>
+        </div>
     </div>
 </div>
 
@@ -101,6 +109,7 @@
     const BSTMUrl = "{{route('admin.BSTMcleared.display')}}";
     const BSBAFMUrl = "{{route('admin.BSBAFMcleared.display')}}";
     const BSBAMMUrl = "{{route('admin.BSBAMMcleared.display')}}";
+    const BSBAHRMUrl = "{{route('admin.BSBAHRMcleared.display')}}";
     const BEEDUrl = "{{route('admin.BEEDcleared.display')}}";
     const BSEDSOCIALSTUDIESUrl = "{{route('admin.BSEDSOCIALSTUDIEScleared.display')}}";
     const BSEDENGLISHUrl = "{{route('admin.BSEDENGLISHcleared.display')}}";
@@ -125,5 +134,6 @@
 <script src="{{asset('admin/js/BSED_ENGLISH.js')}}"></script>
 <script src="{{asset('admin/js/BSED_VALUES.js')}}"></script>
 <script src="{{asset('admin/js/BSCRIM.js')}}"></script>
+<script src="{{asset('admin/js/BSBA_HRM.js')}}"></script>
 
 @endsection

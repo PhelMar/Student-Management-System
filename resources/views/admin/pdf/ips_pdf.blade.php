@@ -92,20 +92,20 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($ipsData as $ipsdata)
+          @foreach ($query as $row)
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $ipsdata->last_name }}, {{ $ipsdata->first_name }}</td>
-                <td>{{ $ipsdata->latestRecord?->course?->course_name ?? 'N/A' }}</td>
-                <td>{{ $ipsdata->latestRecord?->year?->year_name ?? 'N/A' }}</td>
-                <td>{{ $ipsdata->latestRecord?->semester?->semester_name ?? 'N/A' }}</td>
-                <td>{{ $ipsdata->latestRecord?->schoolYear?->school_year_name ?? 'N/A' }}</td>
-                <td>{{ $ipsdata->ips_remarks ?? 'N/A' }}</td>
+                <td>{{$loop->iteration}}</td>
+                <td>{{$row->student->first_name}} {{$row->student->last_name}}</td>
+                <td>{{$row->course?->course_name ?? 'N/A'}}</td>
+                <td>{{$row->year->year_name ?? 'N/A'}}</td>
+                <td>{{$row->semester->semester_name ?? 'N/A'}}</td>
+                <td>{{$row->schoolYear->school_year_name ?? 'N/A'}}</td>
+                <td>{{$row->student->ips_remarks ?? 'N/A'}}</td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="6" class="total">Total IPS Students</td>
-                <td class="total">{{ $ipsData->count() }}</td>
+                <td class="total">{{ $totalData }}</td>
             </tr>
         </tbody>
     </table>
