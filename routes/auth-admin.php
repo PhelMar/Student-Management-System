@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
     Route::get('/student-counts', [StudentController::class, 'getMunicipalStudentCount'])->name('admin.students.getMunicipalStudentCount');
     Route::get('/students/municipality/list/data', [StudentController::class, 'municipalStudentsList'])->name('admin.students.municipalStudentsList');
     Route::get('/students/municipality/{municipality_id}', [StudentController::class, 'showByMunicipality'])->name('admin.students.byMunicipality');
+    Route::get('/students/getSemesterChartData/{municipality_id}/chart-data', [StudentController::class, 'getSemesterChartData'])->name('admin.students.getSemesterChartData');
     Route::get('/students/municipal-barangay-counts', [StudentController::class, 'municipalBarangayCounts'])->name('admin.students.municipalBarangayCounts');
 
 
@@ -63,7 +64,7 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
 
     Route::get('/violations/create', [ViolationController::class, 'create'])->name('admin.violations.create');
     Route::post('/violations/store', [ViolationController::class, 'store'])->name('admin.violations.store');
-    Route::get('/admin/get-student', [ViolationController::class, 'getStudent'])->name('admin.violations.getStudent');
+    Route::get('/get-violation-student', [ViolationController::class, 'getStudent'])->name('admin.violations.getStudent');
 
     Route::get('/violations-data', [ViolationController::class, 'getViolationsData'])->name('admin.violations.chart-data');
     Route::get('/violations/data', [ViolationController::class, 'getBarViolationsData'])->name('admin.violations.bar-data');
@@ -73,13 +74,13 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->group(func
 
     Route::get('/organizations/create', [OrganizationController::class, 'create'])->name('admin.organizations.create');
     Route::post('/organizations/store', [OrganizationController::class, 'store'])->name('admin.organizations.store');
-    Route::get('/get-student', [OrganizationController::class, 'getStudent'])->name('admin.organizations.getStudent');
+    Route::get('/get-organization-student', [OrganizationController::class, 'getStudent'])->name('admin.organizations.getStudent');
     Route::get('/organizations/display', [OrganizationController::class, 'display'])->name('admin.organizations.display');
     Route::delete('/organizations/delete/{id}', [OrganizationController::class, 'delete'])->name('admin.organizations.delete');
 
     Route::get('/clearance/create', [Clearances::class, 'create'])->name('admin.clearance.create');
     Route::post('/clearance/store', [Clearances::class, 'store'])->name('admin.clearance.store');
-    Route::get('/get-student', [Clearances::class, 'getStudent'])->name('admin.clearance.getStudent');
+    Route::get('/get-clearance-student', [Clearances::class, 'getStudent'])->name('admin.clearance.getStudent');
     Route::get('/clearance/display', [Clearances::class, 'display'])->name('admin.clearance.display');
     Route::get('/clearance/cleared/{id}', [Clearances::class, 'clearedStudent'])->name('admin.clearance.cleared');
     Route::get('/clearance/clearedStudentDisplay', [Clearances::class, 'clearedStudentDisplay'])->name('admin.clearedStudentDisplay.display');

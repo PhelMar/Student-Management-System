@@ -14,7 +14,7 @@
             text: "{{session('success')}}",
             icon: 'success',
             confirmButtonText: 'OK',
-            timer: 1200
+            timer: 2000
         });
     });
 </script>
@@ -23,10 +23,10 @@
     document.addEventListener("DOMContentLoaded", function() {
         Swal.fire({
             title: 'Error!',
-            text: "{{session('error')}}",
+            html: "{!! session('error') !!}",
             icon: 'error',
             confirmButtonText: 'OK',
-            timer: 1200
+            timer: 5000
         });
     });
 </script>

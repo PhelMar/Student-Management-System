@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Validation\Rule;
 
@@ -208,6 +209,7 @@ class StudentController extends Controller
         return response()->json(['count' => $activeCount]);
     }
 
+
     public function getMunicipalStudentCount()
     {
         $current = SchoolHelper::getCurrentSchoolYearAndSemester();
@@ -328,6 +330,39 @@ class StudentController extends Controller
         $municipality = Municipality::where('citymun_code', trim($municipality_id))->firstOrFail();
         return view('admin.students.by_municipality', compact('municipality'));
     }
+
+    public function getSemesterChartData($municipality_id)
+    {
+        $municipality = Municipality::where('citymun_code', trim($municipality_id))->firstOrFail();
+
+        $semesterCounts = StudentRecord::query()
+            ->join('tbl_students', 'student_records.student_id', '=', 'tbl_students.id')
+            ->join('school_years', 'student_records.school_year_id', '=', 'school_years.id')
+            ->join('semesters', 'student_records.semester_id', '=', 'semesters.id')
+            ->where('tbl_students.current_municipality_id', $municipality->citymun_code)
+            ->where('tbl_students.status', 'active')
+            ->select(
+                'school_years.school_year_name',
+                'semesters.semester_name',
+                DB::raw('COUNT(student_records.id) as count')
+            )
+            ->groupBy('school_years.school_year_name', 'semesters.semester_name')
+            ->orderBy('school_years.school_year_name', 'asc')
+            ->orderByRaw("FIELD(semesters.semester_name, '1st Semester', '2nd Semester', 'Summer')")
+            ->get()
+            ->map(function ($r) {
+                return [
+                    'school_year' => $r->school_year_name,
+                    'semester'    => $r->semester_name,
+                    'count'       => $r->count,
+                ];
+            });
+
+        return response()->json($semesterCounts);
+    }
+
+
+
 
     public function municipalBarangayCounts(Request $request)
     {
@@ -598,24 +633,24 @@ class StudentController extends Controller
             $request->merge(['pwd_remarks_id' => null]);
         }
 
-        $validatedData = $request->validate([
-            'id_no' => 'required|digits:10|unique:tbl_students,id_no',
+        $validator = Validator::make($request->all(), [
+            'contact_no' => 'required|digits:11',
+            'email_address' => 'required|email|unique:tbl_students,email_address',
             'first_name' => 'required|max:40',
             'middle_name' => 'nullable|max:40',
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
-            'birthdate' => 'required|date',
+            'birthdate' => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
-            'contact_no' => 'required|digits:11',
-            'email_address' => 'required|email|unique:tbl_students,email_address',
+            'id_no' => 'required|digits:10|unique:tbl_students,id_no',
             'facebook_account' => 'required|max:50',
             'dialect_id' => 'required|exists:dialects,id',
             'student_religion_id' => 'required|exists:religions,id',
             'stay_id' => 'required|exists:stays,id',
             'fathers_name' => 'nullable|max:90',
-            'fathers_birthdate' => 'nullable|date',
+            'fathers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
             'fathers_place_of_birth' => 'nullable',
             'fathers_contact_no' => 'nullable|digits:11',
             'fathers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -623,7 +658,7 @@ class StudentController extends Controller
             'fathers_religion_id' => 'nullable|exists:religions,id',
             'number_of_fathers_sibling' => 'nullable|integer',
             'mothers_name' => 'nullable|max:90',
-            'mothers_birthdate' => 'nullable|date',
+            'mothers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
             'mothers_place_of_birth' => 'nullable',
             'mothers_contact_no' => 'nullable|digits:11',
             'mothers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -672,8 +707,18 @@ class StudentController extends Controller
             'mothers_purok' => 'nullable|string|max:100',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', implode('<br>', $validator->errors()->all()));
+        }
+
+        $validatedData = $validator->validated();
         $validatedData['age'] = Carbon::parse($validatedData['birthdate'])->age;
+
         $student = Student::create($validatedData);
+
 
         StudentRecord::create([
             'student_id'     => $student->id,
@@ -683,13 +728,7 @@ class StudentController extends Controller
             'school_year_id' => $request->school_year_id,
         ]);
 
-        if ($student) {
-            session()->flash('success', 'Added Successfully');
-            return redirect()->route('admin.students.create');
-        } else {
-            session()->flash('error', 'Error occured');
-            return redirect()->route('admin.students.create');
-        }
+        return redirect()->route('admin.students.create')->with('success', 'Added Successfully');
     }
 
     public function storeStudent(Request $request)
@@ -698,24 +737,24 @@ class StudentController extends Controller
             $request->merge(['pwd_remarks_id' => null]);
         }
 
-        $validatedData = $request->validate([
-            'id_no' => 'required|digits:10|unique:tbl_students,id_no',
+        $validator = Validator::make($request->all(), [
+            'contact_no' => 'required|digits:11',
+            'email_address' => 'required|email|unique:tbl_students,email_address',
             'first_name' => 'required|max:40',
             'middle_name' => 'nullable|max:40',
             'last_name' => 'required|max:40',
             'nick_name' => 'nullable|max:40',
             'gender_id' => 'required|exists:genders,id',
-            'birthdate' => 'required|date',
+            'birthdate' => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
             'place_of_birth' => 'required',
             'birth_order_among_sibling' => 'required|integer',
-            'contact_no' => 'required|digits:11',
-            'email_address' => 'required|email|unique:tbl_students,email_address',
+            'id_no' => 'required|digits:10|unique:tbl_students,id_no',
             'facebook_account' => 'required|max:50',
             'dialect_id' => 'required|exists:dialects,id',
             'student_religion_id' => 'required|exists:religions,id',
             'stay_id' => 'required|exists:stays,id',
             'fathers_name' => 'nullable|max:90',
-            'fathers_birthdate' => 'nullable|date',
+            'fathers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
             'fathers_place_of_birth' => 'nullable',
             'fathers_contact_no' => 'nullable|digits:11',
             'fathers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -723,7 +762,7 @@ class StudentController extends Controller
             'fathers_religion_id' => 'nullable|exists:religions,id',
             'number_of_fathers_sibling' => 'nullable|integer',
             'mothers_name' => 'nullable|max:90',
-            'mothers_birthdate' => 'nullable|date',
+            'mothers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
             'mothers_place_of_birth' => 'nullable',
             'mothers_contact_no' => 'nullable|digits:11',
             'mothers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -772,7 +811,16 @@ class StudentController extends Controller
             'mothers_purok' => 'nullable|string|max:100',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', implode('<br>', $validator->errors()->all()));
+        }
+
+        $validatedData = $validator->validated();
         $validatedData['age'] = Carbon::parse($validatedData['birthdate'])->age;
+
         $student = Student::create($validatedData);
 
         StudentRecord::create([
@@ -782,14 +830,7 @@ class StudentController extends Controller
             'semester_id'    => $request->semester_id,
             'school_year_id' => $request->school_year_id,
         ]);
-
-        if ($student) {
-            session()->flash('success', 'Added Successfully');
-            return redirect()->route('admin.students.createStudent');
-        } else {
-            session()->flash('error', 'Error occured');
-            return redirect()->route('admin.students.createStudent');
-        }
+        return redirect()->route('admin.students.create')->with('success', 'Added Successfully');
     }
     public function edit($hashId)
     {
@@ -819,6 +860,9 @@ class StudentController extends Controller
             $school_years = SchoolYear::all();
             $highest_educations = HighestEducation::all();
             $incomes = Income::all();
+            $studentRecord = StudentRecord::where('student_id', $students->id)
+                ->first();
+
             $parents_status = ParentStatuses::all();
             $provinces = Province::orderBy('prov_desc', 'asc')->get();
             $municipalities = Municipality::where('prov_code', $students->current_province_id)->get();
@@ -841,7 +885,8 @@ class StudentController extends Controller
                 'provinces',
                 'municipalities',
                 'barangays',
-                'pwd_remarks'
+                'pwd_remarks',
+                'studentRecord'
             ));
         } catch (Exception $e) {
             abort(404, $e->getMessage());
@@ -905,7 +950,7 @@ class StudentController extends Controller
                 'last_name' => 'required|max:40',
                 'nick_name' => 'nullable|max:40',
                 'gender_id' => 'required|exists:genders,id',
-                'birthdate' => 'required|date',
+                'birthdate' => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
                 'place_of_birth' => 'required',
                 'birth_order_among_sibling' => 'required|integer',
                 'contact_no' => 'required|digits:11',
@@ -915,7 +960,7 @@ class StudentController extends Controller
                 'student_religion_id' => 'required|exists:religions,id',
                 'stay_id' => 'required|exists:stays,id',
                 'fathers_name' => 'nullable|max:90',
-                'fathers_birthdate' => 'nullable|date',
+                'fathers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
                 'fathers_place_of_birth' => 'nullable',
                 'fathers_contact_no' => 'nullable|digits:11',
                 'fathers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -923,7 +968,7 @@ class StudentController extends Controller
                 'fathers_religion_id' => 'nullable|exists:religions,id',
                 'number_of_fathers_sibling' => 'nullable|integer',
                 'mothers_name' => 'nullable|max:90',
-                'mothers_birthdate' => 'nullable|date',
+                'mothers_birthdate' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(30)->format('Y-m-d')],
                 'mothers_place_of_birth' => 'nullable',
                 'mothers_contact_no' => 'nullable|digits:11',
                 'mothers_highest_education_id' => 'nullable|exists:highest_education,id',
@@ -967,9 +1012,7 @@ class StudentController extends Controller
                 'mothers_barangay_id' => 'nullable|exists:baranggays,brgy_code',
                 'mothers_purok' => 'nullable|string|max:100',
             ];
-
-            $validatedData = $request->validate($rules);
-
+            $validator = Validator::make($request->all(), $rules);
 
             $student = Student::findOrFail($id);
 
@@ -1041,6 +1084,14 @@ class StudentController extends Controller
             $student->scholarship_remarks = $request->input('scholarship_remarks');
 
 
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput()
+                    ->with('error', implode('<br>', $validator->errors()->all()));
+            }
+
+            $validatedData = $validator->validated();
             $validatedData['age'] = Carbon::parse($validatedData['birthdate'])->age;
 
             $student->update($validatedData);
@@ -1053,14 +1104,7 @@ class StudentController extends Controller
                 'school_year_id' => $request->school_year_id,
             ]);
 
-
-            if ($student) {
-                session()->flash('success', 'Updated Successfully');
-                return redirect()->route('admin.students.display');
-            } else {
-                session()->flash('error', 'Error occured');
-                return redirect()->route('admin.students.edit');
-            }
+            return redirect()->route('admin.students.display')->with('success', 'Updated Successfully');
         } catch (Exception $e) {
             return redirect()->route('admin.students.display')->with('error', 'Failed to update student' . $e->getMessage());
         }
@@ -1996,15 +2040,31 @@ class StudentController extends Controller
 
     public function getActiveStudentsStats()
     {
-        $activeStudents = DB::table('tbl_students')
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-            ->where('status', 'active')
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
+        $activeStudents = DB::table('student_records')
+            ->join('tbl_students', 'student_records.student_id', '=', 'tbl_students.id')
+            ->join('school_years', 'student_records.school_year_id', '=', 'school_years.id')
+            ->join('semesters', 'student_records.semester_id', '=', 'semesters.id')
+            ->where('tbl_students.status', 'active')
+            ->select(
+                'school_years.school_year_name',
+                'semesters.semester_name',
+                DB::raw('COUNT(tbl_students.id) as count')
+            )
+            ->groupBy('school_years.school_year_name', 'semesters.semester_name')
+            ->orderBy('school_years.school_year_name')
+            ->orderBy('semesters.semester_name')
+            ->get()
+            ->map(function ($r) {
+                return [
+                    'school_year' => $r->school_year_name,
+                    'semester' => $r->semester_name,
+                    'count' => $r->count,
+                ];
+            });
 
         return response()->json($activeStudents);
     }
+
 
     public function ipsPrint(Request $request)
     {

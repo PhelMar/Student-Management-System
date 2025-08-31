@@ -7,9 +7,29 @@
     <button onclick="goBack()" class="btn btn-primary mt-3">Go Back</button>
 </div>
 @if (session('success'))
-<div id="success-alert" class="alert alert-success" role="alert">
-    {{session('success')}}
-</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Success!',
+            text: "{{session('success')}}",
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 2000
+        });
+    });
+</script>
+@elseif (session('error'))
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'Error!',
+            html: "{!! session('error') !!}",
+            icon: 'error',
+            confirmButtonText: 'OK',
+            timer: 5000
+        });
+    });
+</script>
 @endif
 <div class="card">
     <div class="card-header text-white" style="background-color: #0A7075">Edit Student Information</div>

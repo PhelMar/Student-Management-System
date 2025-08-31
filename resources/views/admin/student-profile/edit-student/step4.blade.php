@@ -7,7 +7,7 @@
         <div class="mb-4">
             <label for="fathers_name" class="form-label" style="font-weight: bold;">Full Name</label>
             <input type="text" class="form-control @error('fathers_name') is-invalid @enderror"
-                name="fathers_name" value="{{ old('fathers_name', $students->fathers_name) }}">
+                name="fathers_name" value="{{ old('fathers_name', $students->fathers_name) }}" id="fathers_name">
         </div>
         <div class="mb-4">
             <label for="" class="form-label" style="font-weight: bold;">Province</label>

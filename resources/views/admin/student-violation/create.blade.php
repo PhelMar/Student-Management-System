@@ -20,8 +20,8 @@
                 <div class="col-xl-6 col-md-6">
                     <div class="mb-4">
                         <label for="" class="form-label">ID NO</label>
-                        <input type="text" class="form-control @error('id_no') is-invalid @enderror" name="id_no"
-                            id="id_no">
+                        <input type="text" class="form-control @error('student_id') is-invalid @enderror" name="student_id"
+                            id="student_id">
                         <div id="error-message"></div>
                     </div>
                     <div class="mb-4">
@@ -85,72 +85,87 @@
 </div>
 
 <script>
-    function fetchStudent() {
-        const id_no = $('#id_no').val();
-        const getStudentUrl = "{{ route('admin.violations.getStudent') }}";
-
-        $.ajax({
-            url: getStudentUrl,
-            method: 'GET',
-            data: {
-                id_no: id_no
-            },
-            success: function(response) {
-                $('#error-message').text('');
-
-                $('#first_name').val(response.student.first_name);
-                $('#last_name').val(response.student.last_name);
-                $('#course_name').val(response.student.course.course_name);
-                $('#year_name').val(response.student.year.year_name);
-                $('#semester_name').val(response.student.semester.semester_name);
-                $('#school_year_name').val(response.student.school_year.school_year_name);
-
-                $('#course_id').val(response.student.course_id);
-                $('#year_id').val(response.student.year_id);
-                $('#semester_id').val(response.student.semester_id);
-                $('#school_year_id').val(response.student.school_year_id);
-            },
-            error: function(xhr) {
-                if (xhr.status === 404) {
-                    $('#error-message').text(xhr.responseJSON.message).css('color', 'red');
-
-                    $('#first_name').val('');
-                    $('#last_name').val('');
-                    $('#course_name').val('');
-                    $('#year_name').val('');
-                    $('#semester_name').val('');
-                    $('#school_year_name').val('');
-                    $('#remarks').val('');
-
-                    $('#course_id').val('');
-                    $('#year_id').val('');
-                    $('#semester_id').val('');
-                    $('#school_year_id').val('');
-                }
-            }
-        });
-    }
-
-    $(document).ready(function() {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        $('#id_no').on('blur', fetchStudent); // when user leaves the input field
-    });
-
-
-
-    $(document).ready(function() {
-        const successAlert = $('#success-alert');
-        if (successAlert.length) {
-            setTimeout(function() {
-                successAlert.fadeOut();
-                $('#addStudentViolationForm')[0].reset();
-            }, 3000);
+    $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
+    $('#student_id').on('change', function () {
+        const id_no = $(this).val().trim();
+
+        if (!id_no) {
+            clearStudentFields();
+            return;
+        }
+
+        $.ajax({
+            url: '/admin/get-violation-student',
+            method: 'GET',
+            data: { id_no: id_no },
+            success: function (response) {
+                if (response && response.student) {
+                    const s = response.student;
+
+                    // Student info
+                    $('#first_name').val(s.first_name ?? '');
+                    $('#last_name').val(s.last_name ?? '');
+
+                    // Course
+                    $('#course_name').val(s.course ?? '');
+                    $('#course_id').val(s.course_id ?? ''); // must not be null
+
+                    // Year
+                    $('#year_name').val(s.year ?? '');
+                    $('#year_id').val(s.year_id ?? '');
+
+                    // Semester
+                    $('#semester_name').val(s.semester ?? '');
+                    $('#semester_id').val(s.semester_id ?? '');
+
+                    // School year
+                    $('#school_year_name').val(s.school_year ?? '');
+                    $('#school_year_id').val(s.school_year_id ?? '');
+                } else {
+                    clearStudentFields();
+                    alert('Student not found.');
+                }
+            },
+            error: function () {
+                clearStudentFields();
+                alert('Error fetching student. Please try again.');
+            }
+        });
+    });
+
+    function clearStudentFields() {
+        $('#first_name, #last_name, #course_name, #year_name, #semester_name, #school_year_name').val('');
+        $('#course_id, #year_id, #semester_id, #school_year_id').val('');
+    }
+
+    $('#addStudentViolationForm').on('submit', function(e) {
+    const courseId = parseInt($('#course_id').val());
+    const yearId = parseInt($('#year_id').val());
+    const semesterId = parseInt($('#semester_id').val());
+    const schoolYearId = parseInt($('#school_year_id').val());
+
+    if (!courseId || !yearId || !semesterId || !schoolYearId) {
+        e.preventDefault();
+        alert('Please select a valid student with complete records.');
+    }
+});
+
+
+    // Success alert fade out
+    const successAlert = $('#success-alert');
+    if (successAlert.length) {
+        setTimeout(function () {
+            successAlert.fadeOut();
+            $('#addStudentViolationForm')[0].reset();
+        }, 3000);
+    }
+});
+
 </script>
 @endsection

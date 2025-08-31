@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\SchoolYear;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Models\StudentRecord;
 use App\Models\Violation;
 use App\Models\ViolationsType;
 use App\Models\Year;
@@ -39,43 +40,41 @@ class ViolationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_no' => 'required|exists:tbl_students,id_no',
+            'student_id' => 'required|exists:tbl_students,id_no',
             'violations_type_id' => 'required|exists:violations_type,id',
             'violations_date' => 'required|date',
             'remarks' => 'required|string|max:255',
+            'course_id' => 'required|integer|min:1',
+            'year_id' => 'required|integer|min:1',
+            'semester_id' => 'required|integer|min:1',
+            'school_year_id' => 'required|integer|min:1',
         ]);
 
-        $student = Student::where('id_no', $request->id_no)->first();
-
+        // Fetch student
+        $student = Student::where('id_no', $request->student_id)->first();
         if (!$student) {
-            return redirect()->back()->withErrors(['id_no' => 'Student not found.']);
+            return redirect()->back()->withErrors(['student_id' => 'Student not found.']);
         }
 
-        $latestRecord = $student->latestRecord;
-
-        if (!$latestRecord) {
-            return redirect()->back()->withErrors(['id_no' => 'No student record found for this student.']);
-        }
-
+        // Calculate violations_level
         $lastViolation = Violation::where('student_id', $student->id)
-            ->where('semester_id', $latestRecord->semester_id)
-            ->where('school_year_id', $latestRecord->school_year_id)
+            ->where('semester_id', $request->semester_id)
+            ->where('school_year_id', $request->school_year_id)
             ->latest('created_at')
             ->first();
 
-
         $violationsLevel = $lastViolation ? ($lastViolation->violations_level + 1) : 1;
 
-
+        // Insert violation using hidden inputs from the form
         Violation::create([
             'student_id' => $student->id,
             'violations_type_id' => $request->violations_type_id,
             'violations_date' => $request->violations_date,
             'remarks' => $request->remarks,
-            'course_id' => $latestRecord->course_id,
-            'year_id' => $latestRecord->year_id,
-            'semester_id' => $latestRecord->semester_id,
-            'school_year_id' => $latestRecord->school_year_id,
+            'course_id' => $request->course_id,
+            'year_id' => $request->year_id,
+            'semester_id' => $request->semester_id,
+            'school_year_id' => $request->school_year_id,
             'violations_level' => $violationsLevel,
         ]);
 
@@ -84,44 +83,49 @@ class ViolationController extends Controller
 
 
 
-
     public function getStudent(Request $request)
     {
-        $student = Student::where('id_no', $request->id_no)
-            ->whereNotIn('status', ['dropped', 'graduated'])
-            ->with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
-            ])
+        $record = StudentRecord::with([
+            'student:id,id_no,first_name,last_name,status',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) use ($request) {
+                $q->where('id_no', $request->id_no)
+                    ->whereNotIn('status', ['dropped', 'graduated']);
+            })
+            ->orderByDesc('school_year_id')
+            ->orderByDesc('semester_id')
             ->first();
-
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-
-        $record = $student->latestRecord;
 
         if (!$record) {
             return response()->json(['message' => 'No student record found'], 404);
         }
 
+        // Ensure IDs are integers and not null
         return response()->json([
             'student' => [
-                'first_name' => $student->first_name,
-                'last_name' => $student->last_name,
-                'course' => ['course_name' => $record->course?->course_name ?? 'N/A'],
-                'year' => ['year_name' => $record->year?->year_name ?? 'N/A'],
-                'semester' => ['semester_name' => $record->semester?->semester_name ?? 'N/A'],
-                'school_year' => ['school_year_name' => $record->schoolYear?->school_year_name ?? 'N/A'],
-                'course_id' => $record->course_id ?? null,
-                'year_id' => $record->year_id ?? null,
-                'semester_id' => $record->semester_id ?? null,
-                'school_year_id' => $record->school_year_id ?? null,
+                'id_no'          => $record->student->id_no,
+                'first_name'     => $record->student->first_name,
+                'last_name'      => $record->student->last_name,
+
+                'course'         => $record->course?->course_name ?? 'N/A',
+                'course_id'      => $record->course?->id ?? 0,
+
+                'year'           => $record->year?->year_name ?? 'N/A',
+                'year_id'        => $record->year?->id ?? 0,
+
+                'semester'       => $record->semester?->semester_name ?? 'N/A',
+                'semester_id'    => $record->semester?->id ?? 0,
+
+                'school_year'    => $record->schoolYear?->school_year_name ?? 'N/A',
+                'school_year_id' => $record->schoolYear?->id ?? 0,
             ]
         ]);
     }
+
 
 
 

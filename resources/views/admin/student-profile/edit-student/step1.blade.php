@@ -165,3 +165,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+    let today = new Date();
+    let year = today.getFullYear() - 18;
+    let month = (today.getMonth() + 1).toString().padStart(2, '0');
+    let day = today.getDate().toString().padStart(2, '0');
+    let maxDate = `${year}-${month}-${day}`;
+
+    let $birthdate = $('input[name="birthdate"]');
+    $birthdate.attr('max', maxDate);
+
+    $birthdate.on('input', function() {
+        if (this.value > maxDate) {
+            $(this).val('');
+            alert('You must be at least 18 years old.');
+        }
+    });
+
+});
+
+</script>

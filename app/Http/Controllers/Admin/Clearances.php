@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\SchoolYear;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Models\StudentRecord;
 use App\Models\Year;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -56,21 +57,20 @@ class Clearances extends Controller
 
     public function getStudent(Request $request)
     {
-        $student = Student::where('id_no', $request->id_no)
-            ->whereNotIn('status', ['dropped', 'graduated'])
-            ->with([
-                'latestRecord.course:id,course_name',
-                'latestRecord.year:id,year_name',
-                'latestRecord.semester:id,semester_name',
-                'latestRecord.schoolYear:id,school_year_name',
-            ])
+        $record = StudentRecord::with([
+            'student:id,id_no,first_name,last_name,status',
+            'course:id,course_name',
+            'year:id,year_name',
+            'semester:id,semester_name',
+            'schoolYear:id,school_year_name',
+        ])
+            ->whereHas('student', function ($q) use ($request) {
+                $q->where('id_no', $request->id_no)
+                    ->whereNotIn('status', ['dropped', 'graduated']);
+            })
+            ->orderByDesc('school_year_id')
+            ->orderByDesc('semester_id')
             ->first();
-
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-
-        $record = $student->latestRecord;
 
         if (!$record) {
             return response()->json(['message' => 'No student record found'], 404);
@@ -78,16 +78,22 @@ class Clearances extends Controller
 
         return response()->json([
             'student' => [
-                'first_name' => $student->first_name,
-                'last_name' => $student->last_name,
-                'course' => ['course_name' => $record->course?->course_name ?? 'N/A'],
-                'year' => ['year_name' => $record->year?->year_name ?? 'N/A'],
-                'semester' => ['semester_name' => $record->semester?->semester_name ?? 'N/A'],
-                'school_year' => ['school_year_name' => $record->schoolYear?->school_year_name ?? 'N/A'],
-                'course_id' => $record->course_id ?? null,
-                'year_id' => $record->year_id ?? null,
-                'semester_id' => $record->semester_id ?? null,
-                'school_year_id' => $record->school_year_id ?? null,
+                'id_no'          => $record->student->id_no,
+                'first_name'     => $record->student->first_name,
+                'last_name'      => $record->student->last_name,
+
+                // ✅ flatten values
+                'course'         => $record->course?->course_name ?? 'N/A',
+                'course_id'      => $record->course?->id ?? null,
+
+                'year'           => $record->year?->year_name ?? 'N/A',
+                'year_id'        => $record->year?->id ?? null,
+
+                'semester'       => $record->semester?->semester_name ?? 'N/A',
+                'semester_id'    => $record->semester?->id ?? null,
+
+                'school_year'    => $record->schoolYear?->school_year_name ?? 'N/A',
+                'school_year_id' => $record->schoolYear?->id ?? null,
             ]
         ]);
     }

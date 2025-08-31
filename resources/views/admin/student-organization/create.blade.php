@@ -94,58 +94,68 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $('#student_id').on('change', function () {
+        const id_no = $(this).val().trim();
+
+        if (!id_no) {
+            clearStudentFields();
+            return;
+        }
+
+        $.ajax({
+            url: '/admin/get-organization-student',
+            method: 'GET',
+            data: { id_no: id_no },
+            success: function (response) {
+                if (response && response.student) {
+                    const s = response.student;
+
+                    // student info
+                    $('#first_name').val(s.first_name || '');
+                    $('#last_name').val(s.last_name || '');
+
+                    // course
+                    $('#course_name').val(s.course || '');
+                    $('#course_id').val(s.course_id || '');
+
+                    // year
+                    $('#year_name').val(s.year || '');
+                    $('#year_id').val(s.year_id || '');
+
+                    // semester
+                    $('#semester_name').val(s.semester || '');
+                    $('#semester_id').val(s.semester_id || '');
+
+                    // school year
+                    $('#school_year_name').val(s.school_year || '');
+                    $('#school_year_id').val(s.school_year_id || '');
+                } else {
+                    clearStudentFields();
+                    alert('Student not found.');
+                }
+            },
+            error: function () {
+                clearStudentFields();
+                alert('Error fetching student. Please try again.');
             }
         });
-        $('#student_id').on('change', function() {
-            const id_no = $(this).val();
-
-            $.ajax({
-                url: '/admin/get-student', // Adjust this URL based on your route
-                method: 'GET',
-                data: {
-                    id_no: id_no
-                },
-                success: function(response) {
-                    $('#error-message').text('');
-
-                    $('#first_name').val(response.student.first_name);
-                    $('#last_name').val(response.student.last_name);
-                    $('#course_name').val(response.student.course.course_name);
-                    $('#year_name').val(response.student.year.year_name);
-                    $('#semester_name').val(response.student.semester.semester_name);
-                    $('#school_year_name').val(response.student.school_year.school_year_name);
-
-                    $('#course_id').val(response.student.course_id);
-                    $('#year_id').val(response.student.year_id);
-                    $('#semester_id').val(response.student.semester_id);
-                    $('#school_year_id').val(response.student.school_year_id);
-                },
-                error: function(xhr) {
-                    if (xhr.status === 404) {
-                        $('#error-message').text(xhr.responseJSON.message).css('color', 'red');
-
-                        $('#first_name').val('');
-                        $('#last_name').val('');
-                        $('#course_name').val('');
-                        $('#year_name').val('');
-                        $('#semester_name').val('');
-                        $('#school_year_name').val('');
-                        $('#organization_types_id').val('');
-                        $('#positions_id').val('');
-
-                        $('#course_id').val('');
-                        $('#year_id').val('');
-                        $('#semester_id').val('');
-                        $('#school_year_id').val('');
-                    }
-                }
-            });
-        });
     });
+
+    function clearStudentFields() {
+        $('#first_name, #last_name, #course_name, #year_name, #semester_name, #school_year_name').val('');
+        $('#course_id, #year_id, #semester_id, #school_year_id').val('');
+    }
+});
+
+
+
 
 
     $(document).ready(function() {

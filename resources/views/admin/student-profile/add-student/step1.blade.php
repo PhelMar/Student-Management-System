@@ -76,7 +76,8 @@
             <select id="current_province" name="current_province_id" class="form-control @error('current_province_id') is-invalid @enderror" required>
                 <option value="">Select Province</option>
                 @foreach($provinces as $province)
-                <option value="{{ $province->prov_code }}" >
+                <option value="{{ $province->prov_code }}"
+                    >
                     {{ $province->prov_desc }}
                 </option>
                 @endforeach
@@ -121,6 +122,10 @@
         </div>
     </div>
     <hr style="border: 2px solid;stroke: black;" />
+    <div class="col-xl-3 col-md-3 mb-3">
+    <input type="checkbox" id="same_as_current" />
+    <label for="same_as_current" style="font-weight: bold;">Same as Current Address</label>
+</div>
     <h5>Permanent Address</h5>
     <div class="col-xl-3 col-md-3">
         <div class="mb-4">
@@ -156,8 +161,73 @@
         <div class="mb-4">
             <label for="" class="form-label" style="font-weight: bold;">Purok/Village</label>
             <input type="text" class="form-control @error('permanent_purok') is-invalid @enderror"
-                name="permanent_purok" value="{{ old('permanent_purok') }}" required>
+                name="permanent_purok" id="permanent_purok" value="{{ old('permanent_purok') }}" required>
             <small class="error-message text-danger"></small>
         </div>
     </div>
 </div>
+
+   <script>
+$('#same_as_current').on('change', function() {
+    if (this.checked) {
+        // Copy Province
+        let currentProvince = $('#current_province').val();
+        $('#permanent_province').val(currentProvince).trigger('change');
+
+        // Wait for municipalities to load via AJAX
+        setTimeout(function() {
+            let currentMunicipality = $('#current_municipality').val();
+            $('#permanent_municipality').val(currentMunicipality).trigger('change');
+
+            // Wait for barangays to load via AJAX
+            setTimeout(function() {
+                let currentBarangay = $('#current_barangay').val();
+                $('#permanent_barangay').val(currentBarangay);
+            }, 500); // adjust timeout to match your AJAX load speed
+        }, 500); 
+
+        $('#permanent_purok').val($('#current_purok').val());
+        // Make selects "readonly" (submit works)
+        $('#permanent_province, #permanent_municipality, #permanent_barangay')
+            .css('pointer-events', 'none')
+            .css('background-color', '#e9ecef');
+
+    } else {
+        // Enable selects again and clear values if needed
+        $('#permanent_province, #permanent_municipality, #permanent_barangay')
+            .css('pointer-events', 'auto')
+            .css('background-color', '');
+
+        $('#permanent_province').val('').trigger('change');
+        $('#permanent_municipality').val('').trigger('change');
+        $('#permanent_barangay').val('');
+
+        // Purok stays editable, not affected
+    }
+});
+
+$(document).ready(function() {
+    // Restrict birthdate to at least 18 years old
+    let today = new Date();
+    let year = today.getFullYear() - 18; // 18 years ago
+    let month = (today.getMonth() + 1).toString().padStart(2, '0'); // months are 0-indexed
+    let day = today.getDate().toString().padStart(2, '0');
+    let maxDate = `${year}-${month}-${day}`;
+
+    let $birthdate = $('input[name="birthdate"]');
+    $birthdate.attr('max', maxDate);
+
+    // Optional: real-time feedback if they type manually
+    $birthdate.on('input', function() {
+        if (this.value > maxDate) {
+            $(this).val(''); // clear invalid date
+            alert('You must be at least 18 years old.'); // simple feedback
+        }
+    });
+});
+
+
+
+</script>
+
+

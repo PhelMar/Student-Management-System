@@ -21,7 +21,7 @@
                 <option value="" disabled selected>Select School Year</option>
                 @foreach ($school_years as $school_year)
                 <option value="{{$school_year->id}}"
-                    {{$students->school_year_id == $school_year->id ? 'selected' : ''}}>
+                    {{$studentRecord && $studentRecord->school_year_id == $school_year->id ? 'selected' : ''}}>
                     {{$school_year->school_year_name}}
                 </option>
                 @endforeach
@@ -36,7 +36,7 @@
                 value="{{ old('semester_id') }}" required>
                 <option value="" disabled selected>Select Semester</option>
                 @foreach ($semesters as $semester)
-                <option value="{{$semester->id}}" {{$students->semester_id == $semester->id ? 'selected' : ''}}>
+                <option value="{{$semester->id}}" {{$studentRecord && $studentRecord->semester_id == $semester->id ? 'selected' : ''}}>
                     {{$semester->semester_name}}
                 </option>
                 @endforeach
@@ -52,7 +52,7 @@
                 value="{{ old('course_id') }}" required>
                 <option value="" disabled selected>Select Course</option>
                 @foreach ($courses as $course)
-                <option value="{{$course->id}}" {{$students->course_id == $course->id ? 'selected' : ''}}>
+                <option value="{{$course->id}}" {{$studentRecord && $studentRecord->course_id == $course->id ? 'selected' : ''}}>
                     {{$course->course_name}}
                 </option>
                 @endforeach
@@ -67,7 +67,7 @@
                 value="{{ old('year_id') }}" required>
                 <option value="" disabled selected>Select Year</option>
                 @foreach ($years as $year)
-                <option value="{{$year->id}}" {{$students->year_id == $year->id ? 'selected' : ''}}>
+                <option value="{{$year->id}}" {{$studentRecord && $studentRecord->year_id == $year->id ? 'selected' : ''}}>
                     {{$year->year_name}}
                 </option>
                 @endforeach
